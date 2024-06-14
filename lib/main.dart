@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/AdminSide/testing.dart';
 import 'package:hakikat_app_new/Home/homepage.dart';
 import 'package:hakikat_app_new/Home/mainpage.dart';
+import 'package:hakikat_app_new/Splashscreen/splashscreen.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/firebase_options.dart';
 
@@ -41,6 +43,6 @@ class MyApp extends StatelessWidget {
               ColorScheme.fromSeed(seedColor: AppColors.greenthemecolor),
           useMaterial3: true,
         ),
-        home: MainPage());
+        home: SplashScreen());
   }
 }

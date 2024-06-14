@@ -109,6 +109,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/AdminSide/adminpanel.dart';
 import 'package:hakikat_app_new/Cart/cart.dart';
 import 'package:hakikat_app_new/Explore/explore.dart';
 import 'package:hakikat_app_new/Home/homepage.dart';
@@ -178,9 +179,7 @@ class _MainPageState extends State<MainPage> {
             Center(
               child: Text('favorite'),
             ),
-            Center(
-              child: Text('account'),
-            )
+            AdminPanel()
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(

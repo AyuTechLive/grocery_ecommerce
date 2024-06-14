@@ -34,13 +34,23 @@ class _ProductDetailsState extends State<ProductDetails> {
             ),
             child: Center(
               child: SizedBox(
-                width: width * 0.69,
-                height: height * 0.21,
-                child: Image.network(
-                  'https://firebasestorage.googleapis.com/v0/b/oneupnoobs-9ee91.appspot.com/o/Vector.png?alt=media&token=bce591e1-fb44-4596-b3ba-f5b739a8d9c1',
-                  fit: BoxFit.fill,
-                ),
-              ),
+                  width: width * 0.69,
+                  height: height * 0.21,
+                  child: ListView.builder(
+                    itemCount: 3,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      return Image.network(
+                        'https://firebasestorage.googleapis.com/v0/b/oneupnoobs-9ee91.appspot.com/o/Vector.png?alt=media&token=bce591e1-fb44-4596-b3ba-f5b739a8d9c1',
+                        fit: BoxFit.fill,
+                      );
+                    },
+                  )
+                  //  Image.network(
+                  //   'https://firebasestorage.googleapis.com/v0/b/oneupnoobs-9ee91.appspot.com/o/Vector.png?alt=media&token=bce591e1-fb44-4596-b3ba-f5b739a8d9c1',
+                  //   fit: BoxFit.fill,
+                  // ),
+                  ),
             ),
           ),
           Row(

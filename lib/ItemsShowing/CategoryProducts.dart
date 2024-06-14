@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Home/Components/items.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
@@ -11,6 +12,17 @@ class CategoryProduct extends StatefulWidget {
 }
 
 class _CategoryProductState extends State<CategoryProduct> {
+  final databaseRef = FirebaseDatabase.instance.ref();
+  List<Map<String, dynamic>> products = [];
+  List<Map<String, dynamic>> filteredProducts = [];
+  final searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screensize = MediaQuery.of(context).size;
@@ -20,6 +32,22 @@ class _CategoryProductState extends State<CategoryProduct> {
       appBar: AppBar(),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: 'Search products...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              onChanged: (value) {
+                filterProducts(value);
+              },
+            ),
+          ),
           Expanded(
             child: GridView.builder(
               shrinkWrap: true,
@@ -31,18 +59,18 @@ class _CategoryProductState extends State<CategoryProduct> {
                 mainAxisSpacing: height * 0.01,
                 crossAxisCount: 2,
               ),
-              itemCount: 5,
+              itemCount: filteredProducts.length,
               itemBuilder: (context, index) {
+                Map<String, dynamic> product = filteredProducts[index];
                 return Items(
-                  price: '100',
-                  img:
-                      'https://firebasestorage.googleapis.com/v0/b/oneupnoobs-9ee91.appspot.com/o/demoitem.png?alt=media&token=182d753f-603f-4fac-a4c9-bd62c4f5f8fc',
-                  onadd: () {},
                   ontap: () {
-                    nextScreen(context, ProductDetails());
+                    // print(product['Product Img']);
                   },
-                  subtitle: '7pcs, Price',
-                  title: 'Organic Bananas',
+                  onadd: () {},
+                  img: product['Product Img'],
+                  price: '100',
+                  title: product['Product Title'] ?? '',
+                  subtitle: product['Product Subtitle'] ?? '',
                 );
               },
             ),
@@ -50,5 +78,39 @@ class _CategoryProductState extends State<CategoryProduct> {
         ],
       ),
     );
+  }
+
+  void filterProducts(String query) {
+    setState(() {
+      filteredProducts = products
+          .where((product) => (product['Product Title'] ?? '')
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
+  void fetchProducts() {
+    databaseRef.onValue.listen((event) {
+      if (event.snapshot.exists) {
+        Map<dynamic, dynamic> data =
+            event.snapshot.value as Map<dynamic, dynamic>;
+        products.clear(); // Clear the existing data
+        data.forEach((key, value) {
+          if (value is Map) {
+            Map<String, dynamic> product = {
+              'Product Title': value['Product Title'],
+              'Product Subtitle': value['Product Subtitle'],
+              'Product Img': value['Product Img'],
+            };
+            setState(() {
+              products.add(product);
+              filteredProducts =
+                  products; // Initialize filteredProducts with all products
+            });
+          }
+        });
+      }
+    });
   }
 }
