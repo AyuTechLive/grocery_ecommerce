@@ -109,6 +109,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/Cart/cart.dart';
 import 'package:hakikat_app_new/Explore/explore.dart';
 import 'package:hakikat_app_new/Home/homepage.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
@@ -173,9 +174,7 @@ class _MainPageState extends State<MainPage> {
           children: [
             HomePage(),
             Explore(),
-            Center(
-              child: Text('cart'),
-            ),
+            Cart(),
             Center(
               child: Text('favorite'),
             ),

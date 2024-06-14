@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "331819345556",
+    "project_id": "hakikat-app-2e038",
+    "storage_bucket": "hakikat-app-2e038.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:331819345556:android:66969f4368389cfa8bb681",
+        "android_client_info": {
+          "package_name": "com.example.hakikat_app_new"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAknVJR6yu7NkcVU0f4k0JqgtC3xikymOc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

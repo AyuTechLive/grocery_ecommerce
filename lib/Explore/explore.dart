@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hakikat_app_new/Explore/components/categorycard.dart';
+import 'package:hakikat_app_new/ItemsShowing/CategoryProducts.dart';
+import 'package:hakikat_app_new/Utils/widget.dart';
 
 class Explore extends StatefulWidget {
   const Explore({super.key});
@@ -81,6 +83,9 @@ class _ExploreState extends State<Explore> {
               itemCount: 5,
               itemBuilder: (context, index) {
                 return CategoryCard(
+                  ontap: () {
+                    nextScreen(context, CategoryProduct());
+                  },
                   color: Color(0x19F8A44C),
                   img: '',
                   title: '',

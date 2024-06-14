@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hakikat_app_new/Home/Components/homecategroyitem.dart';
 import 'package:hakikat_app_new/Home/Components/items.dart';
+import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
+import 'package:hakikat_app_new/Utils/widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -182,7 +184,9 @@ class _HomePageState extends State<HomePage> {
                     img:
                         'https://firebasestorage.googleapis.com/v0/b/oneupnoobs-9ee91.appspot.com/o/demoitem.png?alt=media&token=182d753f-603f-4fac-a4c9-bd62c4f5f8fc',
                     onadd: () {},
-                    ontap: () {},
+                    ontap: () {
+                      nextScreen(context, ProductDetails());
+                    },
                     subtitle: '7pcs, Price',
                     title: 'Organic Bananas',
                   );
