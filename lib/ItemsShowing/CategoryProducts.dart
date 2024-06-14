@@ -32,22 +32,51 @@ class _CategoryProductState extends State<CategoryProduct> {
       appBar: AppBar(),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Search products...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Container(
+              width: width * 0.879,
+              height: height * 0.057,
+              decoration: ShapeDecoration(
+                color: Color(0xFFF1F2F2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
                 ),
               ),
-              onChanged: (value) {
-                filterProducts(value);
-              },
+              child: Center(
+                child: TextFormField(
+                  textAlign: TextAlign.justify,
+                  controller: searchController,
+                  cursorColor: Color(0xFF4C4E4D),
+                  decoration: InputDecoration(
+                      icon: Padding(
+                          padding: EdgeInsets.only(left: width * 0.03),
+                          child: Icon(Icons.search)),
+                      hintText: 'Search Store',
+                      iconColor: Color(0xFF4C4E4D),
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    filterProducts(value);
+                  },
+                ),
+              ),
             ),
-          ),
+          ]),
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: TextField(
+          //     controller: searchController,
+          //     decoration: InputDecoration(
+          //       hintText: 'Search products...',
+          //       prefixIcon: Icon(Icons.search),
+          //       border: OutlineInputBorder(
+          //         borderRadius: BorderRadius.circular(10.0),
+          //       ),
+          //     ),
+          //     onChanged: (value) {
+          //       filterProducts(value);
+          //     },
+          //   ),
+          // ),
           Expanded(
             child: GridView.builder(
               shrinkWrap: true,

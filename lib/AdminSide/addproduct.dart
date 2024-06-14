@@ -24,7 +24,7 @@ class AddProduct extends StatefulWidget {
 class _AddProductState extends State<AddProduct> {
   bool loading = false;
   final postcontroller = TextEditingController();
-  late TextEditingController cousenamecontroller;
+  late TextEditingController categorynamecontroller;
   final productitlecontroller = TextEditingController();
   final mapcontroller = TextEditingController();
   final productpricecontroller = TextEditingController();
@@ -79,14 +79,14 @@ class _AddProductState extends State<AddProduct> {
     fetchCourses();
     // TODO: implement initState
 
-    cousenamecontroller = TextEditingController();
+    categorynamecontroller = TextEditingController();
     storage = FirebaseStorage.instance;
   }
 
   void fetchCourses() async {
     // Fetch courses from Firestore and update the local list
     var querySnapshot =
-        await FirebaseFirestore.instance.collection('Games').get();
+        await FirebaseFirestore.instance.collection('Categories').get();
     for (var doc in querySnapshot.docs) {
       courses.add(doc.id); // Assuming you use document IDs as course names
     }
@@ -132,7 +132,7 @@ class _AddProductState extends State<AddProduct> {
                       child: DropdownButtonHideUnderline(
                         child: DropdownButtonFormField<String>(
                           value: selectedCourse,
-                          hint: Text('Select Game'),
+                          hint: Text('Select Category'),
                           items: courses.map((String course) {
                             return DropdownMenuItem<String>(
                               value: course,
@@ -143,7 +143,8 @@ class _AddProductState extends State<AddProduct> {
                             // Update the selected course state
                             setState(() {
                               selectedCourse = newValue;
-                              cousenamecontroller.text = selectedCourse ?? '';
+                              categorynamecontroller.text =
+                                  selectedCourse ?? '';
                             });
                           },
                         ),
@@ -333,6 +334,7 @@ class _AddProductState extends State<AddProduct> {
                         productsubtitlecontroller.text.toString(),
                     'Product Price': productpricecontroller.text.toString(),
                     'Product Stock': productquantitycontroller.text.toString(),
+                    'Category': categorynamecontroller.text.toString()
                   }).then(
                     (value) {
                       Utils().toastMessage('Post Succesfully Added');

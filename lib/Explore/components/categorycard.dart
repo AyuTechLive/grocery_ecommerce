@@ -43,7 +43,7 @@ class CategoryCard extends StatelessWidget {
             Container(
               height: height * 0.1,
               child: Image.network(
-                'https://firebasestorage.googleapis.com/v0/b/oneupnoobs-9ee91.appspot.com/o/pngfuel%206.png?alt=media&token=811e4e41-bf2c-437d-a839-8c51cabc085d',
+                img,
                 fit: BoxFit.fill,
               ),
             ),
@@ -54,7 +54,7 @@ class CategoryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Fresh Fruits and Vegetable',
+                  title,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF181725),

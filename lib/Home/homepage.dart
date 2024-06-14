@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -22,9 +23,20 @@ List<String> imageUrls = [
 ];
 
 class _HomePageState extends State<HomePage> {
+  final databaseRef = FirebaseDatabase.instance.ref();
+  List<Map<String, dynamic>> products = [];
+  List<Map<String, dynamic>> filteredProducts = [];
+  final searchController = TextEditingController();
   final searchcontroller = TextEditingController();
+
   int _currentIndex = 0;
   final CarouselController _controller = CarouselController();
+  @override
+  void initState() {
+    super.initState();
+    fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screensize = MediaQuery.of(context).size;
@@ -177,19 +189,20 @@ class _HomePageState extends State<HomePage> {
                 separatorBuilder: (context, index) {
                   return SizedBox(width: width * 0.05);
                 },
-                itemCount: 5,
+                itemCount:
+                    filteredProducts.length > 5 ? 5 : filteredProducts.length,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
+                  Map<String, dynamic> product = filteredProducts[index];
                   return Items(
-                    price: '100',
-                    img:
-                        'https://firebasestorage.googleapis.com/v0/b/oneupnoobs-9ee91.appspot.com/o/demoitem.png?alt=media&token=182d753f-603f-4fac-a4c9-bd62c4f5f8fc',
-                    onadd: () {},
                     ontap: () {
-                      nextScreen(context, ProductDetails());
+                      // print(product['Product Img']);
                     },
-                    subtitle: '7pcs, Price',
-                    title: 'Organic Bananas',
+                    onadd: () {},
+                    img: product['Product Img'],
+                    price: '100',
+                    title: product['Product Title'] ?? '',
+                    subtitle: product['Product Subtitle'] ?? '',
                   );
                 },
               ),
@@ -294,17 +307,26 @@ class _HomePageState extends State<HomePage> {
                 separatorBuilder: (context, index) {
                   return SizedBox(width: width * 0.05);
                 },
-                itemCount: 5,
+                itemCount: products
+                            .where((product) => product['BestSelling'] == true)
+                            .length >
+                        5
+                    ? 5
+                    : products
+                        .where((product) => product['BestSelling'] == true)
+                        .length,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
+                  Map<String, dynamic> product = products
+                      .where((product) => product['BestSelling'] == true)
+                      .toList()[index];
                   return Items(
                     price: '100',
-                    img:
-                        'https://firebasestorage.googleapis.com/v0/b/oneupnoobs-9ee91.appspot.com/o/demoitem2.png?alt=media&token=090e999b-f570-465b-b6a5-fe322c3e9988',
+                    img: product['Product Img'],
                     onadd: () {},
                     ontap: () {},
-                    subtitle: '7pcs, Price',
-                    title: 'Organic Bananas',
+                    subtitle: product['Product Subtitle'] ?? '',
+                    title: product['Product Title'] ?? '',
                   );
                 },
               ),
@@ -316,5 +338,46 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void filterProducts(String query) {
+    setState(() {
+      filteredProducts = products
+          .where((product) => (product['Product Title'] ?? '')
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
+  void fetchProducts() {
+    databaseRef.onValue.listen((event) {
+      if (event.snapshot.exists) {
+        Map<dynamic, dynamic> data =
+            event.snapshot.value as Map<dynamic, dynamic>;
+        products.clear(); // Clear the existing data
+        filteredProducts.clear(); // Clear the existing filtered data
+
+        data.forEach((key, value) {
+          if (value is Map) {
+            Map<String, dynamic> product = {
+              'Product Title': value['Product Title'],
+              'Product Subtitle': value['Product Subtitle'],
+              'Product Img': value['Product Img'],
+              'Exclusive':
+                  value.containsKey('Exclusive') && value['Exclusive'] == true,
+              'BestSelling': value.containsKey('BestSelling') &&
+                  value['BestSelling'] == true,
+            };
+            setState(() {
+              products.add(product);
+              if (product['Exclusive'] == true) {
+                filteredProducts.add(product);
+              }
+            });
+          }
+        });
+      }
+    });
   }
 }

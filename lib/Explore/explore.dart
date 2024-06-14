@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hakikat_app_new/Explore/components/categorycard.dart';
+import 'package:hakikat_app_new/Home/Components/items.dart';
 import 'package:hakikat_app_new/ItemsShowing/CategoryProducts.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
@@ -15,7 +18,53 @@ class Explore extends StatefulWidget {
 List<Color> colors = [Color(0xFF181725), Color(0x19F8A44C)];
 
 class _ExploreState extends State<Explore> {
-  final searchcontroller = TextEditingController();
+  final databaseRef = FirebaseDatabase.instance.ref();
+  final CollectionReference _categoriesCollection =
+      FirebaseFirestore.instance.collection('Categories');
+  List<Map<String, dynamic>> products = [];
+  List<Map<String, dynamic>> filteredProducts = [];
+  final searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProducts();
+  }
+
+  void fetchProducts() {
+    databaseRef.onValue.listen((event) {
+      if (event.snapshot.exists) {
+        Map<dynamic, dynamic> data =
+            event.snapshot.value as Map<dynamic, dynamic>;
+        products.clear(); // Clear the existing data
+        data.forEach((key, value) {
+          if (value is Map) {
+            Map<String, dynamic> product = {
+              'Product Title': value['Product Title'],
+              'Product Subtitle': value['Product Subtitle'],
+              'Product Img': value['Product Img'],
+            };
+            setState(() {
+              products.add(product);
+              filteredProducts =
+                  products; // Initialize filteredProducts with all products
+            });
+          }
+        });
+      }
+    });
+  }
+
+  void filterProducts(String query) {
+    setState(() {
+      filteredProducts = products
+          .where((product) => (product['Product Title'] ?? '')
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screensize = MediaQuery.of(context).size;
@@ -23,6 +72,7 @@ class _ExploreState extends State<Explore> {
     final double width = screensize.width;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -55,7 +105,7 @@ class _ExploreState extends State<Explore> {
               child: Center(
                 child: TextFormField(
                   textAlign: TextAlign.justify,
-                  controller: searchcontroller,
+                  controller: searchController,
                   cursorColor: Color(0xFF4C4E4D),
                   decoration: InputDecoration(
                       icon: Padding(
@@ -65,33 +115,109 @@ class _ExploreState extends State<Explore> {
                       iconColor: Color(0xFF4C4E4D),
                       border: InputBorder.none),
                   onChanged: (value) {
-                    setState(() {});
+                    filterProducts(value);
                   },
                 ),
               ),
             ),
           ]),
           Expanded(
-            child: GridView.builder(
-              padding: EdgeInsets.all(width * 0.06),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisSpacing:
-                    width * 0.03, // Space between items horizontally
-                mainAxisSpacing: height * 0.019,
-                crossAxisCount: 2,
-              ),
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return CategoryCard(
-                  ontap: () {
-                    nextScreen(context, CategoryProduct());
-                  },
-                  color: Color(0x19F8A44C),
-                  img: '',
-                  title: '',
-                );
-              },
-            ),
+            child: searchController.text.isEmpty
+                ? StreamBuilder<QuerySnapshot>(
+                    stream: _categoriesCollection.snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+
+                      return GridView.builder(
+                        padding: EdgeInsets.all(width * 0.06),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisSpacing:
+                              width * 0.03, // Space between items horizontally
+                          mainAxisSpacing: height * 0.019,
+                          crossAxisCount: 2,
+                        ),
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          DocumentSnapshot document =
+                              snapshot.data!.docs[index];
+                          Map<String, dynamic> data =
+                              document.data() as Map<String, dynamic>;
+                          return CategoryCard(
+                            ontap: () {
+                              nextScreen(context, CategoryProduct());
+                            },
+                            color: Color(0x19F8A44C),
+                            img: data['GameImg'] ?? '',
+                            title: data['GameName'] ?? '',
+                          );
+                        },
+                      );
+
+                      // ListView(
+                      //   children: snapshot.data!.docs
+                      //       .map((DocumentSnapshot document) {
+                      //     Map<String, dynamic> data =
+                      //         document.data() as Map<String, dynamic>;
+                      //     return ListTile(
+                      //       title: Text(data['GameName'] ?? ''),
+                      //       subtitle: Text(data['GameImg'] ?? ''),
+                      //     );
+                      //   }).toList(),
+                      // );
+                    },
+                  )
+                //  GridView.builder(
+                //     padding: EdgeInsets.all(width * 0.06),
+                //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                //       crossAxisSpacing:
+                //           width * 0.03, // Space between items horizontally
+                //       mainAxisSpacing: height * 0.019,
+                //       crossAxisCount: 2,
+                //     ),
+                //     itemCount: 5,
+                //     itemBuilder: (context, index) {
+                //       return CategoryCard(
+                //         ontap: () {
+                //           nextScreen(context, CategoryProduct());
+                //         },
+                //         color: Color(0x19F8A44C),
+                //         img: '',
+                //         title: '',
+                //       );
+                //     },
+                //   )
+                : GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.all(width * 0.06),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      childAspectRatio: 0.75,
+                      crossAxisSpacing: width * 0.03,
+                      mainAxisSpacing: height * 0.01,
+                      crossAxisCount: 2,
+                    ),
+                    itemCount: filteredProducts.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> product = filteredProducts[index];
+                      return Items(
+                        ontap: () {
+                          print(product['Product Img']);
+                        },
+                        onadd: () {},
+                        img: product['Product Img'] ?? '',
+                        price: '100',
+                        title: product['Product Title'] ?? '',
+                        subtitle: product['Product Subtitle'] ?? '',
+                      );
+                    },
+                  ),
           )
         ],
       ),
