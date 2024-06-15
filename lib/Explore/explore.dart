@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:hakikat_app_new/Explore/components/categorycard.dart';
 import 'package:hakikat_app_new/Home/Components/items.dart';
 import 'package:hakikat_app_new/ItemsShowing/CategoryProducts.dart';
+import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class Explore extends StatefulWidget {
@@ -43,6 +44,8 @@ class _ExploreState extends State<Explore> {
               'Product Title': value['Product Title'],
               'Product Subtitle': value['Product Subtitle'],
               'Product Img': value['Product Img'],
+              'Product Price': value['Product Price'],
+              'Product Stock': value['Product Stock']
             };
             setState(() {
               products.add(product);
@@ -151,11 +154,15 @@ class _ExploreState extends State<Explore> {
                               document.data() as Map<String, dynamic>;
                           return CategoryCard(
                             ontap: () {
-                              nextScreen(context, CategoryProduct());
+                              nextScreen(
+                                  context,
+                                  CategoryProduct(
+                                    categoryname: data['Category Name'],
+                                  ));
                             },
                             color: Color(0x19F8A44C),
-                            img: data['GameImg'] ?? '',
-                            title: data['GameName'] ?? '',
+                            img: data['Category Img'] ?? '',
+                            title: data['Category Name'] ?? '',
                           );
                         },
                       );
@@ -208,11 +215,31 @@ class _ExploreState extends State<Explore> {
                       Map<String, dynamic> product = filteredProducts[index];
                       return Items(
                         ontap: () {
-                          print(product['Product Img']);
+                          nextScreen(
+                              context,
+                              ProductDetails(
+                                img: product['Product Img'],
+                                maxquantity:
+                                    int.parse(product['Product Stock']),
+                                price: product['Product Price'],
+                                title: product['Product Title'] ?? '',
+                                subtitle: product['Product Subtitle'] ?? '',
+                              ));
                         },
-                        onadd: () {},
+                        onadd: () {
+                          nextScreen(
+                              context,
+                              ProductDetails(
+                                img: product['Product Img'],
+                                maxquantity:
+                                    int.parse(product['Product Stock']),
+                                price: product['Product Price'],
+                                title: product['Product Title'] ?? '',
+                                subtitle: product['Product Subtitle'] ?? '',
+                              ));
+                        },
                         img: product['Product Img'] ?? '',
-                        price: '100',
+                        price: product['Product Price'] ?? '',
                         title: product['Product Title'] ?? '',
                         subtitle: product['Product Subtitle'] ?? '',
                       );

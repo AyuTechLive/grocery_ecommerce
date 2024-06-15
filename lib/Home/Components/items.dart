@@ -108,7 +108,7 @@ class Items extends StatelessWidget {
                 ),
                 Spacer(),
                 IconButton(
-                    onPressed: () {},
+                    onPressed: onadd,
                     icon: Container(
                       width: width * 0.1103,
                       height: height * 0.050,

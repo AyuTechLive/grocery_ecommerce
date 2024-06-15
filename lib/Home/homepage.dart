@@ -3,8 +3,10 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hakikat_app_new/Explore/explore.dart';
 import 'package:hakikat_app_new/Home/Components/homecategroyitem.dart';
 import 'package:hakikat_app_new/Home/Components/items.dart';
+import 'package:hakikat_app_new/Home/mainpage.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
@@ -93,6 +95,9 @@ class _HomePageState extends State<HomePage> {
                       hintText: 'Search Store',
                       iconColor: Color(0xFF4C4E4D),
                       border: InputBorder.none),
+                  onTap: () {
+                    nextScreen(context, Explore());
+                  },
                   onChanged: (value) {
                     setState(() {});
                   },
@@ -196,11 +201,29 @@ class _HomePageState extends State<HomePage> {
                   Map<String, dynamic> product = filteredProducts[index];
                   return Items(
                     ontap: () {
-                      // print(product['Product Img']);
+                      nextScreen(
+                          context,
+                          ProductDetails(
+                            img: product['Product Img'],
+                            maxquantity: int.parse(product['Product Stock']),
+                            price: product['Product Price'],
+                            title: product['Product Title'] ?? '',
+                            subtitle: product['Product Subtitle'] ?? '',
+                          ));
                     },
-                    onadd: () {},
+                    onadd: () {
+                      nextScreen(
+                          context,
+                          ProductDetails(
+                            img: product['Product Img'],
+                            maxquantity: int.parse(product['Product Stock']),
+                            price: product['Product Price'],
+                            title: product['Product Title'] ?? '',
+                            subtitle: product['Product Subtitle'] ?? '',
+                          ));
+                    },
                     img: product['Product Img'],
-                    price: '100',
+                    price: product['Product Price'],
                     title: product['Product Title'] ?? '',
                     subtitle: product['Product Subtitle'] ?? '',
                   );
@@ -227,7 +250,15 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Spacer(),
                 TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushReplacement(context, MaterialPageRoute(
+                        builder: (context) {
+                          return MainPage(
+                            index: 1,
+                          );
+                        },
+                      ));
+                    },
                     child: Text(
                       'See all',
                       style: TextStyle(
@@ -321,10 +352,30 @@ class _HomePageState extends State<HomePage> {
                       .where((product) => product['BestSelling'] == true)
                       .toList()[index];
                   return Items(
-                    price: '100',
+                    price: product['Product Price'],
                     img: product['Product Img'],
-                    onadd: () {},
-                    ontap: () {},
+                    onadd: () {
+                      nextScreen(
+                          context,
+                          ProductDetails(
+                            img: product['Product Img'],
+                            maxquantity: int.parse(product['Product Stock']),
+                            price: product['Product Price'],
+                            title: product['Product Title'] ?? '',
+                            subtitle: product['Product Subtitle'] ?? '',
+                          ));
+                    },
+                    ontap: () {
+                      nextScreen(
+                          context,
+                          ProductDetails(
+                            img: product['Product Img'],
+                            maxquantity: int.parse(product['Product Stock']),
+                            price: product['Product Price'],
+                            title: product['Product Title'] ?? '',
+                            subtitle: product['Product Subtitle'] ?? '',
+                          ));
+                    },
                     subtitle: product['Product Subtitle'] ?? '',
                     title: product['Product Title'] ?? '',
                   );
@@ -361,6 +412,8 @@ class _HomePageState extends State<HomePage> {
         data.forEach((key, value) {
           if (value is Map) {
             Map<String, dynamic> product = {
+              'Product Stock': value['Product Stock'],
+              'Product Price': value['Product Price'],
               'Product Title': value['Product Title'],
               'Product Subtitle': value['Product Subtitle'],
               'Product Img': value['Product Img'],

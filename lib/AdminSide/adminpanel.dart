@@ -13,33 +13,45 @@ class AdminPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        children: [
-          RoundButton(
-            title: 'Add Product',
-            onTap: () {
-              nextScreen(context, AddProduct());
-            },
-          ),
-          RoundButton(
-            title: 'See Product Product',
-            onTap: () {
-              nextScreen(context, ProductListScreen());
-            },
-          ),
-          RoundButton(
-            title: 'Add games',
-            onTap: () {
-              nextScreen(context, AddGames());
-            },
-          ),
-          RoundButton(
-            title: 'Category List screen',
-            onTap: () {
-              nextScreen(context, CategoryListScreen());
-            },
-          )
-        ],
+      body: Padding(
+        padding: EdgeInsetsDirectional.only(end: 20, start: 20),
+        child: Column(
+          children: [
+            RoundButton(
+              title: 'Add Product',
+              onTap: () {
+                nextScreen(context, AddProduct());
+              },
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            RoundButton(
+              title: 'See Product Product',
+              onTap: () {
+                nextScreen(context, ProductListScreen());
+              },
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            RoundButton(
+              title: 'Add games',
+              onTap: () {
+                nextScreen(context, AddCategory());
+              },
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            RoundButton(
+              title: 'Category List screen',
+              onTap: () {
+                nextScreen(context, CategoryListScreen());
+              },
+            )
+          ],
+        ),
       ),
     );
   }

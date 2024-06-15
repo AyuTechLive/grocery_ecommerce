@@ -9,14 +9,14 @@ import 'package:hakikat_app_new/Utils/utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-class AddGames extends StatefulWidget {
-  const AddGames({super.key});
+class AddCategory extends StatefulWidget {
+  const AddCategory({super.key});
 
   @override
-  State<AddGames> createState() => _AddGamesState();
+  State<AddCategory> createState() => _AddCategoryState();
 }
 
-class _AddGamesState extends State<AddGames> {
+class _AddCategoryState extends State<AddCategory> {
   final CollectionReference gamescollection =
       FirebaseFirestore.instance.collection("Categories");
   bool loading = false;
@@ -69,7 +69,7 @@ class _AddGamesState extends State<AddGames> {
       appBar: AppBar(
         backgroundColor: AppColors.greenthemecolor,
         foregroundColor: Colors.white,
-        title: Text('Add New Game'),
+        title: Text('Add New Category'),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -83,7 +83,7 @@ class _AddGamesState extends State<AddGames> {
                 controller: eventnamecontroller,
                 maxLines: 1,
                 decoration: InputDecoration(
-                    hintText: 'Game Name',
+                    hintText: 'Category Name',
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10))),
               ),
@@ -138,7 +138,7 @@ class _AddGamesState extends State<AddGames> {
                 controller: eventimgcontroller,
                 maxLines: 1,
                 decoration: InputDecoration(
-                    hintText: 'Select Game Banner Img',
+                    hintText: 'Select Category Img',
                     icon: InkWell(
                       child: Icon(Icons.add_a_photo),
                       onTap: () async {
@@ -154,7 +154,7 @@ class _AddGamesState extends State<AddGames> {
               ),
               RoundButton(
                 loading: loading,
-                title: 'Add Game',
+                title: 'Add Category',
                 onTap: () {
                   setState(() {
                     loading = true;
@@ -223,8 +223,8 @@ class _AddGamesState extends State<AddGames> {
   Future addgames(String eventname, String eventbannerimg) async {
     var date = DateTime.now().microsecondsSinceEpoch.toString();
     await gamescollection.doc(eventname).set({
-      'GameImg': eventbannerimg,
-      'GameName': eventname,
+      'Category Img': eventbannerimg,
+      'Category Name': eventname,
       // 'Time': time,
       // 'HostName': hostname,
       // 'EventDate': eventdate,

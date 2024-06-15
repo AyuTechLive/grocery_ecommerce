@@ -2,13 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 
 class ProductDetails extends StatefulWidget {
-  const ProductDetails({super.key});
+  final String title;
+  final String subtitle;
+  final String price;
+  final String img;
+  final int maxquantity;
+  const ProductDetails(
+      {super.key,
+      required this.title,
+      required this.subtitle,
+      required this.price,
+      required this.maxquantity,
+      required this.img});
 
   @override
   State<ProductDetails> createState() => _ProductDetailsState();
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
+  int quantity = 1;
+  int totalprice = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    totalprice = int.parse(widget.price);
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screensize = MediaQuery.of(context).size;
@@ -41,7 +61,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       return Image.network(
-                        'https://firebasestorage.googleapis.com/v0/b/oneupnoobs-9ee91.appspot.com/o/Vector.png?alt=media&token=bce591e1-fb44-4596-b3ba-f5b739a8d9c1',
+                        widget.img,
                         fit: BoxFit.fill,
                       );
                     },
@@ -59,7 +79,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               SizedBox(
                 width: width * 0.604,
                 child: Text(
-                  'Naturel Red Apple',
+                  widget.title,
                   style: TextStyle(
                     color: Color(0xFF181725),
                     fontSize: 20,
@@ -85,7 +105,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 width: width * 0.1,
               ),
               Text(
-                '1kg, Price',
+                widget.subtitle,
                 style: TextStyle(
                   color: Color(0xFF7C7C7C),
                   fontSize: 16,
@@ -102,24 +122,29 @@ class _ProductDetailsState extends State<ProductDetails> {
           Row(
             children: [
               Spacer(),
-              Container(
-                width: width * 0.11,
-                height: height * 0.050,
-                decoration: ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(width: 1, color: Color(0xFFF0F0F0)),
-                    borderRadius: BorderRadius.circular(17),
+              IconButton(
+                onPressed: () {
+                  quantitydecrement();
+                },
+                icon: Container(
+                  width: width * 0.11,
+                  height: height * 0.050,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(width: 1, color: Color(0xFFF0F0F0)),
+                      borderRadius: BorderRadius.circular(17),
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: Icon(Icons.remove),
+                  child: Center(
+                    child: Icon(Icons.remove),
+                  ),
                 ),
               ),
               SizedBox(
                 width: width * 0.05,
               ),
               Text(
-                '1',
+                quantity.toString(),
                 style: TextStyle(
                   color: Color(0xFF181725),
                   fontSize: 16,
@@ -132,19 +157,24 @@ class _ProductDetailsState extends State<ProductDetails> {
               SizedBox(
                 width: width * 0.05,
               ),
-              Container(
-                width: width * 0.11,
-                height: height * 0.050,
-                decoration: ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(width: 1, color: Color(0xFFF0F0F0)),
-                    borderRadius: BorderRadius.circular(17),
+              IconButton(
+                onPressed: () {
+                  quantityincrement();
+                },
+                icon: Container(
+                  width: width * 0.11,
+                  height: height * 0.050,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(width: 1, color: Color(0xFFF0F0F0)),
+                      borderRadius: BorderRadius.circular(17),
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.add,
-                    color: AppColors.greenthemecolor,
+                  child: Center(
+                    child: Icon(
+                      Icons.add,
+                      color: AppColors.greenthemecolor,
+                    ),
                   ),
                 ),
               ),
@@ -153,7 +183,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               Spacer(),
               Spacer(),
               Text(
-                '\$4.99',
+                '₹ ${totalprice}',
                 style: TextStyle(
                   color: Color(0xFF181725),
                   fontSize: 18,
@@ -260,5 +290,23 @@ class _ProductDetailsState extends State<ProductDetails> {
         ],
       ),
     );
+  }
+
+  void quantityincrement() {
+    if (quantity < widget.maxquantity) {
+      setState(() {
+        quantity++;
+        totalprice = int.parse(widget.price) * quantity;
+      });
+    }
+  }
+
+  void quantitydecrement() {
+    if (quantity > 0) {
+      setState(() {
+        quantity--;
+        totalprice = int.parse(widget.price) * quantity;
+      });
+    }
   }
 }

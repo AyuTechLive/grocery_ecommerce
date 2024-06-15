@@ -116,7 +116,8 @@ import 'package:hakikat_app_new/Home/homepage.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final int index;
+  const MainPage({super.key, this.index = 0});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -130,6 +131,11 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.index == 1) {
+      setState(() {
+        _currentIndex = 1;
+      });
+    }
     _pageController = PageController(
         initialPage: _currentIndex); // Set initial page to the default index
   }

@@ -44,6 +44,8 @@ class _AddProductState extends State<AddProduct> {
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   File? _image;
+  bool isExclusive = false;
+  bool isBestSelling = false;
 
   final picker = ImagePicker();
   Future<void> getimageGallery() async {
@@ -307,6 +309,24 @@ class _AddProductState extends State<AddProduct> {
                         },
                         child: Icon(Icons.add))),
               ),
+              SwitchListTile(
+                title: Text('Exclusive'),
+                value: isExclusive,
+                onChanged: (value) {
+                  setState(() {
+                    isExclusive = value;
+                  });
+                },
+              ),
+              SwitchListTile(
+                title: Text('Best Selling'),
+                value: isBestSelling,
+                onChanged: (value) {
+                  setState(() {
+                    isBestSelling = value;
+                  });
+                },
+              ),
               SizedBox(
                 height: 30,
               ),
@@ -334,7 +354,10 @@ class _AddProductState extends State<AddProduct> {
                         productsubtitlecontroller.text.toString(),
                     'Product Price': productpricecontroller.text.toString(),
                     'Product Stock': productquantitycontroller.text.toString(),
-                    'Category': categorynamecontroller.text.toString()
+                    'Category': categorynamecontroller.text.toString(),
+                    'Exclusive':
+                        isExclusive, // Add the 'Exclusive' key-value pair
+                    'BestSelling': isBestSelling,
                   }).then(
                     (value) {
                       Utils().toastMessage('Post Succesfully Added');

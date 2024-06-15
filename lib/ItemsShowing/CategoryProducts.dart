@@ -5,7 +5,8 @@ import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class CategoryProduct extends StatefulWidget {
-  const CategoryProduct({super.key});
+  final String categoryname;
+  const CategoryProduct({super.key, required this.categoryname});
 
   @override
   State<CategoryProduct> createState() => _CategoryProductState();
@@ -29,7 +30,9 @@ class _CategoryProductState extends State<CategoryProduct> {
     final double height = screensize.height;
     final double width = screensize.width;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(widget.categoryname),
+      ),
       body: Column(
         children: [
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -93,11 +96,30 @@ class _CategoryProductState extends State<CategoryProduct> {
                 Map<String, dynamic> product = filteredProducts[index];
                 return Items(
                   ontap: () {
+                    nextScreen(
+                        context,
+                        ProductDetails(
+                          img: product['Product Img'],
+                          maxquantity: int.parse(product['Product Stock']),
+                          price: product['Product Price'],
+                          title: product['Product Title'] ?? '',
+                          subtitle: product['Product Subtitle'] ?? '',
+                        ));
                     // print(product['Product Img']);
                   },
-                  onadd: () {},
+                  onadd: () {
+                    nextScreen(
+                        context,
+                        ProductDetails(
+                          img: product['Product Img'],
+                          maxquantity: int.parse(product['Product Stock']),
+                          price: product['Product Price'],
+                          title: product['Product Title'] ?? '',
+                          subtitle: product['Product Subtitle'] ?? '',
+                        ));
+                  },
                   img: product['Product Img'],
-                  price: '100',
+                  price: product['Product Price'],
                   title: product['Product Title'] ?? '',
                   subtitle: product['Product Subtitle'] ?? '',
                 );
@@ -125,17 +147,23 @@ class _CategoryProductState extends State<CategoryProduct> {
         Map<dynamic, dynamic> data =
             event.snapshot.value as Map<dynamic, dynamic>;
         products.clear(); // Clear the existing data
+        filteredProducts.clear(); // Clear the existing filtered data
+
         data.forEach((key, value) {
-          if (value is Map) {
+          if (value is Map &&
+              value.containsKey('Category') &&
+              value['Category'] == widget.categoryname) {
             Map<String, dynamic> product = {
+              'Product Stock': value['Product Stock'],
               'Product Title': value['Product Title'],
               'Product Subtitle': value['Product Subtitle'],
               'Product Img': value['Product Img'],
+              'Product Price': value['Product Price'],
             };
             setState(() {
               products.add(product);
-              filteredProducts =
-                  products; // Initialize filteredProducts with all products
+              filteredProducts
+                  .add(product); // Add the product to filteredProducts as well
             });
           }
         });
