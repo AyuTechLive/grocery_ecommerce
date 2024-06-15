@@ -1,11 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/Home/mainpage.dart';
+import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
+import 'package:hakikat_app_new/Utils/utils.dart';
 
 class ProductDetails extends StatefulWidget {
   final String title;
   final String subtitle;
   final String price;
   final String img;
+  final String orderid;
   final int maxquantity;
   const ProductDetails(
       {super.key,
@@ -13,7 +18,8 @@ class ProductDetails extends StatefulWidget {
       required this.subtitle,
       required this.price,
       required this.maxquantity,
-      required this.img});
+      required this.img,
+      required this.orderid});
 
   @override
   State<ProductDetails> createState() => _ProductDetailsState();
@@ -22,10 +28,13 @@ class ProductDetails extends StatefulWidget {
 class _ProductDetailsState extends State<ProductDetails> {
   int quantity = 1;
   int totalprice = 0;
+  bool isInFavorites = false;
+  bool isLoading = false;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    checkIfInFavorites();
     totalprice = int.parse(widget.price);
   }
 
@@ -92,8 +101,14 @@ class _ProductDetailsState extends State<ProductDetails> {
               Spacer(),
               Spacer(),
               IconButton(
-                onPressed: () {},
-                icon: ImageIcon(AssetImage('assets/wishlist.png')),
+                onPressed: () {
+                  toggleFavorite(widget.orderid);
+                },
+                icon: Icon(
+                    isInFavorites
+                        ? Icons.favorite
+                        : Icons.favorite_border_outlined,
+                    color: isInFavorites ? Colors.red : null),
               ),
               Spacer()
             ],
@@ -265,27 +280,34 @@ class _ProductDetailsState extends State<ProductDetails> {
           SizedBox(
             height: height * 0.05,
           ),
-          Container(
-            width: width * 0.879,
-            height: height * 0.074,
-            decoration: ShapeDecoration(
-              color: AppColors.greenthemecolor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(19),
-              ),
-            ),
-            child: Center(
-              child: Text(
-                'Add To Cart',
-                style: TextStyle(
-                  color: Color(0xFFFCFCFC),
-                  fontSize: 16,
-                  fontFamily: 'Gilroy',
-                  fontWeight: FontWeight.w600,
-                  height: 0.06,
-                ),
-              ),
-            ),
+          IconButton(
+            onPressed: () {
+              _addToCart();
+            },
+            icon: isLoading
+                ? CircularProgressIndicator()
+                : Container(
+                    width: width * 0.879,
+                    height: height * 0.074,
+                    decoration: ShapeDecoration(
+                      color: AppColors.greenthemecolor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(19),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Add To Cart',
+                        style: TextStyle(
+                          color: Color(0xFFFCFCFC),
+                          fontSize: 16,
+                          fontFamily: 'Gilroy',
+                          fontWeight: FontWeight.w600,
+                          height: 0.06,
+                        ),
+                      ),
+                    ),
+                  ),
           ),
         ],
       ),
@@ -306,6 +328,104 @@ class _ProductDetailsState extends State<ProductDetails> {
       setState(() {
         quantity--;
         totalprice = int.parse(widget.price) * quantity;
+      });
+    }
+  }
+
+  Future<void> _addToCart() async {
+    setState(() {
+      isLoading = true; // Set loading to true
+    });
+    String userEmailsDocumentId = checkUserAuthenticationType();
+    DocumentReference userDocRef = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userEmailsDocumentId);
+
+    DocumentSnapshot userDocSnapshot = await userDocRef.get();
+    if (userDocSnapshot.exists) {
+      DocumentReference cartDocRef =
+          userDocRef.collection('Cart').doc(widget.orderid);
+
+      cartDocRef.set({
+        'id': widget.orderid,
+        'quantity': quantity,
+        // Add any other fields you need for the cart item
+      }, SetOptions(merge: true)).then((value) {
+        setState(() {
+          isLoading = false;
+          Utils().toastMessage('Item added to cart');
+        });
+      }).catchError((error) {
+        setState(() {
+          isLoading = false; // Set loading to false in case of error
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error adding item to cart: $error'),
+          ),
+        );
+      });
+    } else {
+      setState(() {
+        isLoading = false; // Set loading to false in case of error
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error adding item to cart'),
+        ),
+      );
+    }
+  }
+
+  Future<void> toggleFavorite(String productid) async {
+    String userEmailsDocumentId = checkUserAuthenticationType();
+    DocumentReference userDocRef = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userEmailsDocumentId);
+
+    DocumentSnapshot userDocSnapshot = await userDocRef.get();
+    if (userDocSnapshot.exists) {
+      if (isInFavorites) {
+        await userDocRef.update({
+          'Favorites': FieldValue.arrayRemove([productid])
+        }).then((value) {
+          setState(() {
+            isInFavorites = false;
+            Utils().toastMessage('Item removed from Favorites');
+          });
+        });
+      } else {
+        await userDocRef.update({
+          'Favorites': FieldValue.arrayUnion([productid])
+        }).then((value) {
+          setState(() {
+            isInFavorites = true;
+            Utils().toastMessage('Item added to Favorites');
+          });
+        });
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Insufficient balance to join the match'),
+        ),
+      );
+    }
+    await checkIfInFavorites();
+  }
+
+  Future<void> checkIfInFavorites() async {
+    String userEmailsDocumentId = checkUserAuthenticationType();
+    DocumentReference userDocRef = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userEmailsDocumentId);
+
+    DocumentSnapshot userDocSnapshot = await userDocRef.get();
+    if (userDocSnapshot.exists) {
+      List<dynamic> favorites = userDocSnapshot.get('Favorites') ?? [];
+      isInFavorites = favorites.contains(widget.orderid); // Add this line
+      setState(() {
+        isInFavorites;
       });
     }
   }

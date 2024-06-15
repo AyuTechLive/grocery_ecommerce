@@ -4,15 +4,15 @@ import 'package:hakikat_app_new/Home/Components/items.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
-class CategoryProduct extends StatefulWidget {
+class ExclusiveItems extends StatefulWidget {
   final String categoryname;
-  const CategoryProduct({super.key, required this.categoryname});
+  const ExclusiveItems({super.key, required this.categoryname});
 
   @override
-  State<CategoryProduct> createState() => _CategoryProductState();
+  State<ExclusiveItems> createState() => _ExclusiveItemsState();
 }
 
-class _CategoryProductState extends State<CategoryProduct> {
+class _ExclusiveItemsState extends State<ExclusiveItems> {
   final databaseRef = FirebaseDatabase.instance.ref();
   List<Map<String, dynamic>> products = [];
   List<Map<String, dynamic>> filteredProducts = [];
@@ -153,8 +153,8 @@ class _CategoryProductState extends State<CategoryProduct> {
 
         data.forEach((key, value) {
           if (value is Map &&
-              value.containsKey('Category') &&
-              value['Category'] == widget.categoryname) {
+              value.containsKey(widget.categoryname) &&
+              value[widget.categoryname] == true) {
             Map<String, dynamic> product = {
               'Product Stock': value['Product Stock'],
               'Product Title': value['Product Title'],

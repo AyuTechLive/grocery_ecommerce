@@ -45,7 +45,8 @@ class _ExploreState extends State<Explore> {
               'Product Subtitle': value['Product Subtitle'],
               'Product Img': value['Product Img'],
               'Product Price': value['Product Price'],
-              'Product Stock': value['Product Stock']
+              'Product Stock': value['Product Stock'],
+              'id': value['id']
             };
             setState(() {
               products.add(product);
@@ -218,6 +219,7 @@ class _ExploreState extends State<Explore> {
                           nextScreen(
                               context,
                               ProductDetails(
+                                orderid: product['id'],
                                 img: product['Product Img'],
                                 maxquantity:
                                     int.parse(product['Product Stock']),
@@ -230,6 +232,7 @@ class _ExploreState extends State<Explore> {
                           nextScreen(
                               context,
                               ProductDetails(
+                                orderid: product['id'],
                                 img: product['Product Img'],
                                 maxquantity:
                                     int.parse(product['Product Stock']),

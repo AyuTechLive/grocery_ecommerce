@@ -6,7 +6,9 @@ import 'package:flutter/widgets.dart';
 import 'package:hakikat_app_new/Explore/explore.dart';
 import 'package:hakikat_app_new/Home/Components/homecategroyitem.dart';
 import 'package:hakikat_app_new/Home/Components/items.dart';
+import 'package:hakikat_app_new/Home/Components/sectionheader.dart';
 import 'package:hakikat_app_new/Home/mainpage.dart';
+import 'package:hakikat_app_new/ItemsShowing/Exclusiveitemshowing.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
@@ -170,7 +172,10 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Spacer(),
                 TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      nextScreen(
+                          context, ExclusiveItems(categoryname: 'Exclusive'));
+                    },
                     child: Text(
                       'See all',
                       style: TextStyle(
@@ -204,6 +209,7 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            orderid: product['id'],
                             img: product['Product Img'],
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
@@ -215,6 +221,7 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            orderid: product['id'],
                             img: product['Product Img'],
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
@@ -233,47 +240,60 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: height * 0.02,
             ),
-            Row(
-              children: [
-                SizedBox(
-                  width: width * 0.06,
-                ),
-                Text(
-                  'Categories',
-                  style: TextStyle(
-                    color: Color(0xFF181725),
-                    fontSize: 18,
-                    fontFamily: 'Gilroy',
-                    fontWeight: FontWeight.w600,
-                    height: 0,
-                  ),
-                ),
-                Spacer(),
-                TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(context, MaterialPageRoute(
-                        builder: (context) {
-                          return MainPage(
-                            index: 1,
-                          );
-                        },
-                      ));
-                    },
-                    child: Text(
-                      'See all',
-                      style: TextStyle(
-                        color: Color(0xFF53B175),
-                        fontSize: 16,
-                        fontFamily: 'Gilroy',
-                        fontWeight: FontWeight.w600,
-                        height: 0,
-                      ),
-                    )),
-                SizedBox(
-                  width: width * 0.02,
-                )
-              ],
-            ),
+            Sectionheader(
+              title: 'Categories',
+              ontap: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) {
+                    return MainPage(
+                      index: 1,
+                    );
+                  },
+                ));
+              },
+            )
+            // Row(
+            //   children: [
+            //     SizedBox(
+            //       width: width * 0.06,
+            //     ),
+            //     Text(
+            //       'Categories',
+            //       style: TextStyle(
+            //         color: Color(0xFF181725),
+            //         fontSize: 18,
+            //         fontFamily: 'Gilroy',
+            //         fontWeight: FontWeight.w600,
+            //         height: 0,
+            //       ),
+            //     ),
+            //     Spacer(),
+            //     TextButton(
+            //         onPressed: () {
+            //           Navigator.pushReplacement(context, MaterialPageRoute(
+            //             builder: (context) {
+            //               return MainPage(
+            //                 index: 1,
+            //               );
+            //             },
+            //           ));
+            //         },
+            //         child: Text(
+            //           'See all',
+            //           style: TextStyle(
+            //             color: Color(0xFF53B175),
+            //             fontSize: 16,
+            //             fontFamily: 'Gilroy',
+            //             fontWeight: FontWeight.w600,
+            //             height: 0,
+            //           ),
+            //         )),
+            //     SizedBox(
+            //       width: width * 0.02,
+            //     )
+            //   ],
+            // ),
+            ,
             SizedBox(
               height: height * 0.117,
               child: ListView.separated(
@@ -314,7 +334,10 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Spacer(),
                 TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      nextScreen(
+                          context, ExclusiveItems(categoryname: 'BestSelling'));
+                    },
                     child: Text(
                       'See all',
                       style: TextStyle(
@@ -358,6 +381,7 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            orderid: product['id'],
                             img: product['Product Img'],
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
@@ -369,6 +393,90 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            orderid: product['id'],
+                            img: product['Product Img'],
+                            maxquantity: int.parse(product['Product Stock']),
+                            price: product['Product Price'],
+                            title: product['Product Title'] ?? '',
+                            subtitle: product['Product Subtitle'] ?? '',
+                          ));
+                    },
+                    subtitle: product['Product Subtitle'] ?? '',
+                    title: product['Product Title'] ?? '',
+                  );
+                },
+              ),
+            ),
+            SizedBox(
+              height: height * 0.02,
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: width * 0.06,
+                ),
+                Text(
+                  'All Items',
+                  style: TextStyle(
+                    color: Color(0xFF181725),
+                    fontSize: 18,
+                    fontFamily: 'Gilroy',
+                    fontWeight: FontWeight.w600,
+                    height: 0,
+                  ),
+                ),
+                Spacer(),
+                TextButton(
+                    onPressed: () {
+                      nextScreen(context, ExclusiveItems(categoryname: 'All'));
+                    },
+                    child: Text(
+                      'See all',
+                      style: TextStyle(
+                        color: Color(0xFF53B175),
+                        fontSize: 16,
+                        fontFamily: 'Gilroy',
+                        fontWeight: FontWeight.w600,
+                        height: 0,
+                      ),
+                    )),
+                SizedBox(
+                  width: width * 0.02,
+                )
+              ],
+            ),
+            SizedBox(
+              height: height * 0.277,
+              child: ListView.separated(
+                padding:
+                    EdgeInsets.only(left: width * 0.05, right: width * 0.05),
+                separatorBuilder: (context, index) {
+                  return SizedBox(width: width * 0.05);
+                },
+                itemCount: products.length > 5 ? 5 : products.length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> product = products[index];
+                  return Items(
+                    price: product['Product Price'],
+                    img: product['Product Img'],
+                    onadd: () {
+                      nextScreen(
+                          context,
+                          ProductDetails(
+                            orderid: product['id'],
+                            img: product['Product Img'],
+                            maxquantity: int.parse(product['Product Stock']),
+                            price: product['Product Price'],
+                            title: product['Product Title'] ?? '',
+                            subtitle: product['Product Subtitle'] ?? '',
+                          ));
+                    },
+                    ontap: () {
+                      nextScreen(
+                          context,
+                          ProductDetails(
+                            orderid: product['id'],
                             img: product['Product Img'],
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
@@ -412,6 +520,7 @@ class _HomePageState extends State<HomePage> {
         data.forEach((key, value) {
           if (value is Map) {
             Map<String, dynamic> product = {
+              'id': value['id'],
               'Product Stock': value['Product Stock'],
               'Product Price': value['Product Price'],
               'Product Title': value['Product Title'],
