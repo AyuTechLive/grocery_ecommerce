@@ -2,8 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Cart/components/carttile.dart';
+import 'package:hakikat_app_new/CheckoutPage/checkoutpage.dart';
+import 'package:hakikat_app_new/CheckoutPage/democheckout.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
+import 'package:hakikat_app_new/Utils/widget.dart';
 
 class CartScreen extends StatefulWidget {
   @override
@@ -165,43 +168,51 @@ class _CartScreenState extends State<CartScreen> {
                         },
                       ),
                     ),
-                    Container(
-                      width: width * 0.879,
-                      height: height * 0.074,
-                      decoration: ShapeDecoration(
-                        color: AppColors.greenthemecolor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(19),
+                    IconButton(
+                      onPressed: () {
+                        nextScreen(
+                            context,
+                            DemoCheckout(
+                                cartItems: cartItems, grandTotal: grandTotal));
+                      },
+                      icon: Container(
+                        width: width * 0.879,
+                        height: height * 0.074,
+                        decoration: ShapeDecoration(
+                          color: AppColors.greenthemecolor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(19),
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Spacer(),
-                          Spacer(),
-                          Text(
-                            'Go to Checkout',
-                            style: TextStyle(
-                              color: Color(0xFFFCFCFC),
-                              fontSize: 18,
-                              fontFamily: 'Gilroy',
-                              fontWeight: FontWeight.w600,
-                              height: 0.06,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Spacer(),
+                            Spacer(),
+                            Text(
+                              'Go to Checkout',
+                              style: TextStyle(
+                                color: Color(0xFFFCFCFC),
+                                fontSize: 18,
+                                fontFamily: 'Gilroy',
+                                fontWeight: FontWeight.w600,
+                                height: 0.06,
+                              ),
                             ),
-                          ),
-                          Spacer(),
-                          Text(
-                            "₹" + grandTotal.toString(),
-                            style: TextStyle(
-                              color: Color(0xFFFCFCFC),
-                              fontSize: 18,
-                              fontFamily: 'Gilroy',
-                              fontWeight: FontWeight.w600,
-                              height: 0.06,
+                            Spacer(),
+                            Text(
+                              "₹" + grandTotal.toString(),
+                              style: TextStyle(
+                                color: Color(0xFFFCFCFC),
+                                fontSize: 18,
+                                fontFamily: 'Gilroy',
+                                fontWeight: FontWeight.w600,
+                                height: 0.06,
+                              ),
                             ),
-                          ),
-                          Spacer()
-                        ],
+                            Spacer()
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(

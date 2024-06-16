@@ -13,7 +13,7 @@ class HomeCategoryItems extends StatelessWidget {
     final double height = screensize.height;
     final double width = screensize.width;
     return InkWell(
-      onTap: () {},
+      onTap: ontap,
       child: Container(
           width: width * 0.599,
           height: height * 0.117,
@@ -27,7 +27,13 @@ class HomeCategoryItems extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Spacer(),
-              Image.network(img),
+              Container(
+                width: width * 0.25,
+                child: Image.network(
+                  img,
+                  fit: BoxFit.fill,
+                ),
+              ),
               Spacer(),
               Text(
                 title,

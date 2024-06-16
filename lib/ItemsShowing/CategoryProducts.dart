@@ -5,8 +5,8 @@ import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class CategoryProduct extends StatefulWidget {
-  final String categoryname;
-  const CategoryProduct({super.key, required this.categoryname});
+  final String? categoryname;
+  const CategoryProduct({super.key, this.categoryname});
 
   @override
   State<CategoryProduct> createState() => _CategoryProductState();
@@ -31,7 +31,7 @@ class _CategoryProductState extends State<CategoryProduct> {
     final double width = screensize.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.categoryname),
+        title: Text(widget.categoryname ?? 'All Products'),
       ),
       body: Column(
         children: [
@@ -51,12 +51,14 @@ class _CategoryProductState extends State<CategoryProduct> {
                   controller: searchController,
                   cursorColor: Color(0xFF4C4E4D),
                   decoration: InputDecoration(
-                      icon: Padding(
-                          padding: EdgeInsets.only(left: width * 0.03),
-                          child: Icon(Icons.search)),
-                      hintText: 'Search Store',
-                      iconColor: Color(0xFF4C4E4D),
-                      border: InputBorder.none),
+                    icon: Padding(
+                      padding: EdgeInsets.only(left: width * 0.03),
+                      child: Icon(Icons.search),
+                    ),
+                    hintText: 'Search Store',
+                    iconColor: Color(0xFF4C4E4D),
+                    border: InputBorder.none,
+                  ),
                   onChanged: (value) {
                     filterProducts(value);
                   },
@@ -64,26 +66,10 @@ class _CategoryProductState extends State<CategoryProduct> {
               ),
             ),
           ]),
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: TextField(
-          //     controller: searchController,
-          //     decoration: InputDecoration(
-          //       hintText: 'Search products...',
-          //       prefixIcon: Icon(Icons.search),
-          //       border: OutlineInputBorder(
-          //         borderRadius: BorderRadius.circular(10.0),
-          //       ),
-          //     ),
-          //     onChanged: (value) {
-          //       filterProducts(value);
-          //     },
-          //   ),
-          // ),
           Expanded(
             child: GridView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              // physics: NeverScrollableScrollPhysics(),
               padding: EdgeInsets.all(width * 0.06),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 childAspectRatio: 0.75,
@@ -97,28 +83,29 @@ class _CategoryProductState extends State<CategoryProduct> {
                 return Items(
                   ontap: () {
                     nextScreen(
-                        context,
-                        ProductDetails(
-                          orderid: product['id'],
-                          img: product['Product Img'],
-                          maxquantity: int.parse(product['Product Stock']),
-                          price: product['Product Price'],
-                          title: product['Product Title'] ?? '',
-                          subtitle: product['Product Subtitle'] ?? '',
-                        ));
-                    // print(product['Product Img']);
+                      context,
+                      ProductDetails(
+                        orderid: product['id'],
+                        img: product['Product Img'],
+                        maxquantity: int.parse(product['Product Stock']),
+                        price: product['Product Price'],
+                        title: product['Product Title'] ?? '',
+                        subtitle: product['Product Subtitle'] ?? '',
+                      ),
+                    );
                   },
                   onadd: () {
                     nextScreen(
-                        context,
-                        ProductDetails(
-                          orderid: product['id'],
-                          img: product['Product Img'],
-                          maxquantity: int.parse(product['Product Stock']),
-                          price: product['Product Price'],
-                          title: product['Product Title'] ?? '',
-                          subtitle: product['Product Subtitle'] ?? '',
-                        ));
+                      context,
+                      ProductDetails(
+                        orderid: product['id'],
+                        img: product['Product Img'],
+                        maxquantity: int.parse(product['Product Stock']),
+                        price: product['Product Price'],
+                        title: product['Product Title'] ?? '',
+                        subtitle: product['Product Subtitle'] ?? '',
+                      ),
+                    );
                   },
                   img: product['Product Img'],
                   price: product['Product Price'],
@@ -152,9 +139,7 @@ class _CategoryProductState extends State<CategoryProduct> {
         filteredProducts.clear(); // Clear the existing filtered data
 
         data.forEach((key, value) {
-          if (value is Map &&
-              value.containsKey('Category') &&
-              value['Category'] == widget.categoryname) {
+          if (value is Map) {
             Map<String, dynamic> product = {
               'Product Stock': value['Product Stock'],
               'Product Title': value['Product Title'],
@@ -163,11 +148,15 @@ class _CategoryProductState extends State<CategoryProduct> {
               'Product Price': value['Product Price'],
               'id': value['id'],
             };
-            setState(() {
-              products.add(product);
-              filteredProducts
-                  .add(product); // Add the product to filteredProducts as well
-            });
+
+            if (widget.categoryname == 'All Products' ||
+                (value.containsKey('Category') &&
+                    value['Category'] == widget.categoryname)) {
+              setState(() {
+                products.add(product);
+                filteredProducts.add(product);
+              });
+            }
           }
         });
       }

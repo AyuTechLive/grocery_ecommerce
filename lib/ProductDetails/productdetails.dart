@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/Cart/cart.dart';
+import 'package:hakikat_app_new/Cart/democart.dart';
 import 'package:hakikat_app_new/Home/mainpage.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/utils.dart';
+import 'package:hakikat_app_new/Utils/widget.dart';
 
 class ProductDetails extends StatefulWidget {
   final String title;
@@ -30,6 +33,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   int totalprice = 0;
   bool isInFavorites = false;
   bool isLoading = false;
+  bool isInCart = false;
   @override
   void initState() {
     // TODO: implement initState
@@ -282,7 +286,7 @@ class _ProductDetailsState extends State<ProductDetails> {
           ),
           IconButton(
             onPressed: () {
-              _addToCart();
+              isInCart ? _gotoCart() : _addToCart();
             },
             icon: isLoading
                 ? CircularProgressIndicator()
@@ -295,18 +299,31 @@ class _ProductDetailsState extends State<ProductDetails> {
                         borderRadius: BorderRadius.circular(19),
                       ),
                     ),
-                    child: Center(
-                      child: Text(
-                        'Add To Cart',
-                        style: TextStyle(
-                          color: Color(0xFFFCFCFC),
-                          fontSize: 16,
-                          fontFamily: 'Gilroy',
-                          fontWeight: FontWeight.w600,
-                          height: 0.06,
-                        ),
-                      ),
-                    ),
+                    child: isInCart
+                        ? Center(
+                            child: Text(
+                              'Go To Cart',
+                              style: TextStyle(
+                                color: Color(0xFFFCFCFC),
+                                fontSize: 16,
+                                fontFamily: 'Gilroy',
+                                fontWeight: FontWeight.w600,
+                                height: 0.06,
+                              ),
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              'Add To Cart',
+                              style: TextStyle(
+                                color: Color(0xFFFCFCFC),
+                                fontSize: 16,
+                                fontFamily: 'Gilroy',
+                                fontWeight: FontWeight.w600,
+                                height: 0.06,
+                              ),
+                            ),
+                          ),
                   ),
           ),
         ],
@@ -353,7 +370,8 @@ class _ProductDetailsState extends State<ProductDetails> {
       }, SetOptions(merge: true)).then((value) {
         setState(() {
           isLoading = false;
-          Utils().toastMessage('Item added to cart');
+          isInCart = true;
+          //  Utils().toastMessage('Item added to cart');
         });
       }).catchError((error) {
         setState(() {
@@ -428,5 +446,9 @@ class _ProductDetailsState extends State<ProductDetails> {
         isInFavorites;
       });
     }
+  }
+
+  _gotoCart() {
+    nextScreen(context, CartScreen());
   }
 }

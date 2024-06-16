@@ -340,7 +340,7 @@ class _AddProductState extends State<AddProduct> {
                   String id = postcontroller.text.toString();
                   String idnew =
                       DateTime.now().millisecondsSinceEpoch.toString();
-                  databaseRef = FirebaseDatabase.instance.ref(id);
+                  databaseRef = FirebaseDatabase.instance.ref();
 
                   databaseRef
 
