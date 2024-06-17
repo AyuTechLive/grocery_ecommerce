@@ -9,6 +9,7 @@ class MyOrderTile extends StatelessWidget {
   final String quantity;
   final bool processing;
   final String title;
+  final VoidCallback ontap;
   const MyOrderTile(
       {super.key,
       required this.orderid,
@@ -17,7 +18,8 @@ class MyOrderTile extends StatelessWidget {
       required this.price,
       required this.quantity,
       required this.processing,
-      required this.title});
+      required this.title,
+      required this.ontap});
 
   @override
   Widget build(BuildContext context) {
@@ -116,10 +118,10 @@ class MyOrderTile extends StatelessWidget {
             Row(
               children: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: ontap,
                   icon: Container(
                       width: width * 0.4,
-                      height: height * 0.064,
+                      height: height * 0.060,
                       decoration: ShapeDecoration(
                         color: AppColors.greenthemecolor,
                         shape: RoundedRectangleBorder(

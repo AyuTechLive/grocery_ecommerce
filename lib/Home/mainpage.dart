@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/Account/account.dart';
 import 'package:hakikat_app_new/AdminSide/adminpanel.dart';
 import 'package:hakikat_app_new/Cart/cart.dart';
 import 'package:hakikat_app_new/Cart/democart.dart';
@@ -78,7 +79,7 @@ class _MainPageState extends State<MainPage> {
             Explore(),
             CartScreen(),
             FavoritesScreen(),
-            MyOrdersScreen()
+            Account()
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(

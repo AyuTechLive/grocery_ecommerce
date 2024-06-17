@@ -37,7 +37,7 @@ class AdminPanel extends StatelessWidget {
               height: 20,
             ),
             RoundButton(
-              title: 'Add games',
+              title: 'Add Category',
               onTap: () {
                 nextScreen(context, AddCategory());
               },

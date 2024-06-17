@@ -285,47 +285,73 @@ class _ProductDetailsState extends State<ProductDetails> {
             height: height * 0.05,
           ),
           IconButton(
-            onPressed: () {
-              isInCart ? _gotoCart() : _addToCart();
-            },
-            icon: isLoading
-                ? CircularProgressIndicator()
-                : Container(
-                    width: width * 0.879,
-                    height: height * 0.074,
-                    decoration: ShapeDecoration(
-                      color: AppColors.greenthemecolor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(19),
-                      ),
-                    ),
-                    child: isInCart
-                        ? Center(
-                            child: Text(
-                              'Go To Cart',
-                              style: TextStyle(
-                                color: Color(0xFFFCFCFC),
-                                fontSize: 16,
-                                fontFamily: 'Gilroy',
-                                fontWeight: FontWeight.w600,
-                                height: 0.06,
-                              ),
-                            ),
-                          )
-                        : Center(
-                            child: Text(
-                              'Add To Cart',
-                              style: TextStyle(
-                                color: Color(0xFFFCFCFC),
-                                fontSize: 16,
-                                fontFamily: 'Gilroy',
-                                fontWeight: FontWeight.w600,
-                                height: 0.06,
-                              ),
+              onPressed: () {
+                widget.maxquantity > 0
+                    ? isInCart
+                        ? _gotoCart()
+                        : _addToCart()
+                    : Utils().toastMessage('Item Out Of Stock');
+              },
+              icon: widget.maxquantity > 0
+                  ? isLoading
+                      ? CircularProgressIndicator()
+                      : Container(
+                          width: width * 0.879,
+                          height: height * 0.074,
+                          decoration: ShapeDecoration(
+                            color: AppColors.greenthemecolor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(19),
                             ),
                           ),
-                  ),
-          ),
+                          child: isInCart
+                              ? Center(
+                                  child: Text(
+                                    'Go To Cart',
+                                    style: TextStyle(
+                                      color: Color(0xFFFCFCFC),
+                                      fontSize: 16,
+                                      fontFamily: 'Gilroy',
+                                      fontWeight: FontWeight.w600,
+                                      height: 0.06,
+                                    ),
+                                  ),
+                                )
+                              : Center(
+                                  child: Text(
+                                    'Add To Cart',
+                                    style: TextStyle(
+                                      color: Color(0xFFFCFCFC),
+                                      fontSize: 16,
+                                      fontFamily: 'Gilroy',
+                                      fontWeight: FontWeight.w600,
+                                      height: 0.06,
+                                    ),
+                                  ),
+                                ),
+                        )
+                  : Container(
+                      width: width * 0.879,
+                      height: height * 0.074,
+                      decoration: ShapeDecoration(
+                        color: Colors.red.withOpacity(0.3),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(19),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Out Of Stock',
+                          style: TextStyle(
+                            color: Colors.black.withOpacity(0.6),
+                            fontSize: 16,
+                            fontFamily: 'Gilroy',
+                            fontWeight: FontWeight.w600,
+                            height: 0.06,
+                          ),
+                        ),
+                      ),
+                    )),
         ],
       ),
     );

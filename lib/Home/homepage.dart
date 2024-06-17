@@ -4,6 +4,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hakikat_app_new/Account/addadress.dart';
+import 'package:hakikat_app_new/Account/addressscreen.dart';
 import 'package:hakikat_app_new/Explore/components/categorycard.dart';
 import 'package:hakikat_app_new/Explore/explore.dart';
 import 'package:hakikat_app_new/Home/Components/homecategroyitem.dart';
@@ -33,6 +35,7 @@ class _HomePageState extends State<HomePage> {
       FirebaseFirestore.instance.collection('Banners').snapshots();
   final CollectionReference _categoriesCollection =
       FirebaseFirestore.instance.collection('Categories');
+  String? _selectedAddress;
 
   int _currentIndex = 0;
   final CarouselController _controller = CarouselController();
@@ -40,6 +43,27 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     fetchProducts();
+  }
+
+  Future<void> _navigateToAddressScreen(BuildContext context) async {
+    final selectedAddress = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddressScreen(
+          onAddressSelected: (address) {
+            setState(() {
+              _selectedAddress = address;
+            });
+          },
+        ),
+      ),
+    );
+
+    if (selectedAddress != null) {
+      setState(() {
+        _selectedAddress = selectedAddress;
+      });
+    }
   }
 
   @override
@@ -57,15 +81,24 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.location_pin),
-                Text(
-                  'Dhaka, Banassre',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFF4C4E4D),
-                    fontSize: 18,
-                    fontFamily: 'Gilroy',
-                    fontWeight: FontWeight.w600,
-                    height: 0,
+                IconButton(
+                  onPressed: () {
+                    _navigateToAddressScreen(context);
+                  },
+                  icon: SizedBox(
+                    width: width * 0.6,
+                    child: Text(
+                      overflow: TextOverflow.ellipsis,
+                      _selectedAddress ?? 'Select Address',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF4C4E4D),
+                        fontSize: 18,
+                        fontFamily: 'Gilroy',
+                        fontWeight: FontWeight.w600,
+                        height: 0,
+                      ),
+                    ),
                   ),
                 )
               ],

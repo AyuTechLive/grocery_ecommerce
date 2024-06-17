@@ -1,10 +1,13 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
+import 'package:hakikat_app_new/Account/addressscreen.dart';
 import 'package:hakikat_app_new/OrderSucess/ordersucess.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
+import 'package:hakikat_app_new/Utils/utils.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class DemoCheckout extends StatefulWidget {
@@ -19,6 +22,7 @@ class DemoCheckout extends StatefulWidget {
 
 class _DemoCheckoutState extends State<DemoCheckout> {
   bool isLoading = false;
+  String? selectedAddress;
   Future<void> _placeOrder(BuildContext context) async {
     setState(() {
       isLoading = true; // Set loading to true when placing the order
@@ -37,6 +41,7 @@ class _DemoCheckoutState extends State<DemoCheckout> {
       'items': widget.cartItems,
       'total': widget.grandTotal,
       'timestamp': FieldValue.serverTimestamp(),
+      'address': selectedAddress
     };
 
     // Create a batch write
@@ -75,6 +80,27 @@ class _DemoCheckoutState extends State<DemoCheckout> {
     nextScreenReplace(context, OrderSucess());
   }
 
+  void _selectAddress(BuildContext context) async {
+    final selectedAddress = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddressScreen(
+          onAddressSelected: (address) {
+            setState(() {
+              this.selectedAddress = address;
+            });
+          },
+        ),
+      ),
+    );
+
+    if (selectedAddress != null) {
+      setState(() {
+        this.selectedAddress = selectedAddress;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screensize = MediaQuery.of(context).size;
@@ -99,33 +125,44 @@ class _DemoCheckoutState extends State<DemoCheckout> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: width * 0.85,
-                  height: height * 0.07532,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.15),
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: width * 0.05,
-                      ),
-                      Icon(Icons.home_filled),
-                      SizedBox(
-                        width: width * 0.02,
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [Text('Home'), Text('N-1/8 GKA')],
-                      ),
-                      Spacer(),
-                      Icon(Icons.expand_more),
-                      SizedBox(
-                        width: width * 0.03,
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: () => _selectAddress(context),
+                  child: Container(
+                    width: width * 0.85,
+                    height: height * 0.07532,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.15),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: width * 0.05,
+                        ),
+                        Icon(Icons.home_filled),
+                        SizedBox(
+                          width: width * 0.02,
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: width * 0.6,
+                              child: Text(
+                                selectedAddress ?? 'Select Address',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Spacer(),
+                        Icon(Icons.expand_more),
+                        SizedBox(
+                          width: width * 0.03,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -246,7 +283,9 @@ class _DemoCheckoutState extends State<DemoCheckout> {
       ),
       bottomNavigationBar: IconButton(
         onPressed: () {
-          _placeOrder(context);
+          selectedAddress != null
+              ? _placeOrder(context)
+              : Utils().toastMessage('Select Address');
         },
         icon: isLoading
             ? CircularProgressIndicator()

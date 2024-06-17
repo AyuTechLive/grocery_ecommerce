@@ -13,7 +13,10 @@ class MyOrdersScreen extends StatefulWidget {
 
 class _MyOrdersScreenState extends State<MyOrdersScreen> {
   bool isLoading = true;
+  bool isLoadingMore = false;
   List<OrderData> orderData = [];
+  int limit = 5; // Number of documents to fetch initially
+  DocumentSnapshot? lastVisible;
 
   @override
   void initState() {
@@ -37,15 +40,20 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
     // Fetch the order details from the "orders" collection
     List<OrderData> fetchedOrderData = [];
-    for (String orderId in orderIds) {
-      DocumentSnapshot orderSnapshot = await FirebaseFirestore.instance
-          .collection('orders')
-          .doc(orderId)
-          .get();
+    Query ordersQuery = FirebaseFirestore.instance
+        .collection('orders')
+        .orderBy('timestamp', descending: true)
+        .limit(limit);
 
-      if (orderSnapshot.exists) {
-        Map<String, dynamic> orderData =
-            orderSnapshot.data() as Map<String, dynamic>;
+    if (lastVisible != null) {
+      ordersQuery = ordersQuery.startAfterDocument(lastVisible!);
+    }
+
+    QuerySnapshot ordersSnapshot = await ordersQuery.get();
+
+    for (DocumentSnapshot orderDoc in ordersSnapshot.docs) {
+      Map<String, dynamic> orderData = orderDoc.data() as Map<String, dynamic>;
+      if (orderIds.contains(orderData['orderId'])) {
         OrderData order = OrderData.fromMap(orderData);
         fetchedOrderData.add(order);
       }
@@ -53,55 +61,85 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
     setState(() {
       isLoading = false;
-      orderData = fetchedOrderData;
+      isLoadingMore = false;
+      orderData.addAll(fetchedOrderData);
+      if (ordersSnapshot.docs.length == limit) {
+        lastVisible = ordersSnapshot.docs.last;
+      } else {
+        lastVisible = null;
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('My Orders'),
-        ),
-        body: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : orderData.isEmpty
-                ? Center(child: Text('You Have Not Ordered Something From Us'))
-                : ListView.separated(
-                    separatorBuilder: (context, index) {
-                      return SizedBox(
-                        height: 20,
-                      );
-                    },
-                    itemCount: orderData.length,
-                    itemBuilder: (context, index) {
-                      OrderData order = orderData[index];
-                      String formatteddate = timestampToFormattedDate(
-                          order.orderdate, 'dd-MM-yyyy');
-                      return GestureDetector(
-                          onTap: () {
-                            showOrderDetails(context, order);
+      appBar: AppBar(
+        title: Text('My Orders'),
+      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : orderData.isEmpty
+              ? Center(child: Text('You Have Not Ordered Something From Us'))
+              : NotificationListener<ScrollNotification>(
+                  onNotification: (ScrollNotification scrollInfo) {
+                    if (scrollInfo.metrics.pixels ==
+                        scrollInfo.metrics.maxScrollExtent) {
+                      if (lastVisible != null && !isLoadingMore) {
+                        setState(() {
+                          isLoadingMore = true;
+                        });
+                        fetchOrderDetails();
+                      }
+                    }
+                    return true;
+                  },
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView.separated(
+                          separatorBuilder: (context, index) {
+                            return SizedBox(
+                              height: 20,
+                            );
                           },
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 20, right: 20),
-                            child: MyOrderTile(
-                              quantity: order.items.length.toString(),
-                              processing: true,
-                              title: order.title,
-                              price: order.total.toString(),
-                              img: order.imgurl,
-                              orderid: order.orderId,
-                              date: formatteddate,
-                            ),
-                          )
-
-                          //  ListTile(
-                          //   title: Text('Order ID: ${order.orderId}'),
-                          //   subtitle: Text('Total: ₹${order.total}'),
-                          // ),
-                          );
-                    },
-                  ));
+                          itemCount: orderData.length,
+                          itemBuilder: (context, index) {
+                            OrderData order = orderData[index];
+                            String formatteddate = timestampToFormattedDate(
+                                order.orderdate, 'dd-MM-yyyy');
+                            return GestureDetector(
+                              onTap: () {
+                                showOrderDetails(context, order);
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 20, right: 20),
+                                child: MyOrderTile(
+                                  ontap: () {
+                                    showOrderDetails(context, order);
+                                  },
+                                  quantity: order.items.length.toString(),
+                                  processing: true,
+                                  title: order.title,
+                                  price: order.total.toString(),
+                                  img: order.imgurl,
+                                  orderid: order.orderId,
+                                  date: formatteddate,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      if (isLoadingMore)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                    ],
+                  ),
+                ),
+    );
   }
 
   void showOrderDetails(BuildContext context, OrderData order) {
