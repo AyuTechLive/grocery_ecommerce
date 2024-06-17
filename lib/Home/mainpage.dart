@@ -7,6 +7,8 @@ import 'package:hakikat_app_new/Cart/democart.dart';
 import 'package:hakikat_app_new/Explore/explore.dart';
 import 'package:hakikat_app_new/Favorites/favorites.dart';
 import 'package:hakikat_app_new/Home/homepage.dart';
+import 'package:hakikat_app_new/OrderSucess/myorder.dart';
+
 import 'package:hakikat_app_new/Utils/colors.dart';
 
 class MainPage extends StatefulWidget {
@@ -76,7 +78,7 @@ class _MainPageState extends State<MainPage> {
             Explore(),
             CartScreen(),
             FavoritesScreen(),
-            AdminPanel()
+            MyOrdersScreen()
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(

@@ -23,8 +23,8 @@ class _DemoCheckoutState extends State<DemoCheckout> {
     setState(() {
       isLoading = true; // Set loading to true when placing the order
     });
-    String userDocumentId = checkUserAuthenticationType();
 
+    String userDocumentId = checkUserAuthenticationType();
     DocumentReference userDocRef =
         FirebaseFirestore.instance.collection('Users').doc(userDocumentId);
 
@@ -39,26 +39,34 @@ class _DemoCheckoutState extends State<DemoCheckout> {
       'timestamp': FieldValue.serverTimestamp(),
     };
 
-    // Add the order to the 'orders' collection
-    await FirebaseFirestore.instance
-        .collection('orders')
-        .doc(orderId)
-        .set(orderData);
+    // Create a batch write
+    WriteBatch batch = FirebaseFirestore.instance.batch();
 
-    // Update the user's 'my orders' list
-    await userDocRef.update({
-      'my orders': FieldValue.arrayUnion([orderId]),
+    // Add the order to the 'orders' collection
+    batch.set(FirebaseFirestore.instance.collection('orders').doc(orderId),
+        orderData);
+
+    // Update the user's 'my orders' list in the batch
+    batch.update(userDocRef, {
+      'my orders': FieldValue.arrayUnion([orderId])
     });
 
+    // Commit the batch
+    await batch.commit();
+
+    // Decrease quantities in parallel
     await _decreaseQuantities(widget.cartItems);
+
+    // Delete cart items
     await _deleteCartItem();
 
     // Show confirmation message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Order placed successfully!'),
-      ),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text('Order placed successfully!'),
+    //   ),
+    // );
+
     setState(() {
       isLoading = false; // Set loading to false after placing the order
     });
@@ -76,162 +84,165 @@ class _DemoCheckoutState extends State<DemoCheckout> {
       appBar: AppBar(
         title: Text('Checkout'),
       ),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: width * 0.1,
-              ),
-              Text('Delivery address'),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: width * 0.85,
-                height: height * 0.07532,
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.15),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: width * 0.1,
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                Text('Delivery address'),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: width * 0.85,
+                  height: height * 0.07532,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.15),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: width * 0.05,
+                      ),
+                      Icon(Icons.home_filled),
+                      SizedBox(
+                        width: width * 0.02,
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [Text('Home'), Text('N-1/8 GKA')],
+                      ),
+                      Spacer(),
+                      Icon(Icons.expand_more),
+                      SizedBox(
+                        width: width * 0.03,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: height * 0.03,
+            ),
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: width * 0.05,
+                      width: width * 0.1,
                     ),
-                    Icon(Icons.home_filled),
-                    SizedBox(
-                      width: width * 0.02,
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Text('Home'), Text('N-1/8 GKA')],
-                    ),
-                    Spacer(),
-                    Icon(Icons.expand_more),
-                    SizedBox(
-                      width: width * 0.03,
+                    Text('Payment Mode'),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: width * 0.85,
+                      height: height * 0.07532,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.15),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: width * 0.05,
+                          ),
+                          Icon(Icons.wallet),
+                          SizedBox(
+                            width: width * 0.02,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [Text('Cash On Delivery')],
+                          ),
+                          Spacer(),
+                          SizedBox(
+                            width: width * 0.03,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: height * 0.03,
-          ),
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: width * 0.1,
-                  ),
-                  Text('Payment Mode'),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: width * 0.85,
-                    height: height * 0.07532,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.15),
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+              ],
+            ),
+            SizedBox(
+              height: height * 0.03,
+            ),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: width * 0.1,
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: width * 0.05,
-                        ),
-                        Icon(Icons.wallet),
-                        SizedBox(
-                          width: width * 0.02,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [Text('Cash On Delivery')],
-                        ),
-                        Spacer(),
-                        SizedBox(
-                          width: width * 0.03,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(
-            height: height * 0.03,
-          ),
-          Column(
-            children: [
-              Row(
-                children: [
-                  SizedBox(
-                    width: width * 0.1,
-                  ),
-                  Text('Order Summary'),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: width * 0.85,
-                    // height: height * 0.07532,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.15),
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        ListView.builder(
-                          shrinkWrap:
-                              true, // Add this line to prevent the ListView from taking up extra space
-                          itemCount: widget.cartItems.length,
-                          itemBuilder: (context, index) {
-                            Map<String, dynamic> item = widget.cartItems[index];
-                            return ListTile(
-                              title: Text(item['Product Title']),
-                              subtitle: Text(item['Product Subtitle']),
-                              trailing: Text(
-                                '₹${item['Product Price']} x ${item['quantity']}',
+                    Text('Order Summary'),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: width * 0.85,
+                      // height: height * 0.07532,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.15),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          ListView.builder(
+                            shrinkWrap:
+                                true, // Add this line to prevent the ListView from taking up extra space
+                            itemCount: widget.cartItems.length,
+                            itemBuilder: (context, index) {
+                              Map<String, dynamic> item =
+                                  widget.cartItems[index];
+                              return ListTile(
+                                title: Text(item['Product Title']),
+                                subtitle: Text(item['Product Subtitle']),
+                                trailing: Text(
+                                  '₹${item['Product Price']} x ${item['quantity']}',
+                                ),
+                              );
+                            },
+                          ),
+                          Divider(),
+                          Container(
+                            padding: EdgeInsets.all(16.0),
+                            child: Text(
+                              'Total: ₹${widget.grandTotal}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
-                            );
-                          },
-                        ),
-                        Divider(),
-                        Container(
-                          padding: EdgeInsets.all(16.0),
-                          child: Text(
-                            'Total: ₹${widget.grandTotal}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: IconButton(
         onPressed: () {
@@ -286,28 +297,32 @@ class _DemoCheckoutState extends State<DemoCheckout> {
 }
 
 Future<void> _decreaseQuantities(List<Map<String, dynamic>> cartItems) async {
+  List<Future<void>> futures = [];
+
   for (var item in cartItems) {
     String itemId = item['id'];
     int orderedQuantity = item['quantity'];
 
-    // Get the current quantity from the Realtime Database
-    DataSnapshot snapshot =
-        await FirebaseDatabase.instance.ref().child(itemId).get();
+    futures.add(_decreaseQuantityForItem(itemId, orderedQuantity));
+  }
 
-    if (snapshot.value != null) {
-      Map<dynamic, dynamic> itemData = snapshot.value as Map<dynamic, dynamic>;
+  await Future.wait(futures);
+}
 
-      // Check if the "Product Stock" field exists
+Future<void> _decreaseQuantityForItem(
+    String itemId, int orderedQuantity) async {
+  DataSnapshot snapshot =
+      await FirebaseDatabase.instance.ref().child(itemId).get();
 
-      int currentQuantity = int.parse(itemData['Product Stock']);
+  if (snapshot.value != null) {
+    Map<dynamic, dynamic> itemData = snapshot.value as Map<dynamic, dynamic>;
 
-      int newQuantity = currentQuantity - orderedQuantity;
+    int currentQuantity = int.parse(itemData['Product Stock']);
+    int newQuantity = currentQuantity - orderedQuantity;
 
-      // Update the Realtime Database with the new quantity
-      await FirebaseDatabase.instance
-          .ref()
-          .child(itemId)
-          .update({'Product Stock': newQuantity.toString()});
-    }
+    await FirebaseDatabase.instance
+        .ref()
+        .child(itemId)
+        .update({'Product Stock': newQuantity.toString()});
   }
 }
