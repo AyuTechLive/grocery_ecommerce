@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
+import 'package:hakikat_app_new/Utils/utils.dart';
 
 class AddAddress extends StatefulWidget {
   const AddAddress({super.key});
@@ -20,6 +21,7 @@ class _AddAddressState extends State<AddAddress> {
   final mobilenocontroller = TextEditingController();
   final addressline2controller = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool isloading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +75,12 @@ class _AddAddressState extends State<AddAddress> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter mobile name';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(
                   height: height * 0.02,
@@ -115,6 +123,12 @@ class _AddAddressState extends State<AddAddress> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter address line 1';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(
                   height: height * 0.02,
@@ -157,6 +171,12 @@ class _AddAddressState extends State<AddAddress> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter address line 2';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(
                   height: height * 0.02,
@@ -199,6 +219,12 @@ class _AddAddressState extends State<AddAddress> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter city';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(
                   height: height * 0.02,
@@ -241,6 +267,12 @@ class _AddAddressState extends State<AddAddress> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter state';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(
                   height: height * 0.02,
@@ -283,6 +315,12 @@ class _AddAddressState extends State<AddAddress> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter pincode';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(
                   height: height * 0.02,
@@ -325,16 +363,53 @@ class _AddAddressState extends State<AddAddress> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter mobile number';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(
                   height: height * 0.03,
                 ),
-                RoundButton(
-                  title: 'Save Address',
-                  onTap: () {
-                    _saveAddress();
+                IconButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      _saveAddress();
+                    }
                   },
-                )
+                  icon: isloading
+                      ? CircularProgressIndicator()
+                      : Container(
+                          width: width * 0.879,
+                          height: height * 0.074,
+                          decoration: ShapeDecoration(
+                            color: AppColors.greenthemecolor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(19),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Save Address',
+                              style: TextStyle(
+                                color: Color(0xFFFCFCFC),
+                                fontSize: 16,
+                                fontFamily: 'Gilroy',
+                                fontWeight: FontWeight.w600,
+                                height: 0.06,
+                              ),
+                            ),
+                          ),
+                        ),
+                ),
+                // RoundButton(
+                //   title:  'Save Address',
+                //   onTap: () {
+                //     _saveAddress();
+                //   },
+                // )
               ],
             ),
           ),
@@ -345,6 +420,9 @@ class _AddAddressState extends State<AddAddress> {
 
   Future<void> _saveAddress() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        isloading = true;
+      });
       // Get the user's document ID
       String userDocumentId = checkUserAuthenticationType();
       String idnew = DateTime.now().millisecondsSinceEpoch.toString();
@@ -380,12 +458,12 @@ class _AddAddressState extends State<AddAddress> {
       pincodecontroller.clear();
       mobilenocontroller.clear();
 
+      setState(() {
+        isloading = false;
+      });
+      Utils().toastMessage('Address saved successfully');
+      Navigator.pop(context);
       // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Address saved successfully'),
-        ),
-      );
     }
   }
 }

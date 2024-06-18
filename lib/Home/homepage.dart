@@ -73,6 +73,7 @@ class _HomePageState extends State<HomePage> {
     final double width = screensize.width;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.center,

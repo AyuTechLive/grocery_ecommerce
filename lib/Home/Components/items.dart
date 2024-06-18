@@ -26,7 +26,7 @@ class Items extends StatelessWidget {
       onTap: ontap,
       child: Container(
         width: width * 0.4186,
-        height: height * 0.277,
+        //height: height * 0.277,
         decoration: ShapeDecoration(
           shape: RoundedRectangleBorder(
             side: BorderSide(width: 1, color: Color(0xFFE2E2E2)),

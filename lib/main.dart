@@ -6,13 +6,20 @@ import 'package:hakikat_app_new/Home/mainpage.dart';
 import 'package:hakikat_app_new/Splashscreen/splashscreen.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/firebase_options.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(const MyApp());
+  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  OneSignal.initialize('9c34ad01-1149-4c6d-8720-2afd0ea248d5');
+  OneSignal.Notifications.requestPermission(true).then((value) {
+    print('signal value: $value');
+  });
 }
 
 class MyApp extends StatelessWidget {

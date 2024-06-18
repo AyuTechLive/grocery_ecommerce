@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/Account/addressscreen.dart';
 import 'package:hakikat_app_new/Account/components/accountmenu.dart';
 import 'package:hakikat_app_new/AdminSide/adminpanel.dart';
 import 'package:hakikat_app_new/Auth/login.dart';
@@ -18,6 +19,7 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
+  String? _selectedAddress;
   final auth = FirebaseAuth.instance;
   String userName = '';
   String userEmail = '';
@@ -92,7 +94,7 @@ class _AccountState extends State<Account> {
               img: 'delivery',
               title: 'Delivery Addreess',
               ontap: () {
-                Utils().toastMessage('Currently Under Dev');
+                _navigateToAddressScreen(context);
               },
             ),
             Divider(),
@@ -218,6 +220,27 @@ class _AccountState extends State<Account> {
       setState(() {
         userName = userData['Name'] ?? '';
         userEmail = userData['Email'] ?? '';
+      });
+    }
+  }
+
+  Future<void> _navigateToAddressScreen(BuildContext context) async {
+    final selectedAddress = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddressScreen(
+          onAddressSelected: (address) {
+            setState(() {
+              _selectedAddress = address;
+            });
+          },
+        ),
+      ),
+    );
+
+    if (selectedAddress != null) {
+      setState(() {
+        _selectedAddress = selectedAddress;
       });
     }
   }
