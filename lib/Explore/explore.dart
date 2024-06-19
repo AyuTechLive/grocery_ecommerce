@@ -3,10 +3,13 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hakikat_app_new/AdminSide/editcategory.dart';
+import 'package:hakikat_app_new/AdminSide/editproduct.dart';
 import 'package:hakikat_app_new/Explore/components/categorycard.dart';
 import 'package:hakikat_app_new/Home/Components/items.dart';
 import 'package:hakikat_app_new/ItemsShowing/CategoryProducts.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
+import 'package:hakikat_app_new/Utils/defaultimage.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class Explore extends StatefulWidget {
@@ -155,14 +158,27 @@ class _ExploreState extends State<Explore> {
                               document.data() as Map<String, dynamic>;
                           return CategoryCard(
                             ontap: () {
-                              nextScreen(
-                                  context,
-                                  CategoryProduct(
-                                    categoryname: data['Category Name'],
-                                  ));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditCategoryScreen(
+                                    categoryId: data[
+                                        'Category Name'], // Replace with the actual category ID
+                                    initialCategoryName: data[
+                                        'Category Name'], // Replace with the initial category name
+                                    initialCategoryImageUrl: data[
+                                        'Category Img'], // Replace with the initial image URL
+                                  ),
+                                ),
+                              );
+                              // nextScreen(
+                              //     context,
+                              //     CategoryProduct(
+                              //       categoryname: data['Category Name'],
+                              //     ));
                             },
                             color: Color(0x19F8A44C),
-                            img: data['Category Img'] ?? '',
+                            img: data['Category Img'] ?? AppImage.defaultimgurl,
                             title: data['Category Name'] ?? '',
                           );
                         },
@@ -219,8 +235,14 @@ class _ExploreState extends State<Explore> {
                           nextScreen(
                               context,
                               ProductDetails(
+                                imageUrls: List<String>.from(
+                                    product['Product Img'] ??
+                                        [AppImage.defaultimgurl]),
                                 orderid: product['id'],
-                                img: product['Product Img'],
+                                img: (product['Product Img'] != null &&
+                                        product['Product Img'].isNotEmpty)
+                                    ? product['Product Img'][0]
+                                    : AppImage.defaultimgurl,
                                 maxquantity:
                                     int.parse(product['Product Stock']),
                                 price: product['Product Price'],
@@ -229,19 +251,25 @@ class _ExploreState extends State<Explore> {
                               ));
                         },
                         onadd: () {
-                          nextScreen(
-                              context,
-                              ProductDetails(
-                                orderid: product['id'],
-                                img: product['Product Img'],
-                                maxquantity:
-                                    int.parse(product['Product Stock']),
-                                price: product['Product Price'],
-                                title: product['Product Title'] ?? '',
-                                subtitle: product['Product Subtitle'] ?? '',
-                              ));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditProductScreen(
+                                imageUrls: List<String>.from(
+                                  (product['Product Img'] ?? []).where(
+                                    (url) => url != AppImage.defaultimgurl,
+                                  ),
+                                ),
+                                productId: product['id'],
+                                initialProductData: product,
+                              ),
+                            ),
+                          );
                         },
-                        img: product['Product Img'] ?? '',
+                        img: (product['Product Img'] != null &&
+                                product['Product Img'].isNotEmpty)
+                            ? product['Product Img'][0]
+                            : AppImage.defaultimgurl,
                         price: product['Product Price'] ?? '',
                         title: product['Product Title'] ?? '',
                         subtitle: product['Product Subtitle'] ?? '',

@@ -1,7 +1,9 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/AdminSide/editproduct.dart';
 import 'package:hakikat_app_new/Home/Components/items.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
+import 'package:hakikat_app_new/Utils/defaultimage.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class CategoryProduct extends StatefulWidget {
@@ -17,6 +19,8 @@ class _CategoryProductState extends State<CategoryProduct> {
   List<Map<String, dynamic>> products = [];
   List<Map<String, dynamic>> filteredProducts = [];
   final searchController = TextEditingController();
+  final String defaulturl =
+      'https://firebasestorage.googleapis.com/v0/b/hakkikatdemo.appspot.com/o/image%2013.png?alt=media&token=266dd175-942b-4d38-8c81-355fb87a327e';
 
   @override
   void initState() {
@@ -85,8 +89,13 @@ class _CategoryProductState extends State<CategoryProduct> {
                     nextScreen(
                       context,
                       ProductDetails(
+                        imageUrls: List<String>.from(
+                            product['Product Img'] ?? [AppImage.defaultimgurl]),
                         orderid: product['id'],
-                        img: product['Product Img'],
+                        img: (product['Product Img'] != null &&
+                                product['Product Img'].isNotEmpty)
+                            ? product['Product Img'][0]
+                            : AppImage.defaultimgurl,
                         maxquantity: int.parse(product['Product Stock']),
                         price: product['Product Price'],
                         title: product['Product Title'] ?? '',
@@ -95,19 +104,25 @@ class _CategoryProductState extends State<CategoryProduct> {
                     );
                   },
                   onadd: () {
-                    nextScreen(
+                    Navigator.push(
                       context,
-                      ProductDetails(
-                        orderid: product['id'],
-                        img: product['Product Img'],
-                        maxquantity: int.parse(product['Product Stock']),
-                        price: product['Product Price'],
-                        title: product['Product Title'] ?? '',
-                        subtitle: product['Product Subtitle'] ?? '',
+                      MaterialPageRoute(
+                        builder: (context) => EditProductScreen(
+                          imageUrls: List<String>.from(
+                            (product['Product Img'] ?? []).where(
+                              (url) => url != AppImage.defaultimgurl,
+                            ),
+                          ),
+                          productId: product['id'],
+                          initialProductData: product,
+                        ),
                       ),
                     );
                   },
-                  img: product['Product Img'],
+                  img: (product['Product Img'] != null &&
+                          product['Product Img'].isNotEmpty)
+                      ? product['Product Img'][0]
+                      : AppImage.defaultimgurl,
                   price: product['Product Price'],
                   title: product['Product Title'] ?? '',
                   subtitle: product['Product Subtitle'] ?? '',
@@ -161,5 +176,9 @@ class _CategoryProductState extends State<CategoryProduct> {
         });
       }
     });
+  }
+
+  void deleteProduct(String productId) {
+    databaseRef.child(productId).remove();
   }
 }

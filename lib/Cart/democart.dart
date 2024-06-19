@@ -6,6 +6,7 @@ import 'package:hakikat_app_new/CheckoutPage/checkoutpage.dart';
 import 'package:hakikat_app_new/CheckoutPage/democheckout.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
+import 'package:hakikat_app_new/Utils/defaultimage.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class CartScreen extends StatefulWidget {
@@ -55,7 +56,10 @@ class _CartScreenState extends State<CartScreen> {
           'Product Title': productDataStringKeys['Product Title'] ?? '',
           'Product Subtitle': productDataStringKeys['Product Subtitle'] ?? '',
           'Product Price': productDataStringKeys['Product Price'] ?? '',
-          'Product Img': productDataStringKeys['Product Img'] ?? '',
+          'Product Img': (productDataStringKeys['Product Img'] != null &&
+                  productDataStringKeys['Product Img'].isNotEmpty)
+              ? productDataStringKeys['Product Img'][0]
+              : AppImage.defaultimgurl,
         });
       }
 
@@ -148,23 +152,22 @@ class _CartScreenState extends State<CartScreen> {
                                 _deleteCartItem(item['id']);
                               },
                               child: CartTile(
-                                onremove: () async {
-                                  bool shouldDelete =
-                                      await _showDeleteConfirmationDialog(
-                                          context, item['id']);
-                                  if (shouldDelete) {
-                                    _deleteCartItem(item['id']);
-                                  }
-                                },
-                                title: item['Product Title'] ?? '',
-                                subtitle: item['Product Subtitle'] ?? '',
-                                price: (int.parse(item['Product Price']) *
-                                            item['quantity'])
-                                        .toString() ??
-                                    '',
-                                quantity: item['quantity'],
-                                img: item['Product Img'],
-                              ));
+                                  onremove: () async {
+                                    bool shouldDelete =
+                                        await _showDeleteConfirmationDialog(
+                                            context, item['id']);
+                                    if (shouldDelete) {
+                                      _deleteCartItem(item['id']);
+                                    }
+                                  },
+                                  title: item['Product Title'] ?? '',
+                                  subtitle: item['Product Subtitle'] ?? '',
+                                  price: (int.parse(item['Product Price']) *
+                                              item['quantity'])
+                                          .toString() ??
+                                      '',
+                                  quantity: item['quantity'],
+                                  img: item['Product Img']));
                         },
                       ),
                     ),

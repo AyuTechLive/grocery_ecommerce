@@ -41,48 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCeiqJZQbssR2CslsH5TV6cwoOTjivZLtc',
-    appId: '1:331819345556:web:69207baa71bef83f8bb681',
-    messagingSenderId: '331819345556',
-    projectId: 'hakikat-app-2e038',
-    authDomain: 'hakikat-app-2e038.firebaseapp.com',
-    storageBucket: 'hakikat-app-2e038.appspot.com',
-    measurementId: 'G-1489NV2E6M',
+    apiKey: 'AIzaSyAHbTpwvcU5fCRSxFNAaxNblNJlmKImNJ0',
+    appId: '1:460364116205:web:11c5e1a993786d81255ce4',
+    messagingSenderId: '460364116205',
+    projectId: 'hakkikatdemo',
+    authDomain: 'hakkikatdemo.firebaseapp.com',
+    storageBucket: 'hakkikatdemo.appspot.com',
+    measurementId: 'G-94BYKHKR3X',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAknVJR6yu7NkcVU0f4k0JqgtC3xikymOc',
-    appId: '1:331819345556:android:66969f4368389cfa8bb681',
-    messagingSenderId: '331819345556',
-    projectId: 'hakikat-app-2e038',
-    storageBucket: 'hakikat-app-2e038.appspot.com',
+    apiKey: 'AIzaSyDb06naJZxObS4TAsZQeM55DNGBiAwzJHk',
+    appId: '1:460364116205:android:0c06dd3c9c7dffa9255ce4',
+    messagingSenderId: '460364116205',
+    projectId: 'hakkikatdemo',
+    storageBucket: 'hakkikatdemo.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCuhuZaYyyoZn9NGgZ7M3chpVqL_Z10V_s',
-    appId: '1:331819345556:ios:705e75bb8c2061638bb681',
-    messagingSenderId: '331819345556',
-    projectId: 'hakikat-app-2e038',
-    storageBucket: 'hakikat-app-2e038.appspot.com',
+    apiKey: 'AIzaSyDY3NgP5Az2KZSQq-qdMNsvsgsFl262KtU',
+    appId: '1:460364116205:ios:5fd12effb3142ced255ce4',
+    messagingSenderId: '460364116205',
+    projectId: 'hakkikatdemo',
+    storageBucket: 'hakkikatdemo.appspot.com',
     iosBundleId: 'com.example.hakikatAppNew',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCuhuZaYyyoZn9NGgZ7M3chpVqL_Z10V_s',
-    appId: '1:331819345556:ios:705e75bb8c2061638bb681',
-    messagingSenderId: '331819345556',
-    projectId: 'hakikat-app-2e038',
-    storageBucket: 'hakikat-app-2e038.appspot.com',
+    apiKey: 'AIzaSyDY3NgP5Az2KZSQq-qdMNsvsgsFl262KtU',
+    appId: '1:460364116205:ios:5fd12effb3142ced255ce4',
+    messagingSenderId: '460364116205',
+    projectId: 'hakkikatdemo',
+    storageBucket: 'hakkikatdemo.appspot.com',
     iosBundleId: 'com.example.hakikatAppNew',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCeiqJZQbssR2CslsH5TV6cwoOTjivZLtc',
-    appId: '1:331819345556:web:c034df6455804c238bb681',
-    messagingSenderId: '331819345556',
-    projectId: 'hakikat-app-2e038',
-    authDomain: 'hakikat-app-2e038.firebaseapp.com',
-    storageBucket: 'hakikat-app-2e038.appspot.com',
-    measurementId: 'G-R3G4HSL0YZ',
+    apiKey: 'AIzaSyAHbTpwvcU5fCRSxFNAaxNblNJlmKImNJ0',
+    appId: '1:460364116205:web:1cc6a311c4da305e255ce4',
+    messagingSenderId: '460364116205',
+    projectId: 'hakkikatdemo',
+    authDomain: 'hakkikatdemo.firebaseapp.com',
+    storageBucket: 'hakkikatdemo.appspot.com',
+    measurementId: 'G-9GB0SPMF9E',
   );
+
 }

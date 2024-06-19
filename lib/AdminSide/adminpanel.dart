@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/AdminSide/Orders/placedorders.dart';
 import 'package:hakikat_app_new/AdminSide/addbanner.dart';
 import 'package:hakikat_app_new/AdminSide/addcategory.dart';
 import 'package:hakikat_app_new/AdminSide/addproduct.dart';
@@ -58,6 +59,15 @@ class AdminPanel extends StatelessWidget {
               title: 'Add Banner',
               onTap: () {
                 nextScreen(context, AddBanner());
+              },
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            RoundButton(
+              title: 'Orders',
+              onTap: () {
+                nextScreen(context, AdminOrderHistoryScreen());
               },
             )
           ],

@@ -120,7 +120,7 @@ class Items extends StatelessWidget {
                       ),
                       child: Center(
                         child: Icon(
-                          Icons.add,
+                          Icons.edit,
                           color: Colors.white,
                         ),
                       ),

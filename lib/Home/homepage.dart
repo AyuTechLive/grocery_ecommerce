@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hakikat_app_new/Account/addadress.dart';
 import 'package:hakikat_app_new/Account/addressscreen.dart';
+import 'package:hakikat_app_new/AdminSide/editproduct.dart';
 import 'package:hakikat_app_new/Explore/components/categorycard.dart';
 import 'package:hakikat_app_new/Explore/explore.dart';
 import 'package:hakikat_app_new/Home/Components/homecategroyitem.dart';
@@ -16,6 +17,7 @@ import 'package:hakikat_app_new/ItemsShowing/CategoryProducts.dart';
 import 'package:hakikat_app_new/ItemsShowing/Exclusiveitemshowing.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
+import 'package:hakikat_app_new/Utils/defaultimage.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,6 +30,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final databaseRef = FirebaseDatabase.instance.ref();
   List<Map<String, dynamic>> products = [];
+  final String defaulturl =
+      'https://firebasestorage.googleapis.com/v0/b/hakkikatdemo.appspot.com/o/image%2013.png?alt=media&token=266dd175-942b-4d38-8c81-355fb87a327e';
   List<Map<String, dynamic>> filteredProducts = [];
   final searchController = TextEditingController();
   final searchcontroller = TextEditingController();
@@ -256,8 +260,14 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            imageUrls: List<String>.from(
+                                product['Product Img'] ??
+                                    [AppImage.defaultimgurl]),
                             orderid: product['id'],
-                            img: product['Product Img'],
+                            img: (product['Product Img'] != null &&
+                                    product['Product Img'].isNotEmpty)
+                                ? product['Product Img'][0]
+                                : AppImage.defaultimgurl,
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
                             title: product['Product Title'] ?? '',
@@ -265,18 +275,24 @@ class _HomePageState extends State<HomePage> {
                           ));
                     },
                     onadd: () {
-                      nextScreen(
-                          context,
-                          ProductDetails(
-                            orderid: product['id'],
-                            img: product['Product Img'],
-                            maxquantity: int.parse(product['Product Stock']),
-                            price: product['Product Price'],
-                            title: product['Product Title'] ?? '',
-                            subtitle: product['Product Subtitle'] ?? '',
-                          ));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditProductScreen(
+                            imageUrls: List<String>.from(
+                                (product['Product Img'] ?? []).where(
+                              (url) => url != AppImage.defaultimgurl,
+                            )),
+                            productId: product['id'],
+                            initialProductData: product,
+                          ),
+                        ),
+                      );
                     },
-                    img: product['Product Img'],
+                    img: (product['Product Img'] != null &&
+                            product['Product Img'].isNotEmpty)
+                        ? product['Product Img'][0]
+                        : defaulturl,
                     price: product['Product Price'],
                     title: product['Product Title'] ?? '',
                     subtitle: product['Product Subtitle'] ?? '',
@@ -403,25 +419,38 @@ class _HomePageState extends State<HomePage> {
                       .toList()[index];
                   return Items(
                     price: product['Product Price'],
-                    img: product['Product Img'],
+                    img: (product['Product Img'] != null &&
+                            product['Product Img'].isNotEmpty)
+                        ? product['Product Img'][0]
+                        : defaulturl,
                     onadd: () {
-                      nextScreen(
-                          context,
-                          ProductDetails(
-                            orderid: product['id'],
-                            img: product['Product Img'],
-                            maxquantity: int.parse(product['Product Stock']),
-                            price: product['Product Price'],
-                            title: product['Product Title'] ?? '',
-                            subtitle: product['Product Subtitle'] ?? '',
-                          ));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditProductScreen(
+                            imageUrls: List<String>.from(
+                              (product['Product Img'] ?? []).where(
+                                (url) => url != AppImage.defaultimgurl,
+                              ),
+                            ),
+                            productId: product['id'],
+                            initialProductData: product,
+                          ),
+                        ),
+                      );
                     },
                     ontap: () {
                       nextScreen(
                           context,
                           ProductDetails(
+                            imageUrls: List<String>.from(
+                                product['Product Img'] ??
+                                    [AppImage.defaultimgurl]),
                             orderid: product['id'],
-                            img: product['Product Img'],
+                            img: (product['Product Img'] != null &&
+                                    product['Product Img'].isNotEmpty)
+                                ? product['Product Img'][0]
+                                : AppImage.defaultimgurl,
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
                             title: product['Product Title'] ?? '',
@@ -461,25 +490,38 @@ class _HomePageState extends State<HomePage> {
                   Map<String, dynamic> product = products[index];
                   return Items(
                     price: product['Product Price'],
-                    img: product['Product Img'],
+                    img: (product['Product Img'] != null &&
+                            product['Product Img'].isNotEmpty)
+                        ? product['Product Img'][0]
+                        : AppImage.defaultimgurl,
                     onadd: () {
-                      nextScreen(
-                          context,
-                          ProductDetails(
-                            orderid: product['id'],
-                            img: product['Product Img'],
-                            maxquantity: int.parse(product['Product Stock']),
-                            price: product['Product Price'],
-                            title: product['Product Title'] ?? '',
-                            subtitle: product['Product Subtitle'] ?? '',
-                          ));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditProductScreen(
+                            imageUrls: List<String>.from(
+                              (product['Product Img'] ?? []).where(
+                                (url) => url != AppImage.defaultimgurl,
+                              ),
+                            ),
+                            productId: product['id'],
+                            initialProductData: product,
+                          ),
+                        ),
+                      );
                     },
                     ontap: () {
                       nextScreen(
                           context,
                           ProductDetails(
+                            imageUrls: List<String>.from(
+                                product['Product Img'] ??
+                                    [AppImage.defaultimgurl]),
                             orderid: product['id'],
-                            img: product['Product Img'],
+                            img: (product['Product Img'] != null &&
+                                    product['Product Img'].isNotEmpty)
+                                ? product['Product Img'][0]
+                                : AppImage.defaultimgurl,
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
                             title: product['Product Title'] ?? '',

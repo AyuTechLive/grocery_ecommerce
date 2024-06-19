@@ -35,14 +35,20 @@ class HomeCategoryItems extends StatelessWidget {
                 ),
               ),
               Spacer(),
-              Text(
-                title,
-                style: TextStyle(
-                  color: Color(0xFF3E423F),
-                  fontSize: 16,
-                  fontFamily: 'Gilroy',
-                  fontWeight: FontWeight.w600,
-                  height: 0,
+              SizedBox(
+                width: width * 0.01,
+              ),
+              SizedBox(
+                width: width * 0.31,
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: Color(0xFF3E423F),
+                    fontSize: 16,
+                    fontFamily: 'Gilroy',
+                    fontWeight: FontWeight.w600,
+                    height: 0,
+                  ),
                 ),
               ),
               Spacer(),
