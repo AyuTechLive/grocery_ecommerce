@@ -41,7 +41,8 @@ class _DemoCheckoutState extends State<DemoCheckout> {
       'items': widget.cartItems,
       'total': widget.grandTotal,
       'timestamp': FieldValue.serverTimestamp(),
-      'address': selectedAddress
+      'address': selectedAddress,
+      'status': "Order Placed"
     };
 
     // Create a batch write

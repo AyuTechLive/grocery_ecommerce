@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Cart/components/carttile.dart';
 import 'package:hakikat_app_new/CheckoutPage/checkoutpage.dart';
 import 'package:hakikat_app_new/CheckoutPage/democheckout.dart';
+import 'package:hakikat_app_new/Utils/appimg.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
@@ -55,7 +56,10 @@ class _CartScreenState extends State<CartScreen> {
           'Product Title': productDataStringKeys['Product Title'] ?? '',
           'Product Subtitle': productDataStringKeys['Product Subtitle'] ?? '',
           'Product Price': productDataStringKeys['Product Price'] ?? '',
-          'Product Img': productDataStringKeys['Product Img'] ?? '',
+          'Product Img': (productDataStringKeys['Product Img'] != null &&
+                  productDataStringKeys['Product Img'].isNotEmpty)
+              ? productDataStringKeys['Product Img'][0]
+              : AppImage.defaultimgurl,
         });
       }
 

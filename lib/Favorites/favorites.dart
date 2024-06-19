@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Favorites/component/favoritetile.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
+import 'package:hakikat_app_new/Utils/appimg.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
@@ -131,8 +132,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                   nextScreen(
                                       context,
                                       ProductDetails(
+                                        imageUrls: List<String>.from(
+                                            item['Product Img'] ??
+                                                [AppImage.defaultimgurl]),
                                         orderid: item['id'],
-                                        img: item['Product Img'],
+                                        img: (item['Product Img'] != null &&
+                                                item['Product Img'].isNotEmpty)
+                                            ? item['Product Img'][0]
+                                            : AppImage.defaultimgurl,
                                         maxquantity:
                                             int.parse(item['Product Stock']),
                                         price: item['Product Price'],
@@ -144,7 +151,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                 ondelete: () {
                                   _removeFromFavorites(item['id']);
                                 },
-                                img: item['Product Img'],
+                                img: (item['Product Img'] != null &&
+                                        item['Product Img'].isNotEmpty)
+                                    ? item['Product Img'][0]
+                                    : AppImage.defaultimgurl,
                                 price: item['Product Price'],
                                 title: item['Product Title'] ?? '',
                                 subtitle: item['Product Subtitle'] ?? '',

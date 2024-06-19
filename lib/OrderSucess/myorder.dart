@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/Favorites/component/favoritetile.dart';
 import 'package:hakikat_app_new/OrderSucess/components/myordertile.dart';
+import 'package:hakikat_app_new/OrderSucess/components/orderdetailstile.dart';
+import 'package:hakikat_app_new/OrderSucess/orderdetailsscreen.dart';
+import 'package:hakikat_app_new/OrderSucess/ordertrack.dart';
 
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
+import 'package:hakikat_app_new/Utils/widget.dart';
 import 'package:intl/intl.dart';
 
 class MyOrdersScreen extends StatefulWidget {
@@ -115,11 +120,24 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                               child: Padding(
                                 padding: EdgeInsets.only(left: 20, right: 20),
                                 child: MyOrderTile(
+                                  ontaptrack: () {
+                                    nextScreen(
+                                        context,
+                                        OrderTrack(
+                                          estimated: order.estimated,
+                                          orderid: order.orderId,
+                                          date: formatteddate,
+                                          status: order.orderstaus,
+                                        ));
+                                  },
                                   ontap: () {
-                                    showOrderDetails(context, order);
+                                    nextScreen(context,
+                                        OrderDetailsScreen(orderData: order));
+                                    // showOrderDetails(context, order);
+                                    // showOrderDetails(context, order);
                                   },
                                   quantity: order.items.length.toString(),
-                                  processing: true,
+                                  processing: order.orderstaus,
                                   title: order.title,
                                   price: order.total.toString(),
                                   img: order.imgurl,
@@ -157,6 +175,11 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
               SizedBox(height: 16),
               Text('Items:'),
               ...order.items.map((item) {
+                // return Orderdetailstile(
+                //     title: item['Product Title'],
+                //     subtitle: item['Product Price'],
+                //     price: item['Product Price'],
+                //     img: '');
                 return ListTile(
                   title: Text(item['Product Title']),
                   subtitle:
@@ -191,19 +214,27 @@ class OrderData {
   final double total;
   final Timestamp orderdate;
   final String title;
+  final String orderstaus;
+  final String estimated;
+  final String address;
   final List<Map<String, dynamic>> items;
 
-  OrderData({
-    required this.title,
-    required this.imgurl,
-    required this.orderId,
-    required this.total,
-    required this.items,
-    required this.orderdate,
-  });
+  OrderData(
+      {required this.title,
+      required this.imgurl,
+      required this.orderId,
+      required this.total,
+      required this.items,
+      required this.orderdate,
+      required this.estimated,
+      required this.orderstaus,
+      required this.address});
 
   factory OrderData.fromMap(Map<String, dynamic> map) {
     return OrderData(
+      address: map['address'] ?? '',
+      estimated: map['Estimated'] ?? '',
+      orderstaus: map['status'],
       title: map['items'][0]['Product Title'] ?? '',
       imgurl: map['items'][0]['Product Img'] ?? '',
       orderId: map['orderId'] ?? '',

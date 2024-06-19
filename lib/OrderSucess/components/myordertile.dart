@@ -7,8 +7,9 @@ class MyOrderTile extends StatelessWidget {
   final String img;
   final String price;
   final String quantity;
-  final bool processing;
+  final String processing;
   final String title;
+  final VoidCallback ontaptrack;
   final VoidCallback ontap;
   const MyOrderTile(
       {super.key,
@@ -19,7 +20,8 @@ class MyOrderTile extends StatelessWidget {
       required this.quantity,
       required this.processing,
       required this.title,
-      required this.ontap});
+      required this.ontap,
+      required this.ontaptrack});
 
   @override
   Widget build(BuildContext context) {
@@ -42,16 +44,17 @@ class MyOrderTile extends StatelessWidget {
                 SizedBox(
                   width: width * 0.02,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Text(
-                    '  Processing  ',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600, color: Colors.white),
-                  ),
-                ),
+                container(processing)
+                // Container(
+                //   decoration: BoxDecoration(
+                //       color: Colors.amber,
+                //       borderRadius: BorderRadius.circular(5)),
+                //   child: Text(
+                //     '  ${processing}  ',
+                //     style: TextStyle(
+                //         fontWeight: FontWeight.w600, color: Colors.white),
+                //   ),
+                // ),
               ],
             ),
             SizedBox(
@@ -142,7 +145,7 @@ class MyOrderTile extends StatelessWidget {
                       )),
                 ),
                 Spacer(),
-                IconButton(onPressed: () {}, icon: Text('Help')),
+                IconButton(onPressed: ontaptrack, icon: Text('Track Order')),
                 SizedBox(
                   width: width * 0.1,
                 )
@@ -150,5 +153,48 @@ class MyOrderTile extends StatelessWidget {
             )
           ],
         ));
+  }
+
+  Widget container(String processing) {
+    if (processing == 'Order Placed') {
+      return Container(
+        decoration: BoxDecoration(
+            color: Colors.amber, borderRadius: BorderRadius.circular(5)),
+        child: Text(
+          '  Order Placed  ',
+          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+        ),
+      );
+    }
+    if (processing == 'Order Confirmed') {
+      return Container(
+        decoration: BoxDecoration(
+            color: Colors.amber, borderRadius: BorderRadius.circular(5)),
+        child: Text(
+          '  Order Confirmed  ',
+          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+        ),
+      );
+    }
+    if (processing == 'Delivered') {
+      return Container(
+        decoration: BoxDecoration(
+            color: AppColors.greenthemecolor,
+            borderRadius: BorderRadius.circular(5)),
+        child: Text(
+          ' Delivered  ',
+          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+        ),
+      );
+    } else {
+      return Container(
+        decoration: BoxDecoration(
+            color: Colors.red, borderRadius: BorderRadius.circular(5)),
+        child: Text(
+          '  Cancelled  ',
+          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+        ),
+      );
+    }
   }
 }

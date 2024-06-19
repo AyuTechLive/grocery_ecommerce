@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Home/Components/items.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
+import 'package:hakikat_app_new/Utils/appimg.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class CategoryProduct extends StatefulWidget {
@@ -83,23 +84,32 @@ class _CategoryProductState extends State<CategoryProduct> {
                 return Items(
                   ontap: () {
                     nextScreen(
-                      context,
-                      ProductDetails(
-                        orderid: product['id'],
-                        img: product['Product Img'],
-                        maxquantity: int.parse(product['Product Stock']),
-                        price: product['Product Price'],
-                        title: product['Product Title'] ?? '',
-                        subtitle: product['Product Subtitle'] ?? '',
-                      ),
-                    );
+                        context,
+                        ProductDetails(
+                          imageUrls: List<String>.from(product['Product Img'] ??
+                              [AppImage.defaultimgurl]),
+                          orderid: product['id'],
+                          img: (product['Product Img'] != null &&
+                                  product['Product Img'].isNotEmpty)
+                              ? product['Product Img'][0]
+                              : AppImage.defaultimgurl,
+                          maxquantity: int.parse(product['Product Stock']),
+                          price: product['Product Price'],
+                          title: product['Product Title'] ?? '',
+                          subtitle: product['Product Subtitle'] ?? '',
+                        ));
                   },
                   onadd: () {
                     nextScreen(
                       context,
                       ProductDetails(
+                        imageUrls: List<String>.from(
+                            product['Product Img'] ?? AppImage.defaultimgurl),
                         orderid: product['id'],
-                        img: product['Product Img'],
+                        img: (product['Product Img'] != null &&
+                                product['Product Img'].isNotEmpty)
+                            ? product['Product Img'][0]
+                            : AppImage.defaultimgurl,
                         maxquantity: int.parse(product['Product Stock']),
                         price: product['Product Price'],
                         title: product['Product Title'] ?? '',
@@ -107,7 +117,10 @@ class _CategoryProductState extends State<CategoryProduct> {
                       ),
                     );
                   },
-                  img: product['Product Img'],
+                  img: (product['Product Img'] != null &&
+                          product['Product Img'].isNotEmpty)
+                      ? product['Product Img'][0]
+                      : AppImage.defaultimgurl,
                   price: product['Product Price'],
                   title: product['Product Title'] ?? '',
                   subtitle: product['Product Subtitle'] ?? '',

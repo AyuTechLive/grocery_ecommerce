@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Cart/cart.dart';
@@ -15,14 +16,18 @@ class ProductDetails extends StatefulWidget {
   final String img;
   final String orderid;
   final int maxquantity;
-  const ProductDetails(
-      {super.key,
-      required this.title,
-      required this.subtitle,
-      required this.price,
-      required this.maxquantity,
-      required this.img,
-      required this.orderid});
+
+  final List<String> imageUrls;
+  const ProductDetails({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.price,
+    required this.maxquantity,
+    required this.img,
+    required this.orderid,
+    required this.imageUrls,
+  });
 
   @override
   State<ProductDetails> createState() => _ProductDetailsState();
@@ -34,6 +39,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   bool isInFavorites = false;
   bool isLoading = false;
   bool isInCart = false;
+  int _currentIndex = 0;
   @override
   void initState() {
     // TODO: implement initState
@@ -66,24 +72,39 @@ class _ProductDetailsState extends State<ProductDetails> {
               ),
             ),
             child: Center(
-              child: SizedBox(
-                  width: width * 0.69,
-                  height: height * 0.21,
-                  child: ListView.builder(
-                    itemCount: 3,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      return Image.network(
-                        widget.img,
-                        fit: BoxFit.fill,
-                      );
-                    },
-                  )
-                  //  Image.network(
-                  //   'https://firebasestorage.googleapis.com/v0/b/oneupnoobs-9ee91.appspot.com/o/Vector.png?alt=media&token=bce591e1-fb44-4596-b3ba-f5b739a8d9c1',
-                  //   fit: BoxFit.fill,
-                  // ),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: height * 0.21,
+                    child: CarouselSlider(
+                      items: widget.imageUrls.map((imageUrl) {
+                        return Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                        );
+                      }).toList(),
+                      options: CarouselOptions(
+                        autoPlay: true,
+                        height: height * 0.21,
+                        viewportFraction: 1.0,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                        },
+                      ),
+                    ),
                   ),
+                  SizedBox(height: 8.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      widget.imageUrls.length,
+                      (index) => buildDot(index: index),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Row(
@@ -476,5 +497,20 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   _gotoCart() {
     nextScreen(context, CartScreen());
+  }
+
+  Widget buildDot({int? index}) {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 200),
+      width: _currentIndex == index ? 20 : 6,
+      height: 6,
+      margin: EdgeInsets.only(right: 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(3),
+        color: _currentIndex == index
+            ? AppColors.greenthemecolor
+            : Colors.grey.shade400,
+      ),
+    );
   }
 }

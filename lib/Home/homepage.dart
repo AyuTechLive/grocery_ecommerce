@@ -15,6 +15,7 @@ import 'package:hakikat_app_new/Home/mainpage.dart';
 import 'package:hakikat_app_new/ItemsShowing/CategoryProducts.dart';
 import 'package:hakikat_app_new/ItemsShowing/Exclusiveitemshowing.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
+import 'package:hakikat_app_new/Utils/appimg.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
@@ -74,7 +75,6 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        
         automaticallyImplyLeading: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -257,8 +257,14 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            imageUrls: List<String>.from(
+                                product['Product Img'] ??
+                                    [AppImage.defaultimgurl]),
                             orderid: product['id'],
-                            img: product['Product Img'],
+                            img: (product['Product Img'] != null &&
+                                    product['Product Img'].isNotEmpty)
+                                ? product['Product Img'][0]
+                                : AppImage.defaultimgurl,
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
                             title: product['Product Title'] ?? '',
@@ -269,15 +275,24 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            imageUrls: List<String>.from(
+                                product['Product Img'] ??
+                                    [AppImage.defaultimgurl]),
                             orderid: product['id'],
-                            img: product['Product Img'],
+                            img: (product['Product Img'] != null &&
+                                    product['Product Img'].isNotEmpty)
+                                ? product['Product Img'][0]
+                                : AppImage.defaultimgurl,
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
                             title: product['Product Title'] ?? '',
                             subtitle: product['Product Subtitle'] ?? '',
                           ));
                     },
-                    img: product['Product Img'],
+                    img: (product['Product Img'] != null &&
+                            product['Product Img'].isNotEmpty)
+                        ? product['Product Img'][0]
+                        : AppImage.defaultimgurl,
                     price: product['Product Price'],
                     title: product['Product Title'] ?? '',
                     subtitle: product['Product Subtitle'] ?? '',
@@ -404,13 +419,22 @@ class _HomePageState extends State<HomePage> {
                       .toList()[index];
                   return Items(
                     price: product['Product Price'],
-                    img: product['Product Img'],
+                    img: (product['Product Img'] != null &&
+                            product['Product Img'].isNotEmpty)
+                        ? product['Product Img'][0]
+                        : AppImage.defaultimgurl,
                     onadd: () {
                       nextScreen(
                           context,
                           ProductDetails(
+                            imageUrls: List<String>.from(
+                                product['Product Img'] ??
+                                    [AppImage.defaultimgurl]),
                             orderid: product['id'],
-                            img: product['Product Img'],
+                            img: (product['Product Img'] != null &&
+                                    product['Product Img'].isNotEmpty)
+                                ? product['Product Img'][0]
+                                : AppImage.defaultimgurl,
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
                             title: product['Product Title'] ?? '',
@@ -421,8 +445,14 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            imageUrls: List<String>.from(
+                                product['Product Img'] ??
+                                    [AppImage.defaultimgurl]),
                             orderid: product['id'],
-                            img: product['Product Img'],
+                            img: (product['Product Img'] != null &&
+                                    product['Product Img'].isNotEmpty)
+                                ? product['Product Img'][0]
+                                : AppImage.defaultimgurl,
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
                             title: product['Product Title'] ?? '',
@@ -462,13 +492,22 @@ class _HomePageState extends State<HomePage> {
                   Map<String, dynamic> product = products[index];
                   return Items(
                     price: product['Product Price'],
-                    img: product['Product Img'],
+                    img: (product['Product Img'] != null &&
+                            product['Product Img'].isNotEmpty)
+                        ? product['Product Img'][0]
+                        : AppImage.defaultimgurl,
                     onadd: () {
                       nextScreen(
                           context,
                           ProductDetails(
+                            imageUrls: List<String>.from(
+                                product['Product Img'] ??
+                                    [AppImage.defaultimgurl]),
                             orderid: product['id'],
-                            img: product['Product Img'],
+                            img: (product['Product Img'] != null &&
+                                    product['Product Img'].isNotEmpty)
+                                ? product['Product Img'][0]
+                                : AppImage.defaultimgurl,
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
                             title: product['Product Title'] ?? '',
@@ -479,8 +518,14 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            imageUrls: List<String>.from(
+                                product['Product Img'] ??
+                                    [AppImage.defaultimgurl]),
                             orderid: product['id'],
-                            img: product['Product Img'],
+                            img: (product['Product Img'] != null &&
+                                    product['Product Img'].isNotEmpty)
+                                ? product['Product Img'][0]
+                                : AppImage.defaultimgurl,
                             maxquantity: int.parse(product['Product Stock']),
                             price: product['Product Price'],
                             title: product['Product Title'] ?? '',
