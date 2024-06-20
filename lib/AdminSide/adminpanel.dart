@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/AdminSide/Orders/cancelledorder.dart';
 import 'package:hakikat_app_new/AdminSide/Orders/placedorders.dart';
 import 'package:hakikat_app_new/AdminSide/addbanner.dart';
 import 'package:hakikat_app_new/AdminSide/addcategory.dart';
@@ -69,6 +70,15 @@ class AdminPanel extends StatelessWidget {
               title: 'Orders',
               onTap: () {
                 nextScreen(context, AdminOrderHistoryScreen());
+              },
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            RoundButton(
+              title: 'Cancelled Orders',
+              onTap: () {
+                nextScreen(context, CancelledOrdersScreen());
               },
             ),
             SizedBox(
