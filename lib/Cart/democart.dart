@@ -18,11 +18,13 @@ class _CartScreenState extends State<CartScreen> {
   double grandTotal = 0.0;
   List<Map<String, dynamic>> cartItems = [];
   bool isLoading = true;
+  int walletBalance = 0;
 
   @override
   void initState() {
     super.initState();
     _fetchCartItems();
+    _fetchUserWalletBalance();
   }
 
   Future<void> _fetchCartItems() async {
@@ -66,16 +68,19 @@ class _CartScreenState extends State<CartScreen> {
       fetchedCartItems.add(cartItem);
     }
 
-    setState(() {
-      cartItems = fetchedCartItems;
-      grandTotal = 0.0; // Reset grandTotal before calculating
-      for (var item in cartItems) {
-        double itemTotal =
-            (int.parse(item['Product Price']).toDouble() * item['quantity']);
-        grandTotal += itemTotal;
-      }
-      isLoading = false; // Data loading completed
-    });
+    if (mounted) {
+      // Check if the widget is still mounted
+      setState(() {
+        cartItems = fetchedCartItems;
+        grandTotal = 0.0; // Reset grandTotal before calculating
+        for (var item in cartItems) {
+          double itemTotal =
+              (int.parse(item['Product Price']).toDouble() * item['quantity']);
+          grandTotal += itemTotal;
+        }
+        isLoading = false; // Data loading completed
+      });
+    }
   }
 
   @override
@@ -177,7 +182,9 @@ class _CartScreenState extends State<CartScreen> {
                         nextScreen(
                             context,
                             DemoCheckout(
-                                cartItems: cartItems, grandTotal: grandTotal));
+                                walletbalance: walletBalance.toString(),
+                                cartItems: cartItems,
+                                grandTotal: grandTotal));
                       },
                       icon: Container(
                         width: width * 0.879,
@@ -272,5 +279,25 @@ class _CartScreenState extends State<CartScreen> {
         );
       },
     );
+  }
+
+  Future<void> _fetchUserWalletBalance() async {
+    String userDocumentId = checkUserAuthenticationType();
+    DocumentReference userDocRef =
+        FirebaseFirestore.instance.collection('Users').doc(userDocumentId);
+
+    DocumentSnapshot userSnapshot = await userDocRef.get();
+    if (userSnapshot.exists && mounted) {
+      // Check if the widget is still mounted
+      setState(() {
+        walletBalance = int.parse(userSnapshot['Wallet'] ?? '0');
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // Cancel any active asynchronous operations or listeners here
+    super.dispose();
   }
 }

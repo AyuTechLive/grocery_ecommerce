@@ -49,11 +49,13 @@ class _ExploreState extends State<Explore> {
               'Product Stock': value['Product Stock'],
               'id': value['id']
             };
-            setState(() {
-              products.add(product);
-              filteredProducts =
-                  products; // Initialize filteredProducts with all products
-            });
+            if (mounted) {
+              setState(() {
+                products.add(product);
+                filteredProducts =
+                    products; // Initialize filteredProducts with all products
+              });
+            }
           }
         });
       }

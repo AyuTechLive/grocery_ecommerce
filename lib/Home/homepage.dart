@@ -579,12 +579,14 @@ class _HomePageState extends State<HomePage> {
               'BestSelling': value.containsKey('BestSelling') &&
                   value['BestSelling'] == true,
             };
-            setState(() {
-              products.add(product);
-              if (product['Exclusive'] == true) {
-                filteredProducts.add(product);
-              }
-            });
+            if (mounted) {
+              setState(() {
+                products.add(product);
+                if (product['Exclusive'] == true) {
+                  filteredProducts.add(product);
+                }
+              });
+            }
           }
         });
       }

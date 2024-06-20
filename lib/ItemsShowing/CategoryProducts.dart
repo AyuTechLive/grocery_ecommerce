@@ -101,21 +101,20 @@ class _CategoryProductState extends State<CategoryProduct> {
                   },
                   onadd: () {
                     nextScreen(
-                      context,
-                      ProductDetails(
-                        imageUrls: List<String>.from(
-                            product['Product Img'] ?? AppImage.defaultimgurl),
-                        orderid: product['id'],
-                        img: (product['Product Img'] != null &&
-                                product['Product Img'].isNotEmpty)
-                            ? product['Product Img'][0]
-                            : AppImage.defaultimgurl,
-                        maxquantity: int.parse(product['Product Stock']),
-                        price: product['Product Price'],
-                        title: product['Product Title'] ?? '',
-                        subtitle: product['Product Subtitle'] ?? '',
-                      ),
-                    );
+                        context,
+                        ProductDetails(
+                          imageUrls: List<String>.from(product['Product Img'] ??
+                              [AppImage.defaultimgurl]),
+                          orderid: product['id'],
+                          img: (product['Product Img'] != null &&
+                                  product['Product Img'].isNotEmpty)
+                              ? product['Product Img'][0]
+                              : AppImage.defaultimgurl,
+                          maxquantity: int.parse(product['Product Stock']),
+                          price: product['Product Price'],
+                          title: product['Product Title'] ?? '',
+                          subtitle: product['Product Subtitle'] ?? '',
+                        ));
                   },
                   img: (product['Product Img'] != null &&
                           product['Product Img'].isNotEmpty)
@@ -165,10 +164,12 @@ class _CategoryProductState extends State<CategoryProduct> {
             if (widget.categoryname == 'All Products' ||
                 (value.containsKey('Category') &&
                     value['Category'] == widget.categoryname)) {
-              setState(() {
-                products.add(product);
-                filteredProducts.add(product);
-              });
+              if (mounted) {
+                setState(() {
+                  products.add(product);
+                  filteredProducts.add(product);
+                });
+              }
             }
           }
         });

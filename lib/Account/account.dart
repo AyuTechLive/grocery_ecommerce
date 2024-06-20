@@ -10,6 +10,7 @@ import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/utils.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
+import 'package:hakikat_app_new/wallet/mywallet.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -119,6 +120,14 @@ class _AccountState extends State<Account> {
               title: 'Help',
               ontap: () {
                 Utils().toastMessage('Currently Under Dev');
+              },
+            ),
+            Divider(),
+            AccountMenuCard(
+              img: 'about',
+              title: 'Wallet',
+              ontap: () {
+                nextScreen(context, MyWallet());
               },
             ),
             Divider(),

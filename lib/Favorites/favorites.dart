@@ -37,9 +37,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       favoriteIds = favorites.cast<String>().toList();
       await _fetchFavoriteData();
     } else {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -63,10 +65,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       }
     }
 
-    setState(() {
-      favoriteData = fetchedData;
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        favoriteData = fetchedData;
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -183,5 +187,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       favoriteIds.remove(favoriteId);
       favoriteData.removeWhere((item) => item['id'] == favoriteId);
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

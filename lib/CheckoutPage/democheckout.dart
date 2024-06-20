@@ -12,9 +12,13 @@ import 'package:hakikat_app_new/Utils/widget.dart';
 
 class DemoCheckout extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
+  final String walletbalance;
   final double grandTotal;
 
-  DemoCheckout({required this.cartItems, required this.grandTotal});
+  DemoCheckout(
+      {required this.cartItems,
+      required this.grandTotal,
+      required this.walletbalance});
 
   @override
   State<DemoCheckout> createState() => _DemoCheckoutState();
@@ -23,62 +27,84 @@ class DemoCheckout extends StatefulWidget {
 class _DemoCheckoutState extends State<DemoCheckout> {
   bool isLoading = false;
   String? selectedAddress;
+
   Future<void> _placeOrder(BuildContext context) async {
-    setState(() {
-      isLoading = true; // Set loading to true when placing the order
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true; // Set loading to true when placing the order
+      });
+    }
 
     String userDocumentId = checkUserAuthenticationType();
     DocumentReference userDocRef =
         FirebaseFirestore.instance.collection('Users').doc(userDocumentId);
 
-    // Generate document ID using the current datetime in epoch milliseconds
-    String orderId = DateTime.now().millisecondsSinceEpoch.toString();
+    // Check if wallet balance is greater than grand total
 
-    // Create the order data
-    Map<String, dynamic> orderData = {
-      'orderId': orderId,
-      'items': widget.cartItems,
-      'total': widget.grandTotal,
-      'timestamp': FieldValue.serverTimestamp(),
-      'address': selectedAddress,
-      'status': "Order Placed"
-    };
+    int currentWallet = int.parse(widget.walletbalance);
 
-    // Create a batch write
-    WriteBatch batch = FirebaseFirestore.instance.batch();
+    if (currentWallet >= widget.grandTotal) {
+      int updatedWalletValue = currentWallet - widget.grandTotal.toInt();
 
-    // Add the order to the 'orders' collection
-    batch.set(FirebaseFirestore.instance.collection('orders').doc(orderId),
-        orderData);
+      // Update the wallet balance
 
-    // Update the user's 'my orders' list in the batch
-    batch.update(userDocRef, {
-      'my orders': FieldValue.arrayUnion([orderId])
-    });
+      // Generate document ID using the current datetime in epoch milliseconds
+      String orderId = DateTime.now().millisecondsSinceEpoch.toString();
 
-    // Commit the batch
-    await batch.commit();
+      // Create the order data
+      Map<String, dynamic> orderData = {
+        'orderId': orderId,
+        'items': widget.cartItems,
+        'total': widget.grandTotal,
+        'timestamp': FieldValue.serverTimestamp(),
+        'address': selectedAddress,
+        'status': "Order Placed"
+      };
 
-    // Decrease quantities in parallel
-    await _decreaseQuantities(widget.cartItems);
+      // Create a batch write
+      WriteBatch batch = FirebaseFirestore.instance.batch();
 
-    // Delete cart items
-    await _deleteCartItem();
+      // Add the order to the 'orders' collection
+      batch.set(FirebaseFirestore.instance.collection('orders').doc(orderId),
+          orderData);
 
-    // Show confirmation message
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(
-    //     content: Text('Order placed successfully!'),
-    //   ),
-    // );
+      // Update the user's 'my orders' list in the batch
+      batch.update(userDocRef, {
+        'Wallet': updatedWalletValue.toString(),
+        'my orders': FieldValue.arrayUnion([orderId])
+      });
 
-    setState(() {
-      isLoading = false; // Set loading to false after placing the order
-    });
+      // Commit the batch
+      await batch.commit();
 
-    // Navigate back or to another screen
-    nextScreenReplace(context, OrderSucess());
+      // Decrease quantities in parallel
+      await _decreaseQuantities(widget.cartItems);
+
+      // Delete cart items
+      await _deleteCartItem();
+
+      if (mounted) {
+        setState(() {
+          isLoading = false; // Set loading to false after placing the order
+        });
+      }
+
+      // Navigate to success screen
+      nextScreenReplace(context, OrderSucess());
+    } else {
+      // Show insufficient balance message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Insufficient balance to place the order'),
+        ),
+      );
+
+      if (mounted) {
+        setState(() {
+          isLoading = false; // Set loading to false
+        });
+      }
+    }
   }
 
   void _selectAddress(BuildContext context) async {
@@ -204,7 +230,9 @@ class _DemoCheckoutState extends State<DemoCheckout> {
                           ),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [Text('Cash On Delivery')],
+                            children: [
+                              Text('Wallet-Balance : ${widget.walletbalance}')
+                            ],
                           ),
                           Spacer(),
                           SizedBox(
