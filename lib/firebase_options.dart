@@ -53,7 +53,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDb06naJZxObS4TAsZQeM55DNGBiAwzJHk',
-    appId: '1:460364116205:android:0c06dd3c9c7dffa9255ce4',
+    appId: '1:460364116205:android:b73322f109b8cefa255ce4',
     messagingSenderId: '460364116205',
     projectId: 'hakkikatdemo',
     databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Splashscreen/splashservices.dart';
+import 'package:hakikat_app_new/Utils/colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,17 +24,20 @@ class _SplashScreenState extends State<SplashScreen> {
     final double height = screensize.width;
     final double widht = screensize.height;
     return Scaffold(
-        backgroundColor: Color(0xff82d4ec),
+        backgroundColor: AppColors.greenthemecolor,
         body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Center(
             child: Container(
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(30)),
               child: ClipRRect(
-                  child: Image.asset(
-                'assets/mainlogo.png',
-                scale: 1.0,
-                fit: BoxFit.fill,
+                  child: CircleAvatar(
+                radius: 120,
+                child: Image.asset(
+                  'assets/hakikat.png',
+                  scale: 1.0,
+                  fit: BoxFit.fill,
+                ),
               )),
             ),
 

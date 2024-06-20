@@ -1,4 +1,4 @@
-package com.example.hakikat_app_new
+package com.hakkikat.user
 
 import io.flutter.embedding.android.FlutterActivity
 

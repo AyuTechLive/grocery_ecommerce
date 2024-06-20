@@ -53,6 +53,7 @@ class _DemoCheckoutState extends State<DemoCheckout> {
 
       // Create the order data
       Map<String, dynamic> orderData = {
+        'email': userDocumentId,
         'orderId': orderId,
         'items': widget.cartItems,
         'total': widget.grandTotal,
