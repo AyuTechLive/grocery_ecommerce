@@ -58,14 +58,24 @@ class _AccountState extends State<Account> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      userName,
-                      style: TextStyle(
-                        color: Color(0xFF181725),
-                        fontSize: 20,
-                        fontFamily: 'Gilroy-Bold',
-                        fontWeight: FontWeight.w400,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          userName,
+                          style: TextStyle(
+                            color: Color(0xFF181725),
+                            fontSize: 20,
+                            fontFamily: 'Gilroy-Bold',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: _editUserName,
+                          child: Icon(Icons.edit,
+                              size: 20, color: AppColors.greenthemecolor),
+                        ),
+                      ],
                     ),
                     Text(
                       userEmail,
@@ -106,14 +116,14 @@ class _AccountState extends State<Account> {
                 Utils().toastMessage('Currently Under Dev');
               },
             ),
-            Divider(),
-            AccountMenuCard(
-              img: 'notification',
-              title: 'Admin (Only For Developer)',
-              ontap: () {
-                nextScreen(context, AdminPanel());
-              },
-            ),
+            // Divider(),
+            // AccountMenuCard(
+            //   img: 'notification',
+            //   title: 'Admin (Only For Developer)',
+            //   ontap: () {
+            //     nextScreen(context, AdminPanel());
+            //   },
+            // ),
             Divider(),
             AccountMenuCard(
               img: 'help',
@@ -250,6 +260,50 @@ class _AccountState extends State<Account> {
     if (selectedAddress != null) {
       setState(() {
         _selectedAddress = selectedAddress;
+      });
+    }
+  }
+
+  Future<void> _editUserName() async {
+    String? newName = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        String updatedName = userName;
+        return AlertDialog(
+          title: Text('Edit Name'),
+          content: TextField(
+            onChanged: (value) {
+              updatedName = value;
+            },
+            controller: TextEditingController(text: userName),
+            decoration: InputDecoration(hintText: "Enter new name"),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Save'),
+              onPressed: () {
+                Navigator.of(context).pop(updatedName);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (newName != null && newName.isNotEmpty) {
+      String userDocumentId = checkUserAuthenticationType();
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userDocumentId)
+          .update({'Name': newName});
+      setState(() {
+        userName = newName;
       });
     }
   }

@@ -41,10 +41,10 @@ class _DemoCheckoutState extends State<DemoCheckout> {
 
     // Check if wallet balance is greater than grand total
 
-    int currentWallet = int.parse(widget.walletbalance);
+    double currentWallet = double.parse(widget.walletbalance);
 
     if (currentWallet >= widget.grandTotal) {
-      int updatedWalletValue = currentWallet - widget.grandTotal.toInt();
+      double updatedWalletValue = currentWallet - widget.grandTotal.toInt();
 
       // Update the wallet balance
 
@@ -72,6 +72,11 @@ class _DemoCheckoutState extends State<DemoCheckout> {
       batch.update(userDocRef, {
         'Wallet': updatedWalletValue.toString(),
         'my orders': FieldValue.arrayUnion([orderId])
+      });
+      batch.set(userDocRef.collection('transactions').doc(), {
+        'amount': -widget.grandTotal.toDouble(),
+        'type': 'Debit',
+        'date': DateTime.now(),
       });
 
       // Commit the batch
@@ -105,6 +110,52 @@ class _DemoCheckoutState extends State<DemoCheckout> {
         });
       }
     }
+  }
+
+  void _showDeliveryChargesDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Delivery Charges'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text('Monday'),
+                trailing: Text('₹50'),
+              ),
+              ListTile(
+                title: Text('Tuesday'),
+                trailing: Text('₹50'),
+              ),
+              ListTile(
+                title: Text('Wednesday'),
+                trailing: Text('₹50'),
+              ),
+              ListTile(
+                title: Text('Thursday'),
+                trailing: Text('₹50'),
+              ),
+              ListTile(
+                title: Text('Friday'),
+                trailing: Text('₹50'),
+              ),
+              ListTile(
+                title: Text('Saturday'),
+                trailing: Text('₹50'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _selectAddress(BuildContext context) async {
@@ -274,10 +325,37 @@ class _DemoCheckoutState extends State<DemoCheckout> {
                             height: height * 0.01,
                           ),
                           ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
                             shrinkWrap:
                                 true, // Add this line to prevent the ListView from taking up extra space
-                            itemCount: widget.cartItems.length,
+                            itemCount: widget.cartItems.length + 1,
                             itemBuilder: (context, index) {
+                              if (index == widget.cartItems.length) {
+                                return Row(
+                                  children: [
+                                    SizedBox(
+                                      width: width * 0.02,
+                                    ),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Text('Delivery Charges')),
+                                    Spacer(),
+                                    IconButton(
+                                        onPressed: () {
+                                          _showDeliveryChargesDialog(context);
+                                        },
+                                        icon: Text(
+                                          'Click To View',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColors.greenthemecolor),
+                                        )),
+                                    SizedBox(
+                                      width: width * 0.02,
+                                    ),
+                                  ],
+                                );
+                              }
                               Map<String, dynamic> item =
                                   widget.cartItems[index];
                               return ListTile(

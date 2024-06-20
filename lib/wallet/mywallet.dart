@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/wallet/component/walletcomponent.dart';
+import 'package:intl/intl.dart';
 
 class MyWallet extends StatefulWidget {
   const MyWallet({super.key});
@@ -82,6 +83,23 @@ class _MyWalletState extends State<MyWallet>
               name: _name.toString(),
             ),
           ),
+          SizedBox(
+            height: height * 0.02,
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: width * 0.04,
+              ),
+              Text(
+                'Transaction History:',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: height * 0.02,
+          ),
           Expanded(
             child: TabBarView(
               controller: _tabController, // Use _tabController
@@ -97,6 +115,9 @@ class _MyWalletState extends State<MyWallet>
   }
 
   Widget _buildTransactionList(bool isCredit) {
+    final Size screensize = MediaQuery.of(context).size;
+    final double height = screensize.height;
+    final double width = screensize.width;
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('Users')
@@ -119,19 +140,82 @@ class _MyWalletState extends State<MyWallet>
 
         final transactions = snapshot.data!.docs;
 
-        return ListView.builder(
+        return ListView.separated(
+          separatorBuilder: (context, index) {
+            return SizedBox(
+              height: height * 0.02,
+            );
+          },
           itemCount: transactions.length,
           itemBuilder: (context, index) {
             final transaction =
                 transactions[index].data() as Map<String, dynamic>?;
             final amount = transaction?['amount'] ?? 0.0;
             final date = transaction?['date'] as Timestamp?;
-            final formattedDate = date != null ? date.toDate().toString() : '';
+            final formattedDate = date != null
+                ? DateFormat('dd/MM/yyyy hh:mm a').format(date.toDate())
+                : '';
 
-            return ListTile(
-              title: Text('Amount: $amount'),
-              subtitle: Text('Date: $formattedDate'),
+            return Padding(
+              padding: EdgeInsets.only(left: width * 0.03, right: width * 0.03),
+              child: Container(
+                width: width * 0.8,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.withOpacity(0.2))),
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: width * 0.02,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Id: ',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 16),
+                              ),
+                              Text(' ${transactions[index].id}'),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Date:',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                              Text('  ${formattedDate}')
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      Text(
+                        amount.toString(),
+                        style: TextStyle(
+                            color: isCredit ? Colors.green : Colors.red,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700),
+                      ),
+                      SizedBox(
+                        width: width * 0.02,
+                      )
+                    ],
+                  ),
+                ),
+              ),
             );
+
+            // ListTile(
+            //   title: Text('Amount: $amount'),
+            //   subtitle: Text('Date: $formattedDate'),
+            // );
           },
         );
       },

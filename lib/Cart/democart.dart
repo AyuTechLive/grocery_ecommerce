@@ -18,7 +18,7 @@ class _CartScreenState extends State<CartScreen> {
   double grandTotal = 0.0;
   List<Map<String, dynamic>> cartItems = [];
   bool isLoading = true;
-  int walletBalance = 0;
+  double walletBalance = 0;
 
   @override
   void initState() {
@@ -290,7 +290,7 @@ class _CartScreenState extends State<CartScreen> {
     if (userSnapshot.exists && mounted) {
       // Check if the widget is still mounted
       setState(() {
-        walletBalance = int.parse(userSnapshot['Wallet'] ?? '0');
+        walletBalance = double.parse(userSnapshot['Wallet'] ?? '0');
       });
     }
   }

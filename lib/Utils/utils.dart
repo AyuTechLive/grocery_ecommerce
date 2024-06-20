@@ -8,9 +8,9 @@ class Utils {
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: AppColors.greenthemecolor,
-        textColor: Colors.white,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.grey.withOpacity(0.2),
+        textColor: Colors.black,
         fontSize: 16.0);
   }
 }

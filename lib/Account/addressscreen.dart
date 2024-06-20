@@ -94,13 +94,19 @@ class _AddressScreenState extends State<AddressScreen> {
                       String userDocumentId = checkUserAuthenticationType();
                       final address =
                           addresses[index].data() as Map<String, dynamic>;
-                      final addressString = address['addressLine1'] +
+                      final addressString = address['name'] +
+                          ', ' +
+                          address['addressLine1'] +
                           ' , ' +
                           address['addressLine2'] +
                           ' ,' +
                           address['city'] +
                           ' ,' +
-                          address['pincode'];
+                          address['state'] +
+                          ' ,' +
+                          address['pincode'] +
+                          ', ' +
+                          address['mobileNo'];
                       final documentId = addresses[index].id;
 
                       return Padding(
