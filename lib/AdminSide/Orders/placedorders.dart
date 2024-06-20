@@ -76,12 +76,16 @@ class _AdminOrderHistoryScreenState extends State<AdminOrderHistoryScreen>
           return Center(child: Text('No orders found'));
         }
 
+        // Sort the orders by timestamp
+        orders.sort((a, b) {
+          final aTimestamp =
+              (a.data() as Map<String, dynamic>)['timestamp'] as Timestamp;
+          final bTimestamp =
+              (b.data() as Map<String, dynamic>)['timestamp'] as Timestamp;
+          return bTimestamp.compareTo(aTimestamp); // Descending order
+        });
+
         return ListView.builder(
-          // separatorBuilder: (context, index) {
-          //   return SizedBox(
-          //     height: height * 0.02,
-          //   );
-          // },
           itemCount: orders.length,
           itemBuilder: (context, index) {
             final order = orders[index].data() as Map<String, dynamic>;

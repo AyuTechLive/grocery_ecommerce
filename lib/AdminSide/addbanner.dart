@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
@@ -16,25 +15,23 @@ class AddBanner extends StatefulWidget {
 
 class _AddBannerState extends State<AddBanner> {
   bool loading = false;
-  final coursediscriptioncontroller = TextEditingController();
-  final coursenamecontroller = TextEditingController();
-  final coursepricecontroller = TextEditingController();
-  final courseimglinkcontroller = TextEditingController();
-  final bannerfunctioncontroller = TextEditingController();
+  final bannerTitleController = TextEditingController();
+  final bannerImageLinkController = TextEditingController();
 
   final fireStore = FirebaseFirestore.instance.collection('Banners');
   File? _image;
   firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
   final picker = ImagePicker();
-  Future<void> getimageGallery() async {
-    final pickedfile = await picker.pickImage(
+
+  Future<void> getImageFromGallery() async {
+    final pickedFile = await picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 50,
+      imageQuality: 80,
     );
     setState(() {
-      if (pickedfile != null) {
-        _image = File(pickedfile.path);
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
       } else {
         Utils().toastMessage('No image picked');
       }
@@ -44,9 +41,8 @@ class _AddBannerState extends State<AddBanner> {
   Future<void> handleImageUpload() async {
     if (_image != null) {
       try {
-        String imageUrl = await uploadimage();
-        courseimglinkcontroller.text =
-            imageUrl; // Save the image URL to the controller
+        String imageUrl = await uploadImage();
+        bannerImageLinkController.text = imageUrl;
       } catch (e) {
         Utils().toastMessage('Failed to upload image: $e');
       }
@@ -55,113 +51,103 @@ class _AddBannerState extends State<AddBanner> {
     }
   }
 
-  String _selectedItem = 'Course Function'; // Default selected item
-
-  List<String> _dropdownItems = ['Course Function', 'External Link', 'Nothing'];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Banner Data'),
+        title: Text('Add Banner'),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 30,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: 20),
+            TextFormField(
+              controller: bannerTitleController,
+              decoration: InputDecoration(
+                labelText: 'Banner Title',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.title),
               ),
-              DropdownButton<String>(
-                value: _selectedItem,
-                items: _dropdownItems.map((String item) {
-                  return DropdownMenuItem<String>(
-                    value: item,
-                    child: Text(item),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedItem = newValue!;
-                  });
-                },
+            ),
+            SizedBox(height: 20),
+            InkWell(
+              onTap: () async {
+                await getImageFromGallery();
+                if (_image != null) {
+                  await handleImageUpload();
+                }
+              },
+              child: Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: _image != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.file(_image!, fit: BoxFit.cover),
+                      )
+                    : Icon(Icons.add_a_photo, size: 50, color: Colors.grey),
               ),
-              TextFormField(
-                controller: coursenamecontroller,
-                maxLines: 1,
-                decoration: InputDecoration(
-                    hintText: 'Banner Title', border: OutlineInputBorder()),
+            ),
+            SizedBox(height: 20),
+            TextFormField(
+              controller: bannerImageLinkController,
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: 'Banner Image Link',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.link),
               ),
-              TextFormField(
-                controller: bannerfunctioncontroller,
-                maxLines: 1,
-                decoration: InputDecoration(
-                    hintText: 'Banner Function', border: OutlineInputBorder()),
-              ),
-              TextFormField(
-                controller: courseimglinkcontroller,
-                maxLines: 4,
-                decoration: InputDecoration(
-                    hintText: 'Course Banner Img Link',
-                    icon: InkWell(
-                      child: Icon(Icons.add_a_photo),
-                      onTap: () async {
-                        await getimageGallery();
-                        await handleImageUpload();
-                      },
-                    ),
-                    border: OutlineInputBorder()),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              RoundButton(
-                loading: loading,
-                title: 'Next',
-                onTap: () {
-                  setState(() {
-                    loading = true;
-                  });
-                  String id = coursenamecontroller.text.toString();
-                  //String id = 'ayushshahi96kmr@gmail.com';
-                  fireStore.doc(id).set({
-                    'Course Name': coursenamecontroller.text.toString(),
-                    'Course Img Link': courseimglinkcontroller.text.toString(),
-                    'Banner Function': bannerfunctioncontroller.text.toString(),
-                    'Banner Type': _selectedItem.toString(),
-                    'id': id,
-                  }).then(
-                    (value) {
-                      Utils().toastMessage('Banner Uploaded SucessFully');
-                      setState(() {
-                        loading = false;
-                      });
-                    },
-                  ).onError(
-                    (error, stackTrace) {
-                      Utils().toastMessage(error.toString());
-                      setState(() {
-                        loading = false;
-                      });
-                    },
-                  );
-                },
-              )
-            ],
-          ),
+            ),
+            SizedBox(height: 30),
+            RoundButton(
+              loading: loading,
+              title: 'Upload Banner',
+              onTap: () {
+                setState(() {
+                  loading = true;
+                });
+                String id = DateTime.now().millisecondsSinceEpoch.toString();
+                fireStore.doc(id).set({
+                  'Banner Title': bannerTitleController.text.trim(),
+                  'Banner Image Link': bannerImageLinkController.text.trim(),
+                  'id': id,
+                }).then(
+                  (value) {
+                    Utils().toastMessage('Banner uploaded successfully');
+                    setState(() {
+                      loading = false;
+                    });
+                    Navigator.pop(context);
+                  },
+                ).onError(
+                  (error, stackTrace) {
+                    Utils().toastMessage(error.toString());
+                    setState(() {
+                      loading = false;
+                    });
+                  },
+                );
+              },
+            )
+          ],
         ),
       ),
     );
   }
 
-  Future<String> uploadimage() async {
+  Future<String> uploadImage() async {
     if (_image == null) {
       throw Exception('No image file selected');
     }
     String fileExtension = _image!.path.split('.').last;
     String fileName = '${DateTime.now().microsecondsSinceEpoch}.$fileExtension';
-    firebase_storage.Reference ref = storage.ref('/foldername/$fileName');
+    firebase_storage.Reference ref = storage.ref('/banners/$fileName');
     firebase_storage.SettableMetadata metadata =
         firebase_storage.SettableMetadata(
       contentType: 'image/$fileExtension',

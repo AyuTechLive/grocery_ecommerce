@@ -100,6 +100,77 @@ class CancelledOrderItem extends StatefulWidget {
 class _CancelledOrderItemState extends State<CancelledOrderItem> {
   bool isExpanded = false;
 
+  Future<void> issueRefund() async {
+    final orderId = widget.order['orderId'];
+    final total = widget.order['total'];
+    final userId = widget.order['email'];
+    print(userId);
+
+    try {
+      // Fetch the current wallet balance
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .get();
+
+      if (!userSnapshot.exists) {
+        throw Exception('User not found');
+      }
+
+      Map<String, dynamic> userData =
+          userSnapshot.data() as Map<String, dynamic>;
+      double currentWalletBalance = double.parse(userData['Wallet'] ?? '0');
+      double newWalletBalance = currentWalletBalance + total;
+
+      // Create a new batch
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+
+      // Reference to the order document
+      DocumentReference orderRef =
+          FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+      // Reference to the user document
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('Users').doc(userId);
+
+      // Reference to the new transaction document
+      DocumentReference transactionRef =
+          userRef.collection('transactions').doc();
+
+      // Update order's refund status
+      batch.update(orderRef, {'refund': true});
+
+      // Add new transaction
+      batch.set(transactionRef, {
+        'amount': total,
+        'bonus': '0',
+        'type': 'Credit',
+        'date': FieldValue.serverTimestamp(),
+      });
+
+      // Update user's wallet with the new balance
+      batch.update(userRef, {
+        'Wallet': newWalletBalance.toStringAsFixed(2),
+      });
+
+      // Commit the batch
+      await batch.commit();
+
+      // Refresh the widget state
+      setState(() {});
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Refund issued successfully')),
+      );
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error issuing refund: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screensize = MediaQuery.of(context).size;
@@ -182,23 +253,40 @@ class _CancelledOrderItemState extends State<CancelledOrderItem> {
               ),
               color: Colors.grey.withOpacity(0.2),
             ),
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: items.length,
-              itemBuilder: (context, itemIndex) {
-                final item = items[itemIndex];
-                final productTitle = item['Product Title'];
-                final productSubtitle = item['Product Subtitle'];
-                final productPrice = item['Product Price'];
-                final quantity = item['quantity'];
+            child: Column(
+              children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: items.length,
+                  itemBuilder: (context, itemIndex) {
+                    final item = items[itemIndex];
+                    final productTitle = item['Product Title'];
+                    final productSubtitle = item['Product Subtitle'];
+                    final productPrice = item['Product Price'];
+                    final quantity = item['quantity'];
 
-                return ListTile(
-                  title: Text(productTitle),
-                  subtitle: Text(productSubtitle),
-                  trailing: Text('₹$productPrice x $quantity'),
-                );
-              },
+                    return ListTile(
+                      title: Text(productTitle),
+                      subtitle: Text(productSubtitle),
+                      trailing: Text('₹$productPrice x $quantity'),
+                    );
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (!widget.order['refund'])
+                      ElevatedButton(
+                        onPressed: issueRefund,
+                        child: Text('Issue Refund'),
+                        style: ElevatedButton.styleFrom(
+                            //  primary: AppColors.greenthemecolor,
+                            ),
+                      ),
+                  ],
+                )
+              ],
             ),
           ),
       ],

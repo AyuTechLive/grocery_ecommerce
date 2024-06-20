@@ -114,18 +114,22 @@ class _AddMoneyState extends State<AddMoney> {
                 }
               },
             ),
+            // TextButton(
+            //   child: Text('Remove'),
+            //   onPressed: () {
+            //     final amount = _amountController.text;
+            //     final bonus = _bonusController.text;
+            //     if (amount.isNotEmpty && bonus.isNotEmpty) {
+            //       _updateWalletBalance(userId, amount, bonus, false);
+            //       Navigator.of(context).pop();
+            //       _amountController.clear();
+            //       _bonusController.clear();
+            //     }
+            //   },
+            // ),
             TextButton(
-              child: Text('Remove'),
-              onPressed: () {
-                final amount = _amountController.text;
-                final bonus = _bonusController.text;
-                if (amount.isNotEmpty && bonus.isNotEmpty) {
-                  _updateWalletBalance(userId, amount, bonus, false);
-                  Navigator.of(context).pop();
-                  _amountController.clear();
-                  _bonusController.clear();
-                }
-              },
+              child: Text('Close'),
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ],
         );
@@ -152,11 +156,11 @@ class _AddMoneyState extends State<AddMoney> {
       controller: _searchController,
       autofocus: true,
       decoration: InputDecoration(
-        hintText: 'Search by Email',
+        hintText: 'Search by Email or Name',
         border: InputBorder.none,
-        hintStyle: TextStyle(color: Colors.white70),
+        hintStyle: TextStyle(color: Colors.black.withOpacity(0.5)),
       ),
-      style: TextStyle(color: Colors.white, fontSize: 16.0),
+      style: TextStyle(color: Colors.black, fontSize: 16.0),
       onChanged: (value) {
         setState(() {
           _searchQuery = value.toLowerCase();
@@ -194,6 +198,10 @@ class _AddMoneyState extends State<AddMoney> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double width = screenSize.width;
+    final double height = screenSize.height;
+
     return Scaffold(
       appBar: AppBar(
         title: _isSearching ? _buildSearchField() : Text('Users'),
@@ -203,22 +211,20 @@ class _AddMoneyState extends State<AddMoney> {
         stream: _usersCollection.snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
 
           if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           final users = snapshot.data!.docs;
           final filteredUsers = users.where((doc) {
             final userData = doc.data() as Map<String, dynamic>?;
             final userEmail = userData?['Email'] as String? ?? '';
-            return userEmail.toLowerCase().contains(_searchQuery);
+            final userName = userData?['Name'] as String? ?? '';
+            return userEmail.toLowerCase().contains(_searchQuery) ||
+                userName.toLowerCase().contains(_searchQuery);
           }).toList();
 
           return ListView.builder(
@@ -227,18 +233,66 @@ class _AddMoneyState extends State<AddMoney> {
               final user = filteredUsers[index].data() as Map<String, dynamic>?;
               final userId = filteredUsers[index].id;
 
-              return ListTile(
-                title: Text(user?['Name'] ?? 'Unknown'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Email: ${user?['Email'] ?? 'N/A'}'),
-                    Text('Wallet Balance: ${user?['Wallet'] ?? '0'}'),
-                  ],
-                ),
-                trailing: ElevatedButton(
-                  child: Text('Modify Balance'),
-                  onPressed: () => _showAmountDialog(userId),
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user?['Name'] ?? 'Unknown',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Email: ${user?['Email'] ?? 'N/A'}',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Wallet Balance: ₹${user?['Wallet'] ?? '0'}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: height * 0.02,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              child: Text('Modify Balance'),
+                              onPressed: () => _showAmountDialog(userId),
+                              style: ElevatedButton.styleFrom(
+                                //primary: Colors.blue,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },

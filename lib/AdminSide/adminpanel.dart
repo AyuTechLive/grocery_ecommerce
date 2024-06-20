@@ -7,7 +7,6 @@ import 'package:hakikat_app_new/AdminSide/addproduct.dart';
 import 'package:hakikat_app_new/AdminSide/testing.dart';
 import 'package:hakikat_app_new/AdminSide/testing2.dart';
 import 'package:hakikat_app_new/AdminSide/users/addmoney.dart';
-import 'package:hakikat_app_new/Utils/roundbutton.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class AdminPanel extends StatelessWidget {
@@ -15,83 +14,111 @@ class AdminPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double height = screenSize.height;
+    final double width = screenSize.width;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('Admin Panel'),
+        centerTitle: true,
+      ),
       body: Padding(
-        padding: EdgeInsetsDirectional.only(end: 20, start: 20),
-        child: Column(
-          children: [
-            RoundButton(
-              title: 'Add Product',
-              onTap: () {
-                nextScreen(context, AddProduct());
-              },
+        padding: EdgeInsets.only(top: height * 0.05),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.green.shade50, Colors.white],
             ),
-            SizedBox(
-              height: 20,
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: GridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              children: [
+                _buildAdminButton(
+                  context,
+                  'Add Product',
+                  Icons.add_box,
+                  AddProduct(),
+                ),
+                // _buildAdminButton(
+                //   context,
+                //   'See Products',
+                //   Icons.list,
+                //   ProductListScreen(),
+                // ),
+                _buildAdminButton(
+                  context,
+                  'Add Category',
+                  Icons.category,
+                  AddCategory(),
+                ),
+                // _buildAdminButton(
+                //   context,
+                //   'Category List',
+                //   Icons.list_alt,
+                //   CategoryListScreen(),
+                // ),
+                _buildAdminButton(
+                  context,
+                  'Add Banner',
+                  Icons.image,
+                  AddBanner(),
+                ),
+                _buildAdminButton(
+                  context,
+                  'Orders',
+                  Icons.shopping_cart,
+                  AdminOrderHistoryScreen(),
+                ),
+                _buildAdminButton(
+                  context,
+                  'Cancelled Orders',
+                  Icons.cancel,
+                  CancelledOrdersScreen(),
+                ),
+                _buildAdminButton(
+                  context,
+                  'Add Money',
+                  Icons.attach_money,
+                  AddMoney(),
+                ),
+              ],
             ),
-            RoundButton(
-              title: 'See Product Product',
-              onTap: () {
-                nextScreen(context, ProductListScreen());
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            RoundButton(
-              title: 'Add Category',
-              onTap: () {
-                nextScreen(context, AddCategory());
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            RoundButton(
-              title: 'Category List screen',
-              onTap: () {
-                nextScreen(context, CategoryListScreen());
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            RoundButton(
-              title: 'Add Banner',
-              onTap: () {
-                nextScreen(context, AddBanner());
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            RoundButton(
-              title: 'Orders',
-              onTap: () {
-                nextScreen(context, AdminOrderHistoryScreen());
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            RoundButton(
-              title: 'Cancelled Orders',
-              onTap: () {
-                nextScreen(context, CancelledOrdersScreen());
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            RoundButton(
-              title: 'Add Money',
-              onTap: () {
-                nextScreen(context, AddMoney());
-              },
-            )
-          ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAdminButton(
+      BuildContext context, String title, IconData icon, Widget destination) {
+    return ElevatedButton(
+      onPressed: () => nextScreen(context, destination),
+      style: ElevatedButton.styleFrom(
+        // primary: Colors.white,
+        // onPrimary: Colors.green,
+        padding: EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        elevation: 4,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 40),
+          SizedBox(height: 8),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }

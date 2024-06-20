@@ -1,7 +1,5 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
@@ -10,38 +8,31 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class AddCategory extends StatefulWidget {
-  const AddCategory({super.key});
+  const AddCategory({Key? key}) : super(key: key);
 
   @override
   State<AddCategory> createState() => _AddCategoryState();
 }
 
 class _AddCategoryState extends State<AddCategory> {
-  final CollectionReference gamescollection =
+  final CollectionReference categoriesCollection =
       FirebaseFirestore.instance.collection("Categories");
   bool loading = false;
-  final hostnamecontroller = TextEditingController();
-  final eventnamecontroller = TextEditingController();
-  final timecontroller = TextEditingController();
-  final eventimgcontroller = TextEditingController();
-  final datecontroller = TextEditingController();
-  final dobcontroller = TextEditingController();
-  final eventdetailcontroller = TextEditingController();
+  final categoryNameController = TextEditingController();
+  final categoryImageController = TextEditingController();
 
   File? _image;
-  firebase_storage.FirebaseStorage storage =
-      firebase_storage.FirebaseStorage.instance;
   final picker = ImagePicker();
-  Future<void> getimageGallery() async {
-    final pickedfile = await picker.pickImage(
+
+  Future<void> getImageFromGallery() async {
+    final pickedFile = await picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 50,
+      imageQuality: 70,
     );
     setState(() {
-      if (pickedfile != null) {
-        _image = File(pickedfile.path);
-      } else {
-        // Utils().toastMessage('No image picked');
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        handleImageUpload();
       }
     });
   }
@@ -49,152 +40,47 @@ class _AddCategoryState extends State<AddCategory> {
   Future<void> handleImageUpload() async {
     if (_image != null) {
       try {
-        String imageUrl = await uploadimage();
-        eventimgcontroller.text =
-            imageUrl; // Save the image URL to the controller
+        String imageUrl = await uploadImage();
+        categoryImageController.text = imageUrl;
       } catch (e) {
-        //  Utils().toastMessage('Failed to upload image: $e');
+        Utils().toastMessage('Failed to upload image: $e');
       }
-    } else {
-      //Utils().toastMessage('No image selected');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final Size screensize = MediaQuery.of(context).size;
-    final double height = screensize.height;
-    final double width = screensize.width;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.greenthemecolor,
-        foregroundColor: Colors.white,
-        title: Text('Add New Category'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        title: Text('Add New Category',
+            style: TextStyle(fontWeight: FontWeight.w400)),
+        elevation: 0,
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: height * 0.03,
+              Text(
+                'Category Details',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87),
               ),
-              TextFormField(
-                controller: eventnamecontroller,
-                maxLines: 1,
-                decoration: InputDecoration(
-                    hintText: 'Category Name',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10))),
+              SizedBox(height: 24),
+              _buildTextField(
+                controller: categoryNameController,
+                labelText: 'Category Name',
+                hintText: 'Enter category name',
               ),
-              SizedBox(
-                height: height * 0.03,
-              ),
-              // TextFormField(
-              //   controller: hostnamecontroller,
-              //   maxLines: 1,
-              //   decoration: InputDecoration(
-              //       hintText: 'HostName',
-              //       border: OutlineInputBorder(
-              //           borderRadius: BorderRadius.circular(10))),
-              // ),
-              // SizedBox(
-              //   height: height * 0.03,
-              // ),
-              // TextFormField(
-              //   controller: eventdetailcontroller,
-              //   maxLines: 5,
-              //   decoration: InputDecoration(
-              //       hintText: 'Event Details',
-              //       border: OutlineInputBorder(
-              //           borderRadius: BorderRadius.circular(10))),
-              // ),
-              // SizedBox(
-              //   height: height * 0.03,
-              // ),
-              // TextFormField(
-              //   controller: timecontroller,
-              //   maxLines: 1,
-              //   decoration: InputDecoration(
-              //       hintText: 'Time',
-              //       border: OutlineInputBorder(
-              //           borderRadius: BorderRadius.circular(10))),
-              // ),
-              // SizedBox(
-              //   height: height * 0.03,
-              // ),
-              // TextFormField(
-              //   controller: datecontroller,
-              //   maxLines: 1,
-              //   decoration: InputDecoration(
-              //       hintText: 'Date',
-              //       border: OutlineInputBorder(
-              //           borderRadius: BorderRadius.circular(10))),
-              // ),
-              // SizedBox(
-              //   height: height * 0.03,
-              // ),
-              TextFormField(
-                controller: eventimgcontroller,
-                maxLines: 1,
-                decoration: InputDecoration(
-                    hintText: 'Select Category Img',
-                    icon: InkWell(
-                      child: Icon(Icons.add_a_photo),
-                      onTap: () async {
-                        await getimageGallery();
-                        await handleImageUpload();
-                      },
-                    ),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10))),
-              ),
-              SizedBox(
-                height: height * 0.03,
-              ),
-              RoundButton(
-                loading: loading,
-                title: 'Add Category',
-                onTap: () {
-                  setState(() {
-                    loading = true;
-                  });
-                  addgames(
-                    eventnamecontroller.text.toString(),
-                    eventimgcontroller.text.toString(),
-
-                    //  eventdetailcontroller.text.toString()
-                  ).then(
-                    (value) {
-                      Utils().toastMessage('Details Sucessfully Added');
-                      setState(() {
-                        loading = false;
-                      });
-                      //nextScreenReplace(context, MembersPage());
-
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) =>
-                      //           AddCourseContentAfterAddingCourse(
-                      //               coursename:
-                      //                   coursenamecontroller.text.toString()),
-                      //     ));
-                    },
-                  ).onError(
-                    (error, stackTrace) {
-                      Utils().toastMessage(error.toString());
-                      setState(() {
-                        loading = false;
-                      });
-                    },
-                  );
-                  //String id = 'ayushshahi96kmr@gmail.com';
-                },
-              ),
-              SizedBox(
-                height: height * 0.05,
-              )
+              SizedBox(height: 24),
+              _buildImagePicker(),
+              SizedBox(height: 36),
+              _buildAddButton(),
             ],
           ),
         ),
@@ -202,33 +88,118 @@ class _AddCategoryState extends State<AddCategory> {
     );
   }
 
-  Future<String> uploadimage() async {
-    if (_image == null) {
-      throw Exception('No image file selected');
-    }
-    String fileExtension = _image!.path.split('.').last;
-    String fileName = '${DateTime.now().microsecondsSinceEpoch}.$fileExtension';
-    firebase_storage.Reference ref = storage.ref('/foldername/$fileName');
-    firebase_storage.SettableMetadata metadata =
-        firebase_storage.SettableMetadata(
-      contentType: 'image/$fileExtension',
-      contentDisposition: 'inline; filename="$fileName"',
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required String hintText,
+  }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.greenthemecolor, width: 2),
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+      ),
     );
-    firebase_storage.UploadTask uploadTask = ref.putFile(_image!, metadata);
-    await uploadTask;
-    String downloadURL = await ref.getDownloadURL();
-    return downloadURL;
   }
 
-  Future addgames(String eventname, String eventbannerimg) async {
-    var date = DateTime.now().microsecondsSinceEpoch.toString();
-    await gamescollection.doc(eventname).set({
-      'Category Img': eventbannerimg,
-      'Category Name': eventname,
-      // 'Time': time,
-      // 'HostName': hostname,
-      // 'EventDate': eventdate,
-      // 'id': date,
+  Widget _buildImagePicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Category Image',
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+        ),
+        SizedBox(height: 8),
+        GestureDetector(
+          onTap: getImageFromGallery,
+          child: Container(
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: _image != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(_image!, fit: BoxFit.cover),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_a_photo,
+                          size: 40, color: Colors.grey[400]),
+                      SizedBox(height: 8),
+                      Text(
+                        'Tap to add image',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddButton() {
+    return RoundButton(
+      title: 'Add Category',
+      onTap: _addCategory,
+      loading: loading,
+    );
+  }
+
+  void _addCategory() async {
+    if (categoryNameController.text.isEmpty ||
+        categoryImageController.text.isEmpty) {
+      Utils().toastMessage('Please fill all fields');
+      return;
+    }
+
+    setState(() => loading = true);
+
+    try {
+      await addCategoryToFirestore(
+        categoryNameController.text.trim(),
+        categoryImageController.text.trim(),
+      );
+      Utils().toastMessage('Category successfully added');
+      Navigator.pop(context);
+    } catch (error) {
+      Utils().toastMessage('Error adding category: $error');
+    } finally {
+      setState(() => loading = false);
+    }
+  }
+
+  Future<String> uploadImage() async {
+    if (_image == null) throw Exception('No image file selected');
+
+    String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    firebase_storage.Reference ref =
+        firebase_storage.FirebaseStorage.instance.ref('/categories/$fileName');
+
+    await ref.putFile(_image!);
+    return await ref.getDownloadURL();
+  }
+
+  Future<void> addCategoryToFirestore(
+      String categoryName, String categoryImageUrl) async {
+    await categoriesCollection.doc(categoryName).set({
+      'Category Img': categoryImageUrl,
+      'Category Name': categoryName,
     });
   }
 }

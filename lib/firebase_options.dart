@@ -46,15 +46,17 @@ class DefaultFirebaseOptions {
     messagingSenderId: '460364116205',
     projectId: 'hakkikatdemo',
     authDomain: 'hakkikatdemo.firebaseapp.com',
+    databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',
     storageBucket: 'hakkikatdemo.appspot.com',
     measurementId: 'G-94BYKHKR3X',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDb06naJZxObS4TAsZQeM55DNGBiAwzJHk',
-    appId: '1:460364116205:android:0c06dd3c9c7dffa9255ce4',
+    appId: '1:460364116205:android:d1af929c3a4211a7255ce4',
     messagingSenderId: '460364116205',
     projectId: 'hakkikatdemo',
+    databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',
     storageBucket: 'hakkikatdemo.appspot.com',
   );
 
@@ -63,6 +65,7 @@ class DefaultFirebaseOptions {
     appId: '1:460364116205:ios:5fd12effb3142ced255ce4',
     messagingSenderId: '460364116205',
     projectId: 'hakkikatdemo',
+    databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',
     storageBucket: 'hakkikatdemo.appspot.com',
     iosBundleId: 'com.example.hakikatAppNew',
   );
@@ -72,6 +75,7 @@ class DefaultFirebaseOptions {
     appId: '1:460364116205:ios:5fd12effb3142ced255ce4',
     messagingSenderId: '460364116205',
     projectId: 'hakkikatdemo',
+    databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',
     storageBucket: 'hakkikatdemo.appspot.com',
     iosBundleId: 'com.example.hakikatAppNew',
   );
@@ -82,6 +86,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '460364116205',
     projectId: 'hakkikatdemo',
     authDomain: 'hakkikatdemo.firebaseapp.com',
+    databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',
     storageBucket: 'hakkikatdemo.appspot.com',
     measurementId: 'G-9GB0SPMF9E',
   );
