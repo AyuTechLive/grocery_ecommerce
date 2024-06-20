@@ -8,6 +8,7 @@ class AdminOrderHistoryScreen extends StatefulWidget {
 }
 
 class _AdminOrderHistoryScreenState extends State<AdminOrderHistoryScreen> {
+  final TextEditingController _estimatetimecontroller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +18,7 @@ class _AdminOrderHistoryScreenState extends State<AdminOrderHistoryScreen> {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('orders')
-            .where('status', isEqualTo: 'Shipping')
+            // .where('status', isEqualTo: 'Order Placed')
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -86,19 +87,19 @@ class _AdminOrderHistoryScreenState extends State<AdminOrderHistoryScreen> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          _updateOrderStatus(orderId, 'Shipping');
+                          _showAcceptTextFieldDialog(orderId);
                         },
                         child: Text('Accept'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          _updateOrderStatus(orderId, 'Cancelled');
+                          _updateOrderStatus(orderId, 'Cancelled', '');
                         },
                         child: Text('Reject'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          _updateOrderStatus(orderId, 'Delivered');
+                          _updateOrderStatus(orderId, 'Delivered', '');
                         },
                         child: Text('Completed'),
                       ),
@@ -113,15 +114,50 @@ class _AdminOrderHistoryScreenState extends State<AdminOrderHistoryScreen> {
     );
   }
 
-  void _updateOrderStatus(String orderId, String status) {
-    FirebaseFirestore.instance.collection('orders').doc(orderId).update({
-      'status': status,
-    }).then((_) {
+  void _updateOrderStatus(String orderId, String status, String estimated) {
+    FirebaseFirestore.instance
+        .collection('orders')
+        .doc(orderId)
+        .update({'status': status, 'Estimated': estimated}).then((_) {
       // Show a success message or perform any additional actions
       print('Order status updated to $status');
     }).catchError((error) {
       // Show an error message or perform any necessary error handling
       print('Failed to update order status: $error');
     });
+  }
+
+  void _showAcceptTextFieldDialog(String orderId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter Text'),
+          content: TextField(
+            controller: _estimatetimecontroller,
+            decoration: InputDecoration(
+              hintText: 'Enter text here',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                _updateOrderStatus(
+                    orderId, 'Order Confirmed', _estimatetimecontroller.text);
+                _estimatetimecontroller.clear();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

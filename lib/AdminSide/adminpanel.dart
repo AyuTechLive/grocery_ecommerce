@@ -5,6 +5,7 @@ import 'package:hakikat_app_new/AdminSide/addcategory.dart';
 import 'package:hakikat_app_new/AdminSide/addproduct.dart';
 import 'package:hakikat_app_new/AdminSide/testing.dart';
 import 'package:hakikat_app_new/AdminSide/testing2.dart';
+import 'package:hakikat_app_new/AdminSide/users/addmoney.dart';
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
@@ -68,6 +69,15 @@ class AdminPanel extends StatelessWidget {
               title: 'Orders',
               onTap: () {
                 nextScreen(context, AdminOrderHistoryScreen());
+              },
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            RoundButton(
+              title: 'Add Money',
+              onTap: () {
+                nextScreen(context, AddMoney());
               },
             )
           ],
