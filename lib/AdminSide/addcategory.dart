@@ -18,6 +18,7 @@ class _AddCategoryState extends State<AddCategory> {
   final CollectionReference categoriesCollection =
       FirebaseFirestore.instance.collection("Categories");
   bool loading = false;
+  bool isImageUploading = false;
   final categoryNameController = TextEditingController();
   final categoryImageController = TextEditingController();
 
@@ -40,10 +41,17 @@ class _AddCategoryState extends State<AddCategory> {
   Future<void> handleImageUpload() async {
     if (_image != null) {
       try {
+        setState(() {
+          isImageUploading = true;
+        });
         String imageUrl = await uploadImage();
         categoryImageController.text = imageUrl;
       } catch (e) {
         Utils().toastMessage('Failed to upload image: $e');
+      } finally {
+        setState(() {
+          isImageUploading = false;
+        });
       }
     }
   }
@@ -157,11 +165,16 @@ class _AddCategoryState extends State<AddCategory> {
     return RoundButton(
       title: 'Add Category',
       onTap: _addCategory,
-      loading: loading,
+      loading: loading || isImageUploading,
     );
   }
 
   void _addCategory() async {
+    if (isImageUploading) {
+      Utils().toastMessage('Please wait for the image to finish uploading');
+      return;
+    }
+
     if (categoryNameController.text.isEmpty ||
         categoryImageController.text.isEmpty) {
       Utils().toastMessage('Please fill all fields');

@@ -25,6 +25,7 @@ class _AddProductState extends State<AddProduct> {
   final mapController = TextEditingController();
   final productPriceController = TextEditingController();
   final productSubtitleController = TextEditingController();
+  final productDiscriptionController = TextEditingController();
   final productQuantityController = TextEditingController();
   final matchImgController = TextEditingController();
   bool isExclusive = false;
@@ -164,6 +165,18 @@ class _AddProductState extends State<AddProduct> {
                 maxLines: 1,
                 decoration: InputDecoration(
                   hintText: 'Enter Subtitle',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+              SizedBox(
+                height: height * 0.01,
+              ),
+              TextFormField(
+                controller: productDiscriptionController,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  hintText: 'Enter Product Discription',
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
@@ -353,6 +366,8 @@ class _AddProductState extends State<AddProduct> {
                     'Product Img': _imageUrls, // Store the list of image URLs
                     'Product Subtitle':
                         productSubtitleController.text.toString(),
+                    'Product Discription':
+                        productDiscriptionController.text.toString(),
                     'Product Price': productPriceController.text.toString(),
                     'Product Stock': productQuantityController.text.toString(),
                     'Category': categoryNameController.text.toString(),
@@ -360,13 +375,14 @@ class _AddProductState extends State<AddProduct> {
                     'BestSelling': isBestSelling,
                   }).then(
                     (value) {
-                      Utils().toastMessage('Post Successfully Added');
+                      Utils().toastMessage('Product Successfully Added');
                       setState(() {
                         loading = false;
                       });
+                      Navigator.pop(context);
                     },
                   ).catchError((error) {
-                    Utils().toastMessage('Failed to add post: $error');
+                    Utils().toastMessage('Failed to add product');
                     setState(() {
                       loading = false;
                     });

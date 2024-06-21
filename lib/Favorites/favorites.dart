@@ -58,6 +58,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           'Product Title': data['Product Title'],
           'Product Subtitle': data['Product Subtitle'],
           'Product Img': data['Product Img'],
+          'Product Discription': data['Product Discription'],
         };
         fetchedData.add(favoriteItem);
       }
@@ -132,6 +133,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                   nextScreen(
                                       context,
                                       ProductDetails(
+                                        discription:
+                                            item['Product Discription'] ?? '',
                                         imageUrls: List<String>.from(
                                             item['Product Img'] ??
                                                 [AppImage.defaultimgurl]),

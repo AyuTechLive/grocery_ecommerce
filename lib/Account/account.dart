@@ -81,14 +81,14 @@ class _AccountState extends State<Account> {
               ],
             ),
             SizedBox(height: height * 0.05),
-            Divider(),
-            AccountMenuCard(
-              img: 'orders',
-              title: 'My Orders',
-              ontap: () {
-                nextScreen(context, MyOrdersScreen());
-              },
-            ),
+            // Divider(),
+            // AccountMenuCard(
+            //   img: 'orders',
+            //   title: 'My Orders',
+            //   ontap: () {
+            //     nextScreen(context, MyOrdersScreen());
+            //   },
+            // ),
             Divider(),
             AccountMenuCard(
               img: 'delivery',

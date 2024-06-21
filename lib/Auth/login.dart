@@ -11,6 +11,7 @@ import 'package:hakikat_app_new/Auth/signup.dart';
 import 'package:hakikat_app_new/Home/mainpage.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
+import 'package:hakikat_app_new/Utils/utils.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -71,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           loading = true;
         });
-        //    Utils().toastMessage('Login succesful');
+        Utils().toastMessage('Login succesful');
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -84,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
           loading = false;
         });
 
-        // Utils().toastMessage(error.toString());
+        Utils().toastMessage('Login Unauthorized');
       },
     );
   }

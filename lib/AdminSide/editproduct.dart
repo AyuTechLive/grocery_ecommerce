@@ -28,6 +28,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   List<int> _imagesToDelete = [];
   late TextEditingController _titleController;
   late TextEditingController _subtitleController;
+  late TextEditingController _discriptionController;
   late TextEditingController _priceController;
   late TextEditingController _quantityController;
   bool _isExclusive = false;
@@ -44,6 +45,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   void initState() {
     super.initState();
+    _discriptionController = TextEditingController(
+        text: widget.initialProductData['Product Discription'] ?? '');
     _titleController = TextEditingController(
         text: widget.initialProductData['Product Title'] ?? '');
     _subtitleController = TextEditingController(
@@ -148,6 +151,30 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 decoration: InputDecoration(
                   label: Text('Subtitle'),
                   hintText: 'Subtitle',
+                  hintStyle: TextStyle(color: Colors.grey.shade600),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                ),
+              ),
+              SizedBox(height: height * 0.02),
+              TextFormField(
+                controller: _discriptionController,
+                maxLines: 1,
+                decoration: InputDecoration(
+                  label: Text('Discription'),
+                  hintText: 'Discription',
                   hintStyle: TextStyle(color: Colors.grey.shade600),
                   border: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey.shade400),
@@ -442,6 +469,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       'Exclusive': _isExclusive,
       'BestSelling': _isBestSelling,
       'Product Img': _updatedImageUrls,
+      'Product Discription': _discriptionController.text
     };
 
     _databaseRef.child(widget.productId).update(updatedData).then((_) {

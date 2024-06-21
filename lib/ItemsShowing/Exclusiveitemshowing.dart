@@ -85,7 +85,7 @@ class _ExclusiveItemsState extends State<ExclusiveItems> {
           Expanded(
             child: GridView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              // physics: NeverScrollableScrollPhysics(),
               padding: EdgeInsets.all(width * 0.06),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 childAspectRatio: 0.75,
@@ -101,6 +101,7 @@ class _ExclusiveItemsState extends State<ExclusiveItems> {
                     nextScreen(
                         context,
                         ProductDetails(
+                          discription: product['Product Discription'] ?? '',
                           imageUrls: List<String>.from(product['Product Img'] ??
                               [AppImage.defaultimgurl]),
                           orderid: product['id'],
@@ -175,6 +176,7 @@ class _ExclusiveItemsState extends State<ExclusiveItems> {
               'Product Subtitle': value['Product Subtitle'],
               'Product Img': value['Product Img'],
               'Product Price': value['Product Price'],
+              'Product Discription': value['Product Discription'],
               'id': value['id'],
             };
             setState(() {

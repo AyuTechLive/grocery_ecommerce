@@ -78,7 +78,7 @@ class _MainPageState extends State<MainPage> {
             HomePage(),
             Explore(),
             CartScreen(),
-            FavoritesScreen(),
+            AdminPanel(),
             Account()
           ],
         ),
@@ -111,8 +111,8 @@ class _MainPageState extends State<MainPage> {
               label: 'Cart',
             ),
             BottomNavigationBarItem(
-              icon: ImageIcon(AssetImage('assets/wishlist.png')),
-              label: 'Favorite',
+              icon: ImageIcon(AssetImage('assets/admin.png')),
+              label: 'Admin',
             ),
             BottomNavigationBarItem(
               icon: ImageIcon(AssetImage('assets/account.png')),

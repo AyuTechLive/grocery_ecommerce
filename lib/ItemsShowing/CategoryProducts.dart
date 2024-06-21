@@ -89,6 +89,7 @@ class _CategoryProductState extends State<CategoryProduct> {
                     nextScreen(
                       context,
                       ProductDetails(
+                        discription: product['Product Discription'] ?? '',
                         imageUrls: List<String>.from(
                             product['Product Img'] ?? [AppImage.defaultimgurl]),
                         orderid: product['id'],
@@ -162,6 +163,7 @@ class _CategoryProductState extends State<CategoryProduct> {
               'Product Img': value['Product Img'],
               'Product Price': value['Product Price'],
               'id': value['id'],
+              'Product Discription': value['Product Discription'],
             };
 
             if (widget.categoryname == 'All Products' ||

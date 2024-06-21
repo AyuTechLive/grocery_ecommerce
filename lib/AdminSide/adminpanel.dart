@@ -4,6 +4,7 @@ import 'package:hakikat_app_new/AdminSide/Orders/placedorders.dart';
 import 'package:hakikat_app_new/AdminSide/addbanner.dart';
 import 'package:hakikat_app_new/AdminSide/addcategory.dart';
 import 'package:hakikat_app_new/AdminSide/addproduct.dart';
+import 'package:hakikat_app_new/AdminSide/removebanner.dart';
 import 'package:hakikat_app_new/AdminSide/testing.dart';
 import 'package:hakikat_app_new/AdminSide/testing2.dart';
 import 'package:hakikat_app_new/AdminSide/users/addmoney.dart';
@@ -20,10 +21,11 @@ class AdminPanel extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Admin Panel'),
+        automaticallyImplyLeading: false,
         centerTitle: true,
       ),
       body: Padding(
-        padding: EdgeInsets.only(top: height * 0.05),
+        padding: EdgeInsets.only(top: height * 0.01),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -33,7 +35,8 @@ class AdminPanel extends StatelessWidget {
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.only(
+                left: width * 0.04, right: width * 0.04, top: height * 0.01),
             child: GridView.count(
               crossAxisCount: 2,
               mainAxisSpacing: 16,
@@ -86,6 +89,12 @@ class AdminPanel extends StatelessWidget {
                   'Add Money',
                   Icons.attach_money,
                   AddMoney(),
+                ),
+                _buildAdminButton(
+                  context,
+                  'Banners',
+                  Icons.branding_watermark,
+                  AllBanners(),
                 ),
               ],
             ),

@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class AddBanner extends StatefulWidget {
-  const AddBanner({super.key});
+  const AddBanner({Key? key}) : super(key: key);
 
   @override
   State<AddBanner> createState() => _AddBannerState();
@@ -15,6 +15,7 @@ class AddBanner extends StatefulWidget {
 
 class _AddBannerState extends State<AddBanner> {
   bool loading = false;
+  bool isImageUploading = false;
   final bannerTitleController = TextEditingController();
   final bannerImageLinkController = TextEditingController();
 
@@ -41,10 +42,17 @@ class _AddBannerState extends State<AddBanner> {
   Future<void> handleImageUpload() async {
     if (_image != null) {
       try {
+        setState(() {
+          isImageUploading = true;
+        });
         String imageUrl = await uploadImage();
         bannerImageLinkController.text = imageUrl;
       } catch (e) {
         Utils().toastMessage('Failed to upload image: $e');
+      } finally {
+        setState(() {
+          isImageUploading = false;
+        });
       }
     } else {
       Utils().toastMessage('No image selected');
@@ -106,33 +114,41 @@ class _AddBannerState extends State<AddBanner> {
             ),
             SizedBox(height: 30),
             RoundButton(
-              loading: loading,
+              loading: loading || isImageUploading,
               title: 'Upload Banner',
-              onTap: () {
+              onTap: () async {
+                if (isImageUploading) {
+                  Utils().toastMessage(
+                      'Please wait for the image to finish uploading');
+                  return;
+                }
+
+                if (bannerTitleController.text.isEmpty ||
+                    bannerImageLinkController.text.isEmpty) {
+                  Utils().toastMessage('Please fill all fields');
+                  return;
+                }
+
                 setState(() {
                   loading = true;
                 });
-                String id = DateTime.now().millisecondsSinceEpoch.toString();
-                fireStore.doc(id).set({
-                  'Banner Title': bannerTitleController.text.trim(),
-                  'Banner Image Link': bannerImageLinkController.text.trim(),
-                  'id': id,
-                }).then(
-                  (value) {
-                    Utils().toastMessage('Banner uploaded successfully');
-                    setState(() {
-                      loading = false;
-                    });
-                    Navigator.pop(context);
-                  },
-                ).onError(
-                  (error, stackTrace) {
-                    Utils().toastMessage(error.toString());
-                    setState(() {
-                      loading = false;
-                    });
-                  },
-                );
+
+                try {
+                  String id = DateTime.now().millisecondsSinceEpoch.toString();
+                  await fireStore.doc(id).set({
+                    'Banner Title': bannerTitleController.text.trim(),
+                    'Banner Image Link': bannerImageLinkController.text.trim(),
+                    'id': id,
+                  });
+                  Utils().toastMessage('Banner uploaded successfully');
+                  Navigator.pop(context);
+                } catch (error) {
+                  Utils().toastMessage('Error uploading banner: $error');
+                } finally {
+                  setState(() {
+                    loading = false;
+                  });
+                }
               },
             )
           ],

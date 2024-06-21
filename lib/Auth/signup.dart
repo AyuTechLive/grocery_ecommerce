@@ -5,6 +5,7 @@ import 'package:hakikat_app_new/Auth/login.dart';
 import 'package:hakikat_app_new/Home/mainpage.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
+import 'package:hakikat_app_new/Utils/utils.dart';
 
 class SignUpNew extends StatefulWidget {
   const SignUpNew({super.key});
@@ -401,8 +402,8 @@ class _SignUpNewState extends State<SignUpNew> {
                               setState(
                                 () {
                                   loading = false;
-                                  //  Utils().toastMessage(
-                                  //  'Account Sucessfully Created');
+                                  Utils().toastMessage(
+                                      'Account Sucessfully Created');
                                   _auth // login succesful to then function mei chala jayega warna on error mei chala jayegaa
                                       .signInWithEmailAndPassword(
                                           email:
@@ -416,7 +417,7 @@ class _SignUpNewState extends State<SignUpNew> {
                                       "count": "0"
                                     }).then(
                                       (value) {
-                                        // Utils().toastMessage('Login succesful');
+                                        Utils().toastMessage('Login succesful');
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -425,7 +426,8 @@ class _SignUpNewState extends State<SignUpNew> {
                                       },
                                     ).onError(
                                       (error, stackTrace) {
-                                        //   Utils().toastMessage(error.toString());
+                                        Utils().toastMessage(
+                                            'Error While Creating Account Try Again');
                                       },
                                     );
                                   });
@@ -435,7 +437,8 @@ class _SignUpNewState extends State<SignUpNew> {
                           },
                         ).onError(
                           (error, stackTrace) {
-                            //    Utils().toastMessage(error.toString());
+                            Utils().toastMessage(
+                                'Error While Creating Account Try Again');
                             setState(() {
                               loading = false;
                             });

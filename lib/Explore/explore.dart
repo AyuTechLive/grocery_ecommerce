@@ -49,7 +49,8 @@ class _ExploreState extends State<Explore> {
               'Product Img': value['Product Img'],
               'Product Price': value['Product Price'],
               'Product Stock': value['Product Stock'],
-              'id': value['id']
+              'id': value['id'],
+              'Product Discription': value['Product Discription'],
             };
             setState(() {
               products.add(product);
@@ -235,6 +236,8 @@ class _ExploreState extends State<Explore> {
                           nextScreen(
                               context,
                               ProductDetails(
+                                discription:
+                                    product['Product Discription'] ?? '',
                                 imageUrls: List<String>.from(
                                     product['Product Img'] ??
                                         [AppImage.defaultimgurl]),

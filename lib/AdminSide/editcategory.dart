@@ -244,7 +244,11 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
         isdeleting = false;
       });
       Utils().toastMessage('Category deleted successfully');
-      Navigator.pop(context); // Navigate back after deleting the category
+      Navigator.pop(context);
+      Navigator.of(context).pop();
+
+      // Pop the edit category screen and return to the previous screen
+      // Navigate back after deleting the category
     } catch (e) {
       Utils().toastMessage('Failed to delete category: $e');
     }

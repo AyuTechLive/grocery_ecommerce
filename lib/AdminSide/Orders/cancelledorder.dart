@@ -32,16 +32,16 @@ class _CancelledOrdersScreenState extends State<CancelledOrdersScreen>
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: 'Refund Issued'),
             Tab(text: 'Refund Pending'),
+            Tab(text: 'Refund Issued'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildOrderList(refundStatus: true),
           _buildOrderList(refundStatus: false),
+          _buildOrderList(refundStatus: true),
         ],
       ),
     );
