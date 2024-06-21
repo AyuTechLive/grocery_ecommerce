@@ -182,11 +182,10 @@ class _HomePageState extends State<HomePage> {
                         ),
                         items: snapshot.data!.docs.map((document) {
                           // Map the snapshot documents to carousel items
-                          String imageUrl = document['Course Img Link'];
+                          String imageUrl = document['Banner Image Link'];
                           // Assuming this is how your data is structured
                           // Build your carousel item with the image URL
-                          String bannerfunction = document['Banner Function'];
-                          String bannertype = document['Banner Type'];
+
                           return Builder(
                             builder: (BuildContext context) {
                               return InkWell(
@@ -208,7 +207,7 @@ class _HomePageState extends State<HomePage> {
                                     borderRadius: BorderRadius.circular(5),
                                     child: Image.network(
                                       imageUrl,
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.fill,
                                     ),
                                   ),
                                 ),
@@ -257,6 +256,7 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            discription: product['Product Discription'] ?? '',
                             imageUrls: List<String>.from(
                                 product['Product Img'] ??
                                     [AppImage.defaultimgurl]),
@@ -275,6 +275,7 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            discription: product['Product Discription'] ?? '',
                             imageUrls: List<String>.from(
                                 product['Product Img'] ??
                                     [AppImage.defaultimgurl]),
@@ -427,6 +428,7 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            discription: product['Product Discription'] ?? '',
                             imageUrls: List<String>.from(
                                 product['Product Img'] ??
                                     [AppImage.defaultimgurl]),
@@ -445,6 +447,7 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            discription: product['Product Discription'] ?? '',
                             imageUrls: List<String>.from(
                                 product['Product Img'] ??
                                     [AppImage.defaultimgurl]),
@@ -500,6 +503,7 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            discription: product['Product Discription'] ?? '',
                             imageUrls: List<String>.from(
                                 product['Product Img'] ??
                                     [AppImage.defaultimgurl]),
@@ -518,6 +522,7 @@ class _HomePageState extends State<HomePage> {
                       nextScreen(
                           context,
                           ProductDetails(
+                            discription: product['Product Discription'] ?? '',
                             imageUrls: List<String>.from(
                                 product['Product Img'] ??
                                     [AppImage.defaultimgurl]),
@@ -573,6 +578,7 @@ class _HomePageState extends State<HomePage> {
               'Product Price': value['Product Price'],
               'Product Title': value['Product Title'],
               'Product Subtitle': value['Product Subtitle'],
+              'Product Discription': value['Product Discription'],
               'Product Img': value['Product Img'],
               'Exclusive':
                   value.containsKey('Exclusive') && value['Exclusive'] == true,

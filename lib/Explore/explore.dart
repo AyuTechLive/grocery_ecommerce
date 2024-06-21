@@ -47,7 +47,8 @@ class _ExploreState extends State<Explore> {
               'Product Img': value['Product Img'],
               'Product Price': value['Product Price'],
               'Product Stock': value['Product Stock'],
-              'id': value['id']
+              'id': value['id'],
+              'Product Discription': value['Product Discription'],
             };
             if (mounted) {
               setState(() {
@@ -222,6 +223,8 @@ class _ExploreState extends State<Explore> {
                           nextScreen(
                               context,
                               ProductDetails(
+                                discription:
+                                    product['Product Discription'] ?? '',
                                 imageUrls: List<String>.from(
                                     product['Product Img'] ??
                                         [AppImage.defaultimgurl]),
@@ -241,6 +244,8 @@ class _ExploreState extends State<Explore> {
                           nextScreen(
                               context,
                               ProductDetails(
+                                discription:
+                                    product['Product Discription'] ?? '',
                                 imageUrls: List<String>.from(
                                     product['Product Img'] ??
                                         [AppImage.defaultimgurl]),

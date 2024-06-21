@@ -5,6 +5,7 @@ import 'package:hakikat_app_new/Auth/login.dart';
 import 'package:hakikat_app_new/Home/mainpage.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
+import 'package:hakikat_app_new/Utils/utils.dart';
 
 class SignUpNew extends StatefulWidget {
   const SignUpNew({super.key});
@@ -393,6 +394,7 @@ class _SignUpNewState extends State<SignUpNew> {
                                   .microsecondsSinceEpoch
                                   .toString(),
                               'My Courses': [],
+                              'Favorites': [],
                               'DOJ': formattedDate,
                               'Name': namecontroller.text.toString(),
                               'Wallet': "0",
@@ -401,8 +403,8 @@ class _SignUpNewState extends State<SignUpNew> {
                               setState(
                                 () {
                                   loading = false;
-                                  //  Utils().toastMessage(
-                                  //  'Account Sucessfully Created');
+                                  Utils().toastMessage(
+                                      'Account Sucessfully Created');
                                   _auth // login succesful to then function mei chala jayega warna on error mei chala jayegaa
                                       .signInWithEmailAndPassword(
                                           email:
@@ -416,7 +418,7 @@ class _SignUpNewState extends State<SignUpNew> {
                                       "count": "0"
                                     }).then(
                                       (value) {
-                                        // Utils().toastMessage('Login succesful');
+                                        Utils().toastMessage('Login succesful');
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -425,7 +427,8 @@ class _SignUpNewState extends State<SignUpNew> {
                                       },
                                     ).onError(
                                       (error, stackTrace) {
-                                        //   Utils().toastMessage(error.toString());
+                                        Utils().toastMessage(
+                                            'Error While Creating Account Try Again');
                                       },
                                     );
                                   });
@@ -435,7 +438,8 @@ class _SignUpNewState extends State<SignUpNew> {
                           },
                         ).onError(
                           (error, stackTrace) {
-                            //    Utils().toastMessage(error.toString());
+                            Utils().toastMessage(
+                                'Error While Creating Account Try Again');
                             setState(() {
                               loading = false;
                             });
@@ -453,7 +457,7 @@ class _SignUpNewState extends State<SignUpNew> {
                               referalcodecontroller.text.toString());
                         } else {
                           // Referral code not found
-                          //  Utils().toastMessage('Invalid referral code');
+                          Utils().toastMessage('Invalid referral code');
                         }
                       }).catchError((error) {
                         //   Utils().toastMessage(
@@ -515,11 +519,12 @@ class _SignUpNewState extends State<SignUpNew> {
         'DOJ': formatteddate,
         'Name': namecontroller.text.toString(),
         'Wallet': "0",
+        'Favorites': [],
         'ReferalId': referalId
       }).then((value) {
         setState(() {
           loading = false;
-          // Utils().toastMessage('Account Sucessfully Created');
+          Utils().toastMessage('Account Sucessfully Created');
           _auth
               .signInWithEmailAndPassword(
                   email: emailcontroller.text.toString(),
@@ -532,13 +537,13 @@ class _SignUpNewState extends State<SignUpNew> {
             }).then((value) {
               updateReferralCount(enteredrefferedid);
             }).onError((error, stackTrace) {
-              //   Utils().toastMessage(error.toString());
+              Utils().toastMessage('Error While Creating Account Try Again');
             });
           });
         });
       });
     }).onError((error, stackTrace) {
-      //  Utils().toastMessage(error.toString());
+      Utils().toastMessage('Error While Creating Account Try Again');
       setState(() {
         loading = false;
       });

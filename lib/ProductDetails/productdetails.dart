@@ -16,6 +16,7 @@ class ProductDetails extends StatefulWidget {
   final String img;
   final String orderid;
   final int maxquantity;
+  final String discription;
 
   final List<String> imageUrls;
   const ProductDetails({
@@ -27,6 +28,7 @@ class ProductDetails extends StatefulWidget {
     required this.img,
     required this.orderid,
     required this.imageUrls,
+    required this.discription,
   });
 
   @override
@@ -40,6 +42,8 @@ class _ProductDetailsState extends State<ProductDetails> {
   bool isLoading = false;
   bool isInCart = false;
   int _currentIndex = 0;
+  bool _isExpanded = true; // Start expanded by default
+
   @override
   void initState() {
     // TODO: implement initState
@@ -57,324 +61,332 @@ class _ProductDetailsState extends State<ProductDetails> {
       appBar: AppBar(
         backgroundColor: Color(0xFFF2F3F2),
       ),
-      body: Column(
-        children: [
-          Container(
-            width: width,
-            height: height * 0.31,
-            decoration: ShapeDecoration(
-              color: Color(0xFFF2F3F2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(25),
-                  bottomRight: Radius.circular(25),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              width: width,
+              height: height * 0.31,
+              decoration: ShapeDecoration(
+                color: Color(0xFFF2F3F2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(25),
+                    bottomRight: Radius.circular(25),
+                  ),
+                ),
+              ),
+              child: Center(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: height * 0.21,
+                      child: CarouselSlider(
+                        items: widget.imageUrls.map((imageUrl) {
+                          return Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                          );
+                        }).toList(),
+                        options: CarouselOptions(
+                          autoPlay: true,
+                          height: height * 0.21,
+                          viewportFraction: 1.0,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 8.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        widget.imageUrls.length,
+                        (index) => buildDot(index: index),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            child: Center(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: height * 0.21,
-                    child: CarouselSlider(
-                      items: widget.imageUrls.map((imageUrl) {
-                        return Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                        );
-                      }).toList(),
-                      options: CarouselOptions(
-                        autoPlay: true,
-                        height: height * 0.21,
-                        viewportFraction: 1.0,
-                        onPageChanged: (index, reason) {
-                          setState(() {
-                            _currentIndex = index;
-                          });
-                        },
+            Row(
+              children: [
+                Spacer(),
+                SizedBox(
+                  width: width * 0.604,
+                  child: Text(
+                    widget.title,
+                    style: TextStyle(
+                      color: Color(0xFF181725),
+                      fontSize: 20,
+                      fontFamily: 'Gilroy-Bold',
+                      fontWeight: FontWeight.w400,
+                      //letterSpacing: 0.10,
+                    ),
+                  ),
+                ),
+                Spacer(),
+                Spacer(),
+                IconButton(
+                  onPressed: () {
+                    toggleFavorite(widget.orderid);
+                  },
+                  icon: Icon(
+                      isInFavorites
+                          ? Icons.favorite
+                          : Icons.favorite_border_outlined,
+                      color: isInFavorites ? Colors.red : null),
+                ),
+                Spacer()
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: width * 0.1,
+                ),
+                Text(
+                  widget.subtitle,
+                  style: TextStyle(
+                    color: Color(0xFF7C7C7C),
+                    fontSize: 16,
+                    fontFamily: 'Gilroy',
+                    fontWeight: FontWeight.w600,
+                    //height: 0.07,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: height * 0.015,
+            ),
+            Row(
+              children: [
+                Spacer(),
+                IconButton(
+                  onPressed: () {
+                    quantitydecrement();
+                  },
+                  icon: Container(
+                    width: width * 0.11,
+                    height: height * 0.050,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(width: 1, color: Color(0xFFF0F0F0)),
+                        borderRadius: BorderRadius.circular(17),
+                      ),
+                    ),
+                    child: Center(
+                      child: Icon(Icons.remove),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: width * 0.05,
+                ),
+                Text(
+                  quantity.toString(),
+                  style: TextStyle(
+                    color: Color(0xFF181725),
+                    fontSize: 16,
+                    fontFamily: 'Gilroy',
+                    fontWeight: FontWeight.w600,
+                    height: 0.07,
+                    letterSpacing: 0.10,
+                  ),
+                ),
+                SizedBox(
+                  width: width * 0.05,
+                ),
+                IconButton(
+                  onPressed: () {
+                    quantityincrement();
+                  },
+                  icon: Container(
+                    width: width * 0.11,
+                    height: height * 0.050,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(width: 1, color: Color(0xFFF0F0F0)),
+                        borderRadius: BorderRadius.circular(17),
+                      ),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.add,
+                        color: AppColors.greenthemecolor,
                       ),
                     ),
                   ),
-                  SizedBox(height: 8.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      widget.imageUrls.length,
-                      (index) => buildDot(index: index),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              Spacer(),
-              SizedBox(
-                width: width * 0.604,
-                child: Text(
-                  widget.title,
+                ),
+                Spacer(),
+                Spacer(),
+                Spacer(),
+                Spacer(),
+                Text(
+                  '₹ ${totalprice}',
                   style: TextStyle(
                     color: Color(0xFF181725),
-                    fontSize: 20,
-                    fontFamily: 'Gilroy-Bold',
+                    fontSize: 18,
+                    fontFamily: 'Gilroy',
+                    fontWeight: FontWeight.w600,
+                    height: 0.08,
+                    letterSpacing: 0.10,
+                  ),
+                ),
+                Spacer()
+              ],
+            ),
+            SizedBox(
+              height: height * 0.04,
+            ),
+            Container(
+              width: width * (0.876),
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 1,
+                    strokeAlign: BorderSide.strokeAlignCenter,
+                    color: Color(0xFFE2E2E2),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: height * 0.01,
+            ),
+            Row(
+              children: [
+                SizedBox(width: width * 0.08),
+                Text(
+                  'Product Detail',
+                  style: TextStyle(
+                    color: Color(0xFF181725),
+                    fontSize: 16,
+                    fontFamily: 'Gilroy',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Spacer(),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  icon:
+                      Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
+                ),
+                SizedBox(width: width * 0.05)
+              ],
+            ),
+            if (_isExpanded)
+              Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: width * 0.08, vertical: 8),
+                child: Text(
+                  widget.discription,
+                  style: TextStyle(
+                    color: Color(0xFF7C7C7C),
+                    fontSize: 13,
+                    fontFamily: 'Gilroy-Medium',
                     fontWeight: FontWeight.w400,
-                    //letterSpacing: 0.10,
                   ),
                 ),
               ),
-              Spacer(),
-              Spacer(),
-              IconButton(
-                onPressed: () {
-                  toggleFavorite(widget.orderid);
-                },
-                icon: Icon(
-                    isInFavorites
-                        ? Icons.favorite
-                        : Icons.favorite_border_outlined,
-                    color: isInFavorites ? Colors.red : null),
-              ),
-              Spacer()
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: width * 0.1,
-              ),
-              Text(
-                widget.subtitle,
-                style: TextStyle(
-                  color: Color(0xFF7C7C7C),
-                  fontSize: 16,
-                  fontFamily: 'Gilroy',
-                  fontWeight: FontWeight.w600,
-                  //height: 0.07,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: height * 0.015,
-          ),
-          Row(
-            children: [
-              Spacer(),
-              IconButton(
-                onPressed: () {
-                  quantitydecrement();
-                },
-                icon: Container(
-                  width: width * 0.11,
-                  height: height * 0.050,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 1, color: Color(0xFFF0F0F0)),
-                      borderRadius: BorderRadius.circular(17),
-                    ),
+            SizedBox(
+              height: height * 0.04,
+            ),
+            Container(
+              width: width * (0.876),
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 1,
+                    strokeAlign: BorderSide.strokeAlignCenter,
+                    color: Color(0xFFE2E2E2),
                   ),
-                  child: Center(
-                    child: Icon(Icons.remove),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: width * 0.05,
-              ),
-              Text(
-                quantity.toString(),
-                style: TextStyle(
-                  color: Color(0xFF181725),
-                  fontSize: 16,
-                  fontFamily: 'Gilroy',
-                  fontWeight: FontWeight.w600,
-                  height: 0.07,
-                  letterSpacing: 0.10,
-                ),
-              ),
-              SizedBox(
-                width: width * 0.05,
-              ),
-              IconButton(
-                onPressed: () {
-                  quantityincrement();
-                },
-                icon: Container(
-                  width: width * 0.11,
-                  height: height * 0.050,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 1, color: Color(0xFFF0F0F0)),
-                      borderRadius: BorderRadius.circular(17),
-                    ),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.add,
-                      color: AppColors.greenthemecolor,
-                    ),
-                  ),
-                ),
-              ),
-              Spacer(),
-              Spacer(),
-              Spacer(),
-              Spacer(),
-              Text(
-                '₹ ${totalprice}',
-                style: TextStyle(
-                  color: Color(0xFF181725),
-                  fontSize: 18,
-                  fontFamily: 'Gilroy',
-                  fontWeight: FontWeight.w600,
-                  height: 0.08,
-                  letterSpacing: 0.10,
-                ),
-              ),
-              Spacer()
-            ],
-          ),
-          SizedBox(
-            height: height * 0.04,
-          ),
-          Container(
-            width: width * (0.876),
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  width: 1,
-                  strokeAlign: BorderSide.strokeAlignCenter,
-                  color: Color(0xFFE2E2E2),
                 ),
               ),
             ),
-          ),
-          SizedBox(
-            height: height * 0.01,
-          ),
-          Row(
-            children: [
-              SizedBox(
-                width: width * 0.08,
-              ),
-              Text(
-                'Product Detail',
-                style: TextStyle(
-                  color: Color(0xFF181725),
-                  fontSize: 16,
-                  fontFamily: 'Gilroy',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Spacer(),
-              IconButton(onPressed: () {}, icon: Icon(Icons.expand_more)),
-              SizedBox(
-                width: width * 0.05,
-              )
-            ],
-          ),
-          SizedBox(
-            width: width * 0.864,
-            child: Text(
-              'Apples are nutritious. Apples may be good for weight loss. apples may be good for your heart. As part of a healtful and varied diet.',
-              style: TextStyle(
-                color: Color(0xFF7C7C7C),
-                fontSize: 13,
-                fontFamily: 'Gilroy-Medium',
-                fontWeight: FontWeight.w400,
-              ),
+            SizedBox(
+              height: height * 0.05,
             ),
-          ),
-          SizedBox(
-            height: height * 0.04,
-          ),
-          Container(
-            width: width * (0.876),
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  width: 1,
-                  strokeAlign: BorderSide.strokeAlignCenter,
-                  color: Color(0xFFE2E2E2),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: height * 0.05,
-          ),
-          IconButton(
-              onPressed: () {
-                widget.maxquantity > 0
-                    ? isInCart
-                        ? _gotoCart()
-                        : _addToCart()
-                    : Utils().toastMessage('Item Out Of Stock');
-              },
-              icon: widget.maxquantity > 0
-                  ? isLoading
-                      ? CircularProgressIndicator()
-                      : Container(
-                          width: width * 0.879,
-                          height: height * 0.074,
-                          decoration: ShapeDecoration(
-                            color: AppColors.greenthemecolor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(19),
-                            ),
-                          ),
-                          child: isInCart
-                              ? Center(
-                                  child: Text(
-                                    'Go To Cart',
-                                    style: TextStyle(
-                                      color: Color(0xFFFCFCFC),
-                                      fontSize: 16,
-                                      fontFamily: 'Gilroy',
-                                      fontWeight: FontWeight.w600,
-                                      height: 0.06,
-                                    ),
-                                  ),
-                                )
-                              : Center(
-                                  child: Text(
-                                    'Add To Cart',
-                                    style: TextStyle(
-                                      color: Color(0xFFFCFCFC),
-                                      fontSize: 16,
-                                      fontFamily: 'Gilroy',
-                                      fontWeight: FontWeight.w600,
-                                      height: 0.06,
-                                    ),
-                                  ),
-                                ),
-                        )
+          ],
+        ),
+      ),
+      bottomNavigationBar: IconButton(
+          onPressed: () {
+            widget.maxquantity > 0
+                ? isInCart
+                    ? _gotoCart()
+                    : _addToCart()
+                : Utils().toastMessage('Item Out Of Stock');
+          },
+          icon: widget.maxquantity > 0
+              ? isLoading
+                  ? CircularProgressIndicator()
                   : Container(
                       width: width * 0.879,
                       height: height * 0.074,
                       decoration: ShapeDecoration(
-                        color: Colors.red.withOpacity(0.3),
+                        color: AppColors.greenthemecolor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(19),
                         ),
                       ),
-                      child: Center(
-                        child: Text(
-                          'Out Of Stock',
-                          style: TextStyle(
-                            color: Colors.black.withOpacity(0.6),
-                            fontSize: 16,
-                            fontFamily: 'Gilroy',
-                            fontWeight: FontWeight.w600,
-                            height: 0.06,
-                          ),
-                        ),
+                      child: isInCart
+                          ? Center(
+                              child: Text(
+                                'Go To Cart',
+                                style: TextStyle(
+                                  color: Color(0xFFFCFCFC),
+                                  fontSize: 16,
+                                  fontFamily: 'Gilroy',
+                                  fontWeight: FontWeight.w600,
+                                  height: 0.06,
+                                ),
+                              ),
+                            )
+                          : Center(
+                              child: Text(
+                                'Add To Cart',
+                                style: TextStyle(
+                                  color: Color(0xFFFCFCFC),
+                                  fontSize: 16,
+                                  fontFamily: 'Gilroy',
+                                  fontWeight: FontWeight.w600,
+                                  height: 0.06,
+                                ),
+                              ),
+                            ),
+                    )
+              : Container(
+                  width: width * 0.879,
+                  height: height * 0.074,
+                  decoration: ShapeDecoration(
+                    color: Colors.red.withOpacity(0.3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(19),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Out Of Stock',
+                      style: TextStyle(
+                        color: Colors.black.withOpacity(0.6),
+                        fontSize: 16,
+                        fontFamily: 'Gilroy',
+                        fontWeight: FontWeight.w600,
+                        height: 0.06,
                       ),
-                    )),
-        ],
-      ),
+                    ),
+                  ),
+                )),
     );
   }
 
@@ -397,48 +409,53 @@ class _ProductDetailsState extends State<ProductDetails> {
   }
 
   Future<void> _addToCart() async {
-    setState(() {
-      isLoading = true; // Set loading to true
-    });
-    String userEmailsDocumentId = checkUserAuthenticationType();
-    DocumentReference userDocRef = FirebaseFirestore.instance
-        .collection('Users')
-        .doc(userEmailsDocumentId);
+    if (quantity < 1) {
+      Utils().toastMessage('You must add at least one quantity');
+      return;
+    } else {
+      setState(() {
+        isLoading = true; // Set loading to true
+      });
+      String userEmailsDocumentId = checkUserAuthenticationType();
+      DocumentReference userDocRef = FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userEmailsDocumentId);
 
-    DocumentSnapshot userDocSnapshot = await userDocRef.get();
-    if (userDocSnapshot.exists) {
-      DocumentReference cartDocRef =
-          userDocRef.collection('Cart').doc(widget.orderid);
+      DocumentSnapshot userDocSnapshot = await userDocRef.get();
+      if (userDocSnapshot.exists) {
+        DocumentReference cartDocRef =
+            userDocRef.collection('Cart').doc(widget.orderid);
 
-      cartDocRef.set({
-        'id': widget.orderid,
-        'quantity': quantity,
-        // Add any other fields you need for the cart item
-      }, SetOptions(merge: true)).then((value) {
-        setState(() {
-          isLoading = false;
-          isInCart = true;
-          //  Utils().toastMessage('Item added to cart');
+        cartDocRef.set({
+          'id': widget.orderid,
+          'quantity': quantity,
+          // Add any other fields you need for the cart item
+        }, SetOptions(merge: true)).then((value) {
+          setState(() {
+            isLoading = false;
+            isInCart = true;
+            //  Utils().toastMessage('Item added to cart');
+          });
+        }).catchError((error) {
+          setState(() {
+            isLoading = false; // Set loading to false in case of error
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error adding item to cart: $error'),
+            ),
+          );
         });
-      }).catchError((error) {
+      } else {
         setState(() {
           isLoading = false; // Set loading to false in case of error
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error adding item to cart: $error'),
+            content: Text('Error adding item to cart'),
           ),
         );
-      });
-    } else {
-      setState(() {
-        isLoading = false; // Set loading to false in case of error
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error adding item to cart'),
-        ),
-      );
+      }
     }
   }
 
