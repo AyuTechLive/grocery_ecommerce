@@ -1,14 +1,14 @@
 {
   "project_info": {
-    "project_number": "460364116205",
-    "firebase_url": "https://hakkikatdemo-default-rtdb.firebaseio.com",
-    "project_id": "hakkikatdemo",
-    "storage_bucket": "hakkikatdemo.appspot.com"
+    "project_number": "331819345556",
+    "firebase_url": "https://hakikat-app-2e038-default-rtdb.firebaseio.com",
+    "project_id": "hakikat-app-2e038",
+    "storage_bucket": "hakikat-app-2e038.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:460364116205:android:0c06dd3c9c7dffa9255ce4",
+        "mobilesdk_app_id": "1:331819345556:android:66969f4368389cfa8bb681",
         "android_client_info": {
           "package_name": "com.example.hakikat_app_new"
         }
@@ -16,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDb06naJZxObS4TAsZQeM55DNGBiAwzJHk"
+          "current_key": "AIzaSyAknVJR6yu7NkcVU0f4k0JqgtC3xikymOc"
         }
       ],
       "services": {
@@ -27,7 +27,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:460364116205:android:b73322f109b8cefa255ce4",
+        "mobilesdk_app_id": "1:331819345556:android:a1119f86dd5ed3858bb681",
         "android_client_info": {
           "package_name": "com.hakkikat.user"
         }
@@ -35,7 +35,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDb06naJZxObS4TAsZQeM55DNGBiAwzJHk"
+          "current_key": "AIzaSyAknVJR6yu7NkcVU0f4k0JqgtC3xikymOc"
         }
       ],
       "services": {
