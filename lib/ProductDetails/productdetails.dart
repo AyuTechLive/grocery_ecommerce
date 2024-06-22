@@ -43,6 +43,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   bool isInCart = false;
   int _currentIndex = 0;
   bool _isExpanded = true; // Start expanded by default
+  PageController _pageController = PageController();
 
   @override
   void initState() {
@@ -66,7 +67,7 @@ class _ProductDetailsState extends State<ProductDetails> {
           children: [
             Container(
               width: width,
-              height: height * 0.31,
+              height: height * 0.4, // Increased height for better visibility
               decoration: ShapeDecoration(
                 color: Color(0xFFF2F3F2),
                 shape: RoundedRectangleBorder(
@@ -76,40 +77,52 @@ class _ProductDetailsState extends State<ProductDetails> {
                   ),
                 ),
               ),
-              child: Center(
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: height * 0.21,
-                      child: CarouselSlider(
-                        items: widget.imageUrls.map((imageUrl) {
-                          return Image.network(
-                            imageUrl,
-                            fit: BoxFit.cover,
-                          );
-                        }).toList(),
-                        options: CarouselOptions(
-                          autoPlay: true,
-                          height: height * 0.21,
-                          viewportFraction: 1.0,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
+              child: Stack(
+                children: [
+                  CarouselSlider(
+                    items: widget.imageUrls.map((imageUrl) {
+                      return Container(
+                        width: width,
+                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    options: CarouselOptions(
+                      height: height * 0.35,
+                      viewportFraction: 0.9,
+                      enlargeCenterPage: true,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 3),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
                     ),
-                    SizedBox(height: 8.0),
-                    Row(
+                  ),
+                  Positioned(
+                    bottom: 10,
+                    left: 0,
+                    right: 0,
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        widget.imageUrls.length,
-                        (index) => buildDot(index: index),
-                      ),
+                      children: widget.imageUrls.asMap().entries.map((entry) {
+                        return buildDot(index: entry.key);
+                      }).toList(),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             Row(

@@ -87,7 +87,7 @@ class _ExclusiveItemsState extends State<ExclusiveItems> {
               // physics: NeverScrollableScrollPhysics(),
               padding: EdgeInsets.all(width * 0.06),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                childAspectRatio: 0.75,
+                childAspectRatio: 0.65,
                 crossAxisSpacing: width * 0.03,
                 mainAxisSpacing: height * 0.01,
                 crossAxisCount: 2,

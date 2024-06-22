@@ -1,12 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:hakikat_app_new/Account/addadress.dart';
 import 'package:hakikat_app_new/Account/addressscreen.dart';
-import 'package:hakikat_app_new/Explore/components/categorycard.dart';
 import 'package:hakikat_app_new/Explore/explore.dart';
 import 'package:hakikat_app_new/Home/Components/homecategroyitem.dart';
 import 'package:hakikat_app_new/Home/Components/items.dart';
@@ -16,7 +12,6 @@ import 'package:hakikat_app_new/ItemsShowing/CategoryProducts.dart';
 import 'package:hakikat_app_new/ItemsShowing/Exclusiveitemshowing.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/appimg.dart';
-import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -40,6 +35,7 @@ class _HomePageState extends State<HomePage> {
 
   int _currentIndex = 0;
   final CarouselController _controller = CarouselController();
+
   @override
   void initState() {
     super.initState();
@@ -72,6 +68,7 @@ class _HomePageState extends State<HomePage> {
     final Size screensize = MediaQuery.of(context).size;
     final double height = screensize.height;
     final double width = screensize.width;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -127,12 +124,14 @@ class _HomePageState extends State<HomePage> {
                   controller: searchcontroller,
                   cursorColor: Color(0xFF4C4E4D),
                   decoration: InputDecoration(
-                      icon: Padding(
-                          padding: EdgeInsets.only(left: width * 0.03),
-                          child: Icon(Icons.search)),
-                      hintText: 'Search Store',
-                      iconColor: Color(0xFF4C4E4D),
-                      border: InputBorder.none),
+                    icon: Padding(
+                      padding: EdgeInsets.only(left: width * 0.03),
+                      child: Icon(Icons.search),
+                    ),
+                    hintText: 'Search Store',
+                    iconColor: Color(0xFF4C4E4D),
+                    border: InputBorder.none,
+                  ),
                   onTap: () {
                     nextScreen(context, Explore());
                   },
@@ -144,7 +143,7 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: height * 0.022),
             StreamBuilder<QuerySnapshot>(
-              stream: fireStore2, // Use the stream variable
+              stream: fireStore2,
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
@@ -156,15 +155,10 @@ class _HomePageState extends State<HomePage> {
                   return Text('No banners found.');
                 }
 
-                // Rest of the CarouselSlider code...
-
-                // Now, integrate the _buildCarouselDots method
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
+                    SizedBox(height: height * 0.02),
                     Center(
                       child: CarouselSlider(
                         carouselController: _controller,
@@ -181,21 +175,12 @@ class _HomePageState extends State<HomePage> {
                           },
                         ),
                         items: snapshot.data!.docs.map((document) {
-                          // Map the snapshot documents to carousel items
                           String imageUrl = document['Banner Image Link'];
-                          // Assuming this is how your data is structured
-                          // Build your carousel item with the image URL
-
                           return Builder(
                             builder: (BuildContext context) {
                               return InkWell(
                                 onTap: () {
-                                  // if (bannertype == 'External Link') {
-                                  //   _launchURL(bannerfunction);
-                                  // } else if (bannertype ==
-                                  //     'Course Function') {
-                                  //   fetchData(bannerfunction);
-                                  // } else if (bannertype == 'Nothing') {}
+                                  // Handle banner tap
                                 },
                                 child: Container(
                                   height: 10,
@@ -214,104 +199,28 @@ class _HomePageState extends State<HomePage> {
                               );
                             },
                           );
-                        }).toList(), // Make sure to convert the map result to a list
-
-                        // Existing CarouselSlider code...
+                        }).toList(),
                       ),
                     ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   // Call the modified _buildCarouselDots with the length of the snapshot documents
-                    //   children:
-                    //       _buildCarouselDots(snapshot.data!.docs.length),
-                    // ),
                   ],
                 );
               },
             ),
-            SizedBox(
-              height: height * 0.02,
-            ),
+            SizedBox(height: height * 0.02),
             Sectionheader(
               title: 'Exclusive Offer',
               ontap: () {
                 nextScreen(context, ExclusiveItems(categoryname: 'Exclusive'));
               },
             ),
-            SizedBox(
-              height: height * 0.277,
-              child: ListView.separated(
-                padding:
-                    EdgeInsets.only(left: width * 0.05, right: width * 0.05),
-                separatorBuilder: (context, index) {
-                  return SizedBox(width: width * 0.05);
-                },
-                itemCount:
-                    filteredProducts.length > 5 ? 5 : filteredProducts.length,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  Map<String, dynamic> product = filteredProducts[index];
-                  return Items(
-                    ontap: () {
-                      nextScreen(
-                          context,
-                          ProductDetails(
-                            discription: product['Product Discription'] ?? '',
-                            imageUrls: List<String>.from(
-                                product['Product Img'] ??
-                                    [AppImage.defaultimgurl]),
-                            orderid: product['id'],
-                            img: (product['Product Img'] != null &&
-                                    product['Product Img'].isNotEmpty)
-                                ? product['Product Img'][0]
-                                : AppImage.defaultimgurl,
-                            maxquantity: int.parse(product['Product Stock']),
-                            price: product['Product Price'],
-                            title: product['Product Title'] ?? '',
-                            subtitle: product['Product Subtitle'] ?? '',
-                          ));
-                    },
-                    onadd: () {
-                      nextScreen(
-                          context,
-                          ProductDetails(
-                            discription: product['Product Discription'] ?? '',
-                            imageUrls: List<String>.from(
-                                product['Product Img'] ??
-                                    [AppImage.defaultimgurl]),
-                            orderid: product['id'],
-                            img: (product['Product Img'] != null &&
-                                    product['Product Img'].isNotEmpty)
-                                ? product['Product Img'][0]
-                                : AppImage.defaultimgurl,
-                            maxquantity: int.parse(product['Product Stock']),
-                            price: product['Product Price'],
-                            title: product['Product Title'] ?? '',
-                            subtitle: product['Product Subtitle'] ?? '',
-                          ));
-                    },
-                    img: (product['Product Img'] != null &&
-                            product['Product Img'].isNotEmpty)
-                        ? product['Product Img'][0]
-                        : AppImage.defaultimgurl,
-                    price: product['Product Price'],
-                    title: product['Product Title'] ?? '',
-                    subtitle: product['Product Subtitle'] ?? '',
-                  );
-                },
-              ),
-            ),
-            SizedBox(
-              height: height * 0.02,
-            ),
+            buildProductList(filteredProducts, 5),
+            SizedBox(height: height * 0.02),
             Sectionheader(
               title: 'Categories',
               ontap: () {
                 Navigator.pushReplacement(context, MaterialPageRoute(
                   builder: (context) {
-                    return MainPage(
-                      index: 1,
-                    );
+                    return MainPage(index: 1);
                   },
                 ));
               },
@@ -323,20 +232,14 @@ class _HomePageState extends State<HomePage> {
                 if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 }
-
                 if (!snapshot.hasData) {
-                  return CircularProgressIndicator(); // or show a loading indicator
+                  return CircularProgressIndicator();
                 }
-
                 final documents = snapshot.data!.docs;
-
                 return SizedBox(
                   height: height * 0.117,
                   child: ListView.separated(
-                    padding: EdgeInsets.only(
-                      left: width * 0.05,
-                      right: width * 0.05,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: width * 0.05),
                     separatorBuilder: (context, index) {
                       return SizedBox(width: width * 0.05);
                     },
@@ -345,11 +248,9 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) {
                       final document = documents[index];
                       final data = document.data() as Map?;
-
                       if (data == null) {
-                        return SizedBox(); // or show a placeholder widget
+                        return SizedBox();
                       }
-
                       return HomeCategoryItems(
                         img: data['Category Img'] ?? '',
                         title: data['Category Name'] ?? '',
@@ -367,29 +268,7 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-            // SizedBox(
-            //   height: height * 0.117,
-            //   child: ListView.separated(
-            //     padding:
-            //         EdgeInsets.only(left: width * 0.05, right: width * 0.05),
-            //     separatorBuilder: (context, index) {
-            //       return SizedBox(width: width * 0.05);
-            //     },
-            //     itemCount: 5,
-            //     scrollDirection: Axis.horizontal,
-            //     itemBuilder: (context, index) {
-            //       return HomeCategoryItems(
-            //         img:
-            //             'https://firebasestorage.googleapis.com/v0/b/carvizo-ce898.appspot.com/o/4215936-pulses-png-8-png-image-pulses-png-409_409%201.png?alt=media&token=455a1ee0-ce82-41f6-91f2-3d71789408f7',
-            //         title: 'Pulses',
-            //         ontap: () {},
-            //       );
-            //     },
-            //   ),
-            // ),
-            SizedBox(
-              height: height * 0.02,
-            ),
+            SizedBox(height: height * 0.02),
             Sectionheader(
               title: 'Best Selling',
               ontap: () {
@@ -397,157 +276,86 @@ class _HomePageState extends State<HomePage> {
                     context, ExclusiveItems(categoryname: 'BestSelling'));
               },
             ),
-            SizedBox(
-              height: height * 0.277,
-              child: ListView.separated(
-                padding:
-                    EdgeInsets.only(left: width * 0.05, right: width * 0.05),
-                separatorBuilder: (context, index) {
-                  return SizedBox(width: width * 0.05);
-                },
-                itemCount: products
-                            .where((product) => product['BestSelling'] == true)
-                            .length >
-                        5
-                    ? 5
-                    : products
-                        .where((product) => product['BestSelling'] == true)
-                        .length,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  Map<String, dynamic> product = products
-                      .where((product) => product['BestSelling'] == true)
-                      .toList()[index];
-                  return Items(
-                    price: product['Product Price'],
-                    img: (product['Product Img'] != null &&
-                            product['Product Img'].isNotEmpty)
-                        ? product['Product Img'][0]
-                        : AppImage.defaultimgurl,
-                    onadd: () {
-                      nextScreen(
-                          context,
-                          ProductDetails(
-                            discription: product['Product Discription'] ?? '',
-                            imageUrls: List<String>.from(
-                                product['Product Img'] ??
-                                    [AppImage.defaultimgurl]),
-                            orderid: product['id'],
-                            img: (product['Product Img'] != null &&
-                                    product['Product Img'].isNotEmpty)
-                                ? product['Product Img'][0]
-                                : AppImage.defaultimgurl,
-                            maxquantity: int.parse(product['Product Stock']),
-                            price: product['Product Price'],
-                            title: product['Product Title'] ?? '',
-                            subtitle: product['Product Subtitle'] ?? '',
-                          ));
-                    },
-                    ontap: () {
-                      nextScreen(
-                          context,
-                          ProductDetails(
-                            discription: product['Product Discription'] ?? '',
-                            imageUrls: List<String>.from(
-                                product['Product Img'] ??
-                                    [AppImage.defaultimgurl]),
-                            orderid: product['id'],
-                            img: (product['Product Img'] != null &&
-                                    product['Product Img'].isNotEmpty)
-                                ? product['Product Img'][0]
-                                : AppImage.defaultimgurl,
-                            maxquantity: int.parse(product['Product Stock']),
-                            price: product['Product Price'],
-                            title: product['Product Title'] ?? '',
-                            subtitle: product['Product Subtitle'] ?? '',
-                          ));
-                    },
-                    subtitle: product['Product Subtitle'] ?? '',
-                    title: product['Product Title'] ?? '',
-                  );
-                },
-              ),
-            ),
-            SizedBox(
-              height: height * 0.02,
-            ),
+            buildProductList(
+                products
+                    .where((product) => product['BestSelling'] == true)
+                    .toList(),
+                5),
+            SizedBox(height: height * 0.02),
             Sectionheader(
               title: 'All Products',
               ontap: () {
                 nextScreen(
-                    context,
-                    CategoryProduct(
-                      categoryname: 'All Products',
-                    ));
+                    context, CategoryProduct(categoryname: 'All Products'));
               },
             ),
-            SizedBox(
-              height: height * 0.277,
-              child: ListView.separated(
-                padding:
-                    EdgeInsets.only(left: width * 0.05, right: width * 0.05),
-                separatorBuilder: (context, index) {
-                  return SizedBox(width: width * 0.05);
-                },
-                itemCount: products.length > 5 ? 5 : products.length,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  Map<String, dynamic> product = products[index];
-                  return Items(
-                    price: product['Product Price'],
-                    img: (product['Product Img'] != null &&
-                            product['Product Img'].isNotEmpty)
-                        ? product['Product Img'][0]
-                        : AppImage.defaultimgurl,
-                    onadd: () {
-                      nextScreen(
-                          context,
-                          ProductDetails(
-                            discription: product['Product Discription'] ?? '',
-                            imageUrls: List<String>.from(
-                                product['Product Img'] ??
-                                    [AppImage.defaultimgurl]),
-                            orderid: product['id'],
-                            img: (product['Product Img'] != null &&
-                                    product['Product Img'].isNotEmpty)
-                                ? product['Product Img'][0]
-                                : AppImage.defaultimgurl,
-                            maxquantity: int.parse(product['Product Stock']),
-                            price: product['Product Price'],
-                            title: product['Product Title'] ?? '',
-                            subtitle: product['Product Subtitle'] ?? '',
-                          ));
-                    },
-                    ontap: () {
-                      nextScreen(
-                          context,
-                          ProductDetails(
-                            discription: product['Product Discription'] ?? '',
-                            imageUrls: List<String>.from(
-                                product['Product Img'] ??
-                                    [AppImage.defaultimgurl]),
-                            orderid: product['id'],
-                            img: (product['Product Img'] != null &&
-                                    product['Product Img'].isNotEmpty)
-                                ? product['Product Img'][0]
-                                : AppImage.defaultimgurl,
-                            maxquantity: int.parse(product['Product Stock']),
-                            price: product['Product Price'],
-                            title: product['Product Title'] ?? '',
-                            subtitle: product['Product Subtitle'] ?? '',
-                          ));
-                    },
-                    subtitle: product['Product Subtitle'] ?? '',
-                    title: product['Product Title'] ?? '',
-                  );
-                },
-              ),
-            ),
-            SizedBox(
-              height: height * 0.02,
-            )
+            buildProductList(products, 5),
+            SizedBox(height: height * 0.02),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildProductList(
+      List<Map<String, dynamic>> productList, int maxItems) {
+    final Size screensize = MediaQuery.of(context).size;
+    final double height = screensize.height;
+    final double width = screensize.width;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          height: height * 0.3, // Set a fixed height or adjust as needed
+          child: ListView.separated(
+            padding:
+                EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.05),
+            separatorBuilder: (context, index) {
+              return SizedBox(width: constraints.maxWidth * 0.05);
+            },
+            itemCount:
+                productList.length > maxItems ? maxItems : productList.length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              Map<String, dynamic> product = productList[index];
+              return Container(
+                width: constraints.maxWidth * 0.4, // Adjust the width as needed
+                child: Items(
+                  ontap: () => navigateToProductDetails(context, product),
+                  onadd: () => navigateToProductDetails(context, product),
+                  img: (product['Product Img'] != null &&
+                          product['Product Img'].isNotEmpty)
+                      ? product['Product Img'][0]
+                      : AppImage.defaultimgurl,
+                  price: product['Product Price'],
+                  title: product['Product Title'] ?? '',
+                  subtitle: product['Product Subtitle'] ?? '',
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void navigateToProductDetails(
+      BuildContext context, Map<String, dynamic> product) {
+    nextScreen(
+      context,
+      ProductDetails(
+        discription: product['Product Discription'] ?? '',
+        imageUrls: List<String>.from(
+            product['Product Img'] ?? [AppImage.defaultimgurl]),
+        orderid: product['id'],
+        img: (product['Product Img'] != null &&
+                product['Product Img'].isNotEmpty)
+            ? product['Product Img'][0]
+            : AppImage.defaultimgurl,
+        maxquantity: int.parse(product['Product Stock']),
+        price: product['Product Price'],
+        title: product['Product Title'] ?? '',
+        subtitle: product['Product Subtitle'] ?? '',
       ),
     );
   }
@@ -567,8 +375,8 @@ class _HomePageState extends State<HomePage> {
       if (event.snapshot.exists) {
         Map<dynamic, dynamic> data =
             event.snapshot.value as Map<dynamic, dynamic>;
-        products.clear(); // Clear the existing data
-        filteredProducts.clear(); // Clear the existing filtered data
+        products.clear();
+        filteredProducts.clear();
 
         data.forEach((key, value) {
           if (value is Map) {
