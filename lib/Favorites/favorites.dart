@@ -147,8 +147,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                                 item['Product Img'].isNotEmpty)
                                             ? item['Product Img'][0]
                                             : AppImage.defaultimgurl,
-                                        maxquantity:
-                                            int.parse(item['Product Stock']),
+                                        maxquantity: item['Product Stock'] !=
+                                                null
+                                            ? int.tryParse(item['Product Stock']
+                                                    .toString()) ??
+                                                0
+                                            : 0,
                                         price: item['Product Price'],
                                         title: item['Product Title'] ?? '',
                                         subtitle:

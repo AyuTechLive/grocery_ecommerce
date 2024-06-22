@@ -97,7 +97,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                       );
                     }).toList(),
                     options: CarouselOptions(
-                      height: height * 0.35,
+                      height: height * 0.3,
                       viewportFraction: 0.9,
                       enlargeCenterPage: true,
                       autoPlay: true,

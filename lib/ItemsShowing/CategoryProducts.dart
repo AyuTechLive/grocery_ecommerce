@@ -94,7 +94,11 @@ class _CategoryProductState extends State<CategoryProduct> {
                                   product['Product Img'].isNotEmpty)
                               ? product['Product Img'][0]
                               : AppImage.defaultimgurl,
-                          maxquantity: int.parse(product['Product Stock']),
+                          maxquantity: product['Product Stock'] != null
+                              ? int.tryParse(
+                                      product['Product Stock'].toString()) ??
+                                  0
+                              : 0,
                           price: product['Product Price'],
                           title: product['Product Title'] ?? '',
                           subtitle: product['Product Subtitle'] ?? '',
@@ -112,7 +116,11 @@ class _CategoryProductState extends State<CategoryProduct> {
                                   product['Product Img'].isNotEmpty)
                               ? product['Product Img'][0]
                               : AppImage.defaultimgurl,
-                          maxquantity: int.parse(product['Product Stock']),
+                          maxquantity: product['Product Stock'] != null
+                              ? int.tryParse(
+                                      product['Product Stock'].toString()) ??
+                                  0
+                              : 0,
                           price: product['Product Price'],
                           title: product['Product Title'] ?? '',
                           subtitle: product['Product Subtitle'] ?? '',

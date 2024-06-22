@@ -26,115 +26,78 @@ class CartTile extends StatelessWidget {
       children: [
         Container(
           width: width,
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Spacer(),
-              Column(
-                children: [
-                  Container(
-                    width: width * 0.241,
-                    height: height * 0.086,
-                    child: Image.network(
-                      img,
-                      fit: BoxFit.fill,
+              Container(
+                width: width * 0.25,
+                height: width * 0.25,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: Offset(0, 2),
                     ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    img,
+                    fit: BoxFit.fill,
                   ),
-                ],
+                ),
               ),
-              Spacer(),
-              Column(
-                children: [
-                  SizedBox(
-                    width: width * 0.330,
-                    child: Text(
+              SizedBox(width: 15),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                       title,
                       style: TextStyle(
                         color: Color(0xFF181725),
                         fontSize: 16,
                         fontFamily: 'Gilroy-Bold',
-                        fontWeight: FontWeight.w400,
-                        //  height: 0.07,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 0.10,
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: height * 0.005,
-                  ),
-                  SizedBox(
-                    width: width * 0.2,
-                    child: Text(
+                    SizedBox(height: 5),
+                    Text(
                       subtitle,
                       style: TextStyle(
                         color: Color(0xFF7C7C7C),
                         fontSize: 14,
                         fontFamily: 'Gilroy-Medium',
                         fontWeight: FontWeight.w400,
-                        //   height: 0.09,
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: height * 0.01,
-                  ),
-                  Row(
-                    children: [
-                      Text('Quantity: '),
-                      // Container(
-                      //   width: width * 0.11,
-                      //   height: height * 0.050,
-                      //   decoration: ShapeDecoration(
-                      //     shape: RoundedRectangleBorder(
-                      //       side: BorderSide(width: 1, color: Color(0xFFF0F0F0)),
-                      //       borderRadius: BorderRadius.circular(17),
-                      //     ),
-                      //   ),
-                      //   child: Center(
-                      //     child: Icon(Icons.remove),
-                      //   ),
-                      // ),
-                      SizedBox(
-                        width: width * 0.02,
-                      ),
-                      Text(
-                        quantity.toString(),
-                        style: TextStyle(
-                          color: Color(0xFF181725),
-                          fontSize: 16,
-                          fontFamily: 'Gilroy',
-                          fontWeight: FontWeight.w600,
-                          height: 0.07,
-                          letterSpacing: 0.10,
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Text('Quantity: '),
+                        Text(
+                          quantity.toString(),
+                          style: TextStyle(
+                            color: Color(0xFF181725),
+                            fontSize: 16,
+                            fontFamily: 'Gilroy',
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.10,
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: width * 0.05,
-                      ),
-                      // Container(
-                      //   width: width * 0.11,
-                      //   height: height * 0.050,
-                      //   decoration: ShapeDecoration(
-                      //     shape: RoundedRectangleBorder(
-                      //       side: BorderSide(width: 1, color: Color(0xFFF0F0F0)),
-                      //       borderRadius: BorderRadius.circular(17),
-                      //     ),
-                      //   ),
-                      //   child: Center(
-                      //     child: Icon(
-                      //       Icons.add,
-                      //       color: AppColors.greenthemecolor,
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
-                  )
-                ],
+                      ],
+                    )
+                  ],
+                ),
               ),
-              Spacer(),
-              Spacer(),
-              Spacer(),
               Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   IconButton(
                       onPressed: onremove,
@@ -142,43 +105,28 @@ class CartTile extends StatelessWidget {
                         Icons.clear,
                         color: Color(0xffB3B3B3),
                       )),
-                  SizedBox(
-                    height: height * 0.04,
-                  ),
-                  Text(
-                    '₹ ${price}',
-                    style: TextStyle(
-                      color: Color(0xFF181725),
-                      fontSize: 18,
-                      fontFamily: 'Gilroy',
-                      fontWeight: FontWeight.w600,
-                      height: 0.08,
-                      letterSpacing: 0.10,
+                  Padding(
+                    padding: EdgeInsets.only(top: 20, right: 10),
+                    child: Text(
+                      '₹ ${price}',
+                      style: TextStyle(
+                        color: Color(0xFF181725),
+                        fontSize: 18,
+                        fontFamily: 'Gilroy',
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.10,
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: height * 0.04,
                   ),
                 ],
               ),
-              Spacer(),
             ],
           ),
         ),
-        SizedBox(
-          height: height * 0.005,
-        ),
         Container(
-          width: width * (0.876),
-          decoration: ShapeDecoration(
-            shape: RoundedRectangleBorder(
-              side: BorderSide(
-                width: 1,
-                strokeAlign: BorderSide.strokeAlignCenter,
-                color: Color(0xFFE2E2E2),
-              ),
-            ),
-          ),
+          width: width * 0.9,
+          height: 1,
+          color: Color(0xFFE2E2E2),
         ),
       ],
     );

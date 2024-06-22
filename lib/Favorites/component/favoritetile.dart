@@ -36,10 +36,24 @@ class FavoriteTile extends StatelessWidget {
                   children: [
                     Container(
                       width: width * 0.2,
-                      height: height * 0.086,
-                      child: Image.network(
-                        img,
-                        fit: BoxFit.fill,
+                      height: width * 0.2,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 1,
+                            blurRadius: 3,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          img,
+                          fit: BoxFit.fill,
+                        ),
                       ),
                     ),
                   ],
