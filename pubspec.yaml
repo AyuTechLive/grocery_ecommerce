@@ -47,6 +47,7 @@ dependencies:
   provider: ^6.1.2
   onesignal_flutter: ^5.2.0
   change_app_package_name: ^1.2.0
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

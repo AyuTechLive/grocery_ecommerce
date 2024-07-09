@@ -3,11 +3,13 @@ import 'package:hakikat_app_new/AdminSide/Orders/cancelledorder.dart';
 import 'package:hakikat_app_new/AdminSide/Orders/placedorders.dart';
 import 'package:hakikat_app_new/AdminSide/addbanner.dart';
 import 'package:hakikat_app_new/AdminSide/addcategory.dart';
+import 'package:hakikat_app_new/AdminSide/addevents.dart';
 import 'package:hakikat_app_new/AdminSide/addproduct.dart';
 import 'package:hakikat_app_new/AdminSide/removebanner.dart';
 import 'package:hakikat_app_new/AdminSide/testing.dart';
 import 'package:hakikat_app_new/AdminSide/testing2.dart';
 import 'package:hakikat_app_new/AdminSide/users/addmoney.dart';
+import 'package:hakikat_app_new/ItemsShowing/outofstockitems.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class AdminPanel extends StatelessWidget {
@@ -74,6 +76,12 @@ class AdminPanel extends StatelessWidget {
                 ),
                 _buildAdminButton(
                   context,
+                  'Add Event',
+                  Icons.event,
+                  AddEvent(),
+                ),
+                _buildAdminButton(
+                  context,
                   'Orders',
                   Icons.shopping_cart,
                   AdminOrderHistoryScreen(),
@@ -95,6 +103,12 @@ class AdminPanel extends StatelessWidget {
                   'Banners',
                   Icons.branding_watermark,
                   AllBanners(),
+                ),
+                _buildAdminButton(
+                  context,
+                  'Out OF Stock',
+                  Icons.remove_shopping_cart,
+                  OutOfStockItems(),
                 ),
               ],
             ),

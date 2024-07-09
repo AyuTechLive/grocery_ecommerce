@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CancelledOrdersScreen extends StatefulWidget {
   @override
@@ -99,6 +100,13 @@ class CancelledOrderItem extends StatefulWidget {
 
 class _CancelledOrderItemState extends State<CancelledOrderItem> {
   bool isExpanded = false;
+  String mobileNo = '';
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    extractMobileNo();
+  }
 
   Future<void> issueRefund() async {
     final orderId = widget.order['orderId'];
@@ -226,6 +234,17 @@ class _CancelledOrderItemState extends State<CancelledOrderItem> {
                 ),
                 Text('Date: $timestamp'),
                 SizedBox(height: height * 0.01),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Mobile: $mobileNo',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    IconButton(
+                      icon: Icon(Icons.call, color: AppColors.greenthemecolor),
+                      onPressed: () => _launchDialer(mobileNo),
+                    ),
+                  ],
+                ),
                 Text('Address: $address',
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 SizedBox(height: height * 0.01),
@@ -293,6 +312,15 @@ class _CancelledOrderItemState extends State<CancelledOrderItem> {
     );
   }
 
+  void extractMobileNo() {
+    final addressParts = widget.order['address'].split(',');
+    if (addressParts.isNotEmpty) {
+      mobileNo = addressParts.last.trim();
+      // Remove the mobile number from the address
+      print(mobileNo);
+    }
+  }
+
   String formatTimestamp(dynamic timestamp) {
     if (timestamp == null) return 'N/A';
 
@@ -306,5 +334,13 @@ class _CancelledOrderItemState extends State<CancelledOrderItem> {
     }
 
     return DateFormat('MMM d, yyyy - h:mm a').format(dateTime);
+  }
+
+  Future<void> _launchDialer(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
   }
 }
