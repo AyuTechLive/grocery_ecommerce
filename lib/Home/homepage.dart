@@ -12,7 +12,9 @@ import 'package:hakikat_app_new/ItemsShowing/CategoryProducts.dart';
 import 'package:hakikat_app_new/ItemsShowing/Exclusiveitemshowing.dart';
 import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/appimg.dart';
+import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -99,7 +101,15 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                )
+                ),
+                IconButton(
+                    onPressed: () {
+                      _launchDialer('9672261265');
+                    },
+                    icon: Icon(
+                      Icons.call_outlined,
+                      color: AppColors.greenthemecolor,
+                    ))
               ],
             )
           ],
@@ -295,6 +305,14 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _launchDialer(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
   }
 
   Widget buildProductList(

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hakikat_app_new/Auth/login.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
+import 'package:hakikat_app_new/Utils/utils.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
@@ -93,8 +94,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       emailcontroller.clear();
                     });
 
-                    // Utils().toastMessage(
-                    //     'Reset Link Sended to Your Email Sucessfully');
+                    Utils().toastMessage(
+                        'Reset Link Sended to Your Email Sucessfully');
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(

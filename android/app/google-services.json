@@ -27,6 +27,25 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:460364116205:android:d1af929c3a4211a7255ce4",
+        "android_client_info": {
+          "package_name": "com.hakkikat.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb06naJZxObS4TAsZQeM55DNGBiAwzJHk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:460364116205:android:b73322f109b8cefa255ce4",
         "android_client_info": {
           "package_name": "com.hakkikat.user"

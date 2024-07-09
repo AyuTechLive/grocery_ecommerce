@@ -187,6 +187,54 @@ class _AddAddressState extends State<AddAddress> {
                       width: width * 0.04,
                     ),
                     Text(
+                      'PinCode',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: height * 0.01,
+                ),
+                TextFormField(
+                  controller: pincodecontroller,
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                    hintText: 'Pincode',
+                    hintStyle: TextStyle(color: Colors.grey.shade600),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter pincode';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(
+                  height: height * 0.02,
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: width * 0.04,
+                    ),
+                    Text(
                       'City',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -277,54 +325,7 @@ class _AddAddressState extends State<AddAddress> {
                 SizedBox(
                   height: height * 0.02,
                 ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: width * 0.04,
-                    ),
-                    Text(
-                      'PinCode',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: height * 0.01,
-                ),
-                TextFormField(
-                  controller: pincodecontroller,
-                  maxLines: 1,
-                  decoration: InputDecoration(
-                    hintText: 'Pincode',
-                    hintStyle: TextStyle(color: Colors.grey.shade600),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter pincode';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(
-                  height: height * 0.02,
-                ),
+
                 Row(
                   children: [
                     SizedBox(

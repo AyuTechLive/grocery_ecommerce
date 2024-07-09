@@ -17,6 +17,7 @@ class _MyWalletState extends State<MyWallet>
   String? _userBalance;
   String? _userUid;
   String? _name;
+  String? _bonus;
   late TabController _tabController;
   String? email;
 
@@ -36,6 +37,7 @@ class _MyWalletState extends State<MyWallet>
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data();
+      final bonus = userData?['Bonus'] ?? 0;
       final balance = userData?['Wallet'] ?? 0;
       final uid = userData?['UID'] ?? '';
       final name = userData?['Name'] ?? '';
@@ -43,6 +45,7 @@ class _MyWalletState extends State<MyWallet>
         _userBalance = balance.toString();
         _userUid = uid;
         _name = name;
+        _bonus = bonus;
       });
     }
   }
@@ -79,7 +82,7 @@ class _MyWalletState extends State<MyWallet>
             child: WalletComponent(
               balance: _userBalance.toString(),
               uid: _userUid.toString(),
-              reward: '',
+              reward: _bonus.toString(),
               name: _name.toString(),
             ),
           ),

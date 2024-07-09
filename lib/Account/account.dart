@@ -3,13 +3,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Account/addressscreen.dart';
 import 'package:hakikat_app_new/Account/components/accountmenu.dart';
+import 'package:hakikat_app_new/Account/helpscreen.dart';
+import 'package:hakikat_app_new/Account/paymentqr.dart';
 import 'package:hakikat_app_new/AdminSide/adminpanel.dart';
 import 'package:hakikat_app_new/Auth/login.dart';
+import 'package:hakikat_app_new/Events/events_page.dart';
 import 'package:hakikat_app_new/OrderSucess/myorder.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/utils.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
+import 'package:hakikat_app_new/aboutus/aboutus.dart';
+import 'package:hakikat_app_new/aboutus/pageoopener.dart';
 import 'package:hakikat_app_new/wallet/mywallet.dart';
 
 class Account extends StatefulWidget {
@@ -103,9 +108,25 @@ class _AccountState extends State<Account> {
             Divider(),
             AccountMenuCard(
               img: 'delivery',
-              title: 'Delivery Addreess',
+              title: 'Delivery Address',
               ontap: () {
                 _navigateToAddressScreen(context);
+              },
+            ),
+            Divider(),
+            AccountMenuCard(
+              img: 'walletrecharge',
+              title: 'Wallet',
+              ontap: () {
+                nextScreen(context, MyWallet());
+              },
+            ),
+            Divider(),
+            AccountMenuCard(
+              img: 'walletrecharge',
+              title: 'Recharge Wallet',
+              ontap: () {
+                nextScreen(context, QrCode());
               },
             ),
             Divider(),
@@ -129,23 +150,42 @@ class _AccountState extends State<Account> {
               img: 'help',
               title: 'Help',
               ontap: () {
-                Utils().toastMessage('Currently Under Dev');
+                nextScreen(context, HelpScreen());
+              },
+            ),
+            Divider(),
+
+            AccountMenuCard(
+              img: 'event',
+              title: 'Events',
+              ontap: () {
+                nextScreen(context, EventPage());
               },
             ),
             Divider(),
             AccountMenuCard(
               img: 'about',
-              title: 'Wallet',
+              title: 'Privacy Policy',
               ontap: () {
-                nextScreen(context, MyWallet());
+                nextScreen(
+                    context,
+                    PageOpener(
+                        url:
+                            'https://hakeekatnatural.blogspot.com/2024/07/privacy-policy.html',
+                        title: 'Privacy Policy'));
               },
             ),
             Divider(),
             AccountMenuCard(
               img: 'about',
-              title: 'About',
+              title: 'About Us',
               ontap: () {
-                Utils().toastMessage('Currently Under Dev');
+                nextScreen(
+                    context,
+                    PageOpener(
+                        url:
+                            'https://hakeekatnatural.blogspot.com/2024/07/about-us.html',
+                        title: 'About Us'));
               },
             ),
             Divider(),

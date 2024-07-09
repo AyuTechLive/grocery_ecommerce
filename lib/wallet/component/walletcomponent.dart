@@ -124,7 +124,7 @@ class WalletComponent extends StatelessWidget {
             child: Opacity(
               opacity: 0.90,
               child: Text(
-                'Bonus Amount : 500',
+                'Bonus Amount : ${reward}',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15.11,
