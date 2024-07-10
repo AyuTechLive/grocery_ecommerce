@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hakeekat_farmer_version/ContactUs/helpscreen.dart';
+import 'package:hakeekat_farmer_version/ContactUs/paymentqr.dart';
+import 'package:hakeekat_farmer_version/Events/events_page.dart';
+import 'package:hakeekat_farmer_version/Gallery/galleryalbum.dart';
 import 'package:hakeekat_farmer_version/Membership/farmer_membership_form.dart';
 import 'package:hakeekat_farmer_version/Membership/farmerapplicationlist.dart';
 import 'package:hakeekat_farmer_version/Membership/sanstha_membership_form.dart';
@@ -79,28 +83,28 @@ class HomeScreen extends StatelessWidget {
                   'Gallery',
                   Icons.home,
                   () {
-                    nextScreen(context, FarmerApplicationsList());
+                    nextScreen(context, GalleryAlbum());
                   },
                 ),
                 _buildCategoryCard(
                   'Events',
                   Icons.favorite,
                   () {
-                    nextScreen(context, VideosListScreen());
+                    nextScreen(context, EventPage());
                   },
                 ),
                 _buildCategoryCard(
-                  'Tractors',
+                  'QR',
                   Icons.agriculture,
                   () {
-                    nextScreen(context, VideosListScreen());
+                    nextScreen(context, QrCode());
                   },
                 ),
                 _buildCategoryCard(
-                  'Rentals',
+                  'Contact Us',
                   Icons.build,
                   () {
-                    nextScreen(context, VideosListScreen());
+                    nextScreen(context, HelpScreen());
                   },
                 ),
               ],
