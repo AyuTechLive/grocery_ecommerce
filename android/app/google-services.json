@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "233847987701",
+    "project_id": "hakeekatfarmer",
+    "storage_bucket": "hakeekatfarmer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233847987701:android:5da30b41793797a4bc54bc",
+        "android_client_info": {
+          "package_name": "com.hakeekat.farmer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5sOK4XWHf8YFmi1Oqp1Nsj3GqUvcuHh4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
