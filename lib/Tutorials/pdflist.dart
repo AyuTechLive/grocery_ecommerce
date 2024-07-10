@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:hakeekat_farmer_version/Activities/pdfopeningscreen.dart';
+import 'package:hakeekat_farmer_version/Utils/widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shimmer/shimmer.dart';
 
 class PdfListScreen extends StatefulWidget {
   @override
@@ -10,6 +13,7 @@ class PdfListScreen extends StatefulWidget {
 class _PdfListScreenState extends State<PdfListScreen> {
   final databaseReference = FirebaseDatabase.instance.ref('Pdf');
   List<PdfFile> pdfFiles = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -29,15 +33,19 @@ class _PdfListScreenState extends State<PdfListScreen> {
       );
       setState(() {
         pdfFiles.add(pdfFile);
+        isLoading = false;
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final Size screensize = MediaQuery.of(context).size;
+    final double height = screensize.height;
+    final double width = screensize.width;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.teal[50],
+        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.teal),
@@ -45,20 +53,68 @@ class _PdfListScreenState extends State<PdfListScreen> {
         ),
         title: Text('Pdf Tutorials',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
+      ),
+      body: isLoading ? _buildShimmerEffect(height) : _buildPdfList(height),
+    );
+  }
+
+  Widget _buildShimmerEffect(double height) {
+    return ListView.separated(
+      separatorBuilder: (context, index) {
+        return SizedBox(height: height * 0.02);
+      },
+      padding: EdgeInsets.all(16),
+      itemCount: 5, // Show 5 shimmer items while loading
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Card(
+            margin: EdgeInsets.only(bottom: 16),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: ListTile(
+              contentPadding: EdgeInsets.all(8),
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  color: Colors.white,
+                ),
+              ),
+              title: Container(
+                width: double.infinity,
+                height: 16,
+                color: Colors.white,
+              ),
+              subtitle: Container(
+                width: double.infinity,
+                height: 12,
+                color: Colors.white,
+              ),
+              trailing: Container(
+                width: 60,
+                height: 24,
+                color: Colors.white,
+              ),
+            ),
           ),
-        ],
-      ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(16),
-        itemCount: pdfFiles.length,
-        itemBuilder: (context, index) {
-          return PdfListItem(pdfFile: pdfFiles[index], index: index);
-        },
-      ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPdfList(double height) {
+    return ListView.separated(
+      separatorBuilder: (context, index) {
+        return SizedBox(height: height * 0.02);
+      },
+      padding: EdgeInsets.all(16),
+      itemCount: pdfFiles.length,
+      itemBuilder: (context, index) {
+        return PdfListItem(pdfFile: pdfFiles[index], index: index);
+      },
     );
   }
 }
@@ -82,7 +138,7 @@ class PdfListItem extends StatelessWidget {
           child: Icon(Icons.picture_as_pdf, color: Colors.red, size: 40),
         ),
         title: Text(
-          pdfFile.title, // Mocking dates for demonstration
+          pdfFile.title,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(pdfFile.subtitle),
@@ -103,13 +159,20 @@ class PdfListItem extends StatelessWidget {
             Icon(Icons.chevron_right),
           ],
         ),
-        onTap: () => _launchPdf(pdfFile.pdfLink),
+        onTap: () {
+          nextScreen(
+              context,
+              PdfViwer(
+                  pdfUrl: pdfFile.pdfLink,
+                  title: pdfFile.title,
+                  swtiches: '1'));
+        },
       ),
     );
   }
 
   Color _getStatusColor(int index) {
-    switch (index) {
+    switch (index % 4) {
       case 0:
       case 1:
         return Colors.green;
@@ -123,7 +186,7 @@ class PdfListItem extends StatelessWidget {
   }
 
   String _getStatus(int index) {
-    switch (index) {
+    switch (index % 4) {
       case 0:
       case 1:
         return 'See Now';

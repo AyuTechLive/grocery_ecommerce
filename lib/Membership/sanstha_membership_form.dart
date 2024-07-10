@@ -93,8 +93,8 @@ class _MembershipFormState extends State<MembershipForm> {
     return Scaffold(
       appBar: AppBar(
         title:
-            Text('सदस्यता आवेदन पत्र', style: TextStyle(color: Colors.white)),
-        backgroundColor: AppColors.greenthemecolor,
+            Text('सदस्यता आवेदन पत्र', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: Container(
@@ -102,7 +102,7 @@ class _MembershipFormState extends State<MembershipForm> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppColors.greenthemecolor, Colors.green.shade200],
+            colors: [Colors.white, Colors.white],
           ),
         ),
         child: SingleChildScrollView(
@@ -184,10 +184,14 @@ class _MembershipFormState extends State<MembershipForm> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('दिनांक: ${DateTime.now().toString().split(' ')[0]}',
-                        style: TextStyle(color: Colors.white)),
+                        style: TextStyle(color: Colors.black)),
                     ElevatedButton(
-                      child: Text('Submit'),
+                      child: Text(
+                        'Submit',
+                        style: TextStyle(color: Colors.white),
+                      ),
                       style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.greenthemecolor,
                         padding:
                             EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(

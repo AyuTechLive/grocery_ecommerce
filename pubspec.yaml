@@ -51,6 +51,10 @@ dependencies:
   url_launcher: ^6.3.0
   cached_network_image: ^3.3.1
   youtube_player_flutter: ^9.0.1
+  syncfusion_flutter_pdfviewer: ^26.1.41
+  dio: ^5.5.0+1
+  file_picker: ^8.0.6
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

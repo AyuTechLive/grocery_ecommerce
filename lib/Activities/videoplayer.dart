@@ -38,19 +38,19 @@ class _LectureVideoPlayerState extends State<LectureVideoPlayer> {
         });
 
         if (isFullScreen) {
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-            // SystemUiOverlay.top,
-            // SystemUiOverlay.bottom,
-          ]);
+          // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+          //   // SystemUiOverlay.top,
+          //   // SystemUiOverlay.bottom,
+          // ]);
           // Perform actions when entering full-screen mode
 
           // Add your logic here for full-screen mode
         } else {
           // Perform actions when exiting full-screen mode
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-            // SystemUiOverlay.top,
-            // SystemUiOverlay.bottom,
-          ]);
+          // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+          //   // SystemUiOverlay.top,
+          //   // SystemUiOverlay.bottom,
+          // ]);
 
           // Add your logic here for normal mode
         }
@@ -168,7 +168,6 @@ class _LectureVideoPlayerState extends State<LectureVideoPlayer> {
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     _controller.dispose();
     super.dispose();
   }

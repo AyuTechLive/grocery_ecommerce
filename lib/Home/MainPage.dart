@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hakeekat_farmer_version/Admin/addvideos.dart';
+import 'package:hakeekat_farmer_version/Events/events_page.dart';
 import 'package:hakeekat_farmer_version/Home/Homepage.dart';
 import 'package:hakeekat_farmer_version/Tutorials/pdflist.dart';
 import 'package:hakeekat_farmer_version/Tutorials/videoslist.dart';
@@ -71,12 +72,11 @@ class _MainPageState extends State<MainPage> {
           },
           children: [
             HomeScreen(),
-            Center(
-              child: Text('data'),
-            ),
             VideosListScreen(),
-            PdfListScreen(),
-            AddLecturesAdmin()
+            EventPage(),
+            Center(
+              child: Text('Accounts'),
+            )
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -101,19 +101,15 @@ class _MainPageState extends State<MainPage> {
             ),
             BottomNavigationBarItem(
               icon: ImageIcon(AssetImage('assets/search.png')),
-              label: 'Explore',
+              label: 'Learn',
             ),
             BottomNavigationBarItem(
-              icon: ImageIcon(AssetImage('assets/cart.png')),
-              label: 'Cart',
-            ),
-            BottomNavigationBarItem(
-              icon: ImageIcon(AssetImage('assets/wishlist.png')),
-              label: 'Favorite',
+              icon: ImageIcon(AssetImage('assets/event.png')),
+              label: 'Events',
             ),
             BottomNavigationBarItem(
               icon: ImageIcon(AssetImage('assets/account.png')),
-              label: 'Account',
+              label: 'Profile',
             ),
           ],
         ),

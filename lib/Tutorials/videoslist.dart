@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hakeekat_farmer_version/Activities/videoplayer.dart';
 import 'package:hakeekat_farmer_version/Utils/colors.dart';
 import 'package:hakeekat_farmer_version/Utils/widget.dart';
+import 'package:shimmer/shimmer.dart';
 
 class VideosListScreen extends StatefulWidget {
   @override
@@ -14,6 +14,7 @@ class VideosListScreen extends StatefulWidget {
 class _VideosListScreenState extends State<VideosListScreen> {
   final databaseReference = FirebaseDatabase.instance.ref('videos');
   List<Video> videos = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _VideosListScreenState extends State<VideosListScreen> {
       );
       setState(() {
         videos.add(video);
+        isLoading = false;
       });
     });
   }
@@ -43,9 +45,10 @@ class _VideosListScreenState extends State<VideosListScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Text('Your Videos',
+        title: Text('Farming Videos',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
@@ -58,13 +61,81 @@ class _VideosListScreenState extends State<VideosListScreen> {
           ),
         ],
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(16),
-        itemCount: videos.length,
-        itemBuilder: (context, index) {
-          return VideoListItem(video: videos[index]);
-        },
-      ),
+      body: isLoading ? _buildShimmerEffect() : _buildVideoList(),
+    );
+  }
+
+  Widget _buildShimmerEffect() {
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: 5, // Show 5 shimmer items while loading
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Card(
+            elevation: 2,
+            margin: EdgeInsets.only(bottom: 16),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 200,
+                  width: double.infinity,
+                  color: Colors.white,
+                ),
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 20,
+                        color: Colors.white,
+                      ),
+                      SizedBox(height: 8),
+                      Container(
+                        width: 200,
+                        height: 16,
+                        color: Colors.white,
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            width: 100,
+                            height: 36,
+                            color: Colors.white,
+                          ),
+                          Container(
+                            width: 36,
+                            height: 36,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildVideoList() {
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: videos.length,
+      itemBuilder: (context, index) {
+        return VideoListItem(video: videos[index]);
+      },
     );
   }
 }
@@ -138,7 +209,6 @@ class VideoListItem extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.greenthemecolor,
-                        // primary: Colors.blue,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)),
                       ),
