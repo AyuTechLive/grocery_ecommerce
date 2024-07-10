@@ -19,8 +19,8 @@ import 'package:hakikat_app_new/AdminSide/users/addmoney.dart';
 import 'package:hakikat_app_new/ItemsShowing/outofstockitems.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
-class AdminPanel extends StatelessWidget {
-  const AdminPanel({super.key});
+class FarmerAdminPanel extends StatelessWidget {
+  const FarmerAdminPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class AdminPanel extends StatelessWidget {
     final double width = screenSize.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Panel'),
+        title: Text('Farmer Admin Panel'),
         automaticallyImplyLeading: false,
         centerTitle: true,
       ),
@@ -53,69 +53,45 @@ class AdminPanel extends StatelessWidget {
               children: [
                 _buildAdminButton(
                   context,
-                  'Add Product',
-                  Icons.add_box,
-                  AddProduct(),
-                ),
-                // _buildAdminButton(
-                //   context,
-                //   'See Products',
-                //   Icons.list,
-                //   ProductListScreen(),
-                // ),
-                _buildAdminButton(
-                  context,
-                  'Add Category',
-                  Icons.category,
-                  AddCategory(),
-                ),
-                // _buildAdminButton(
-                //   context,
-                //   'Category List',
-                //   Icons.list_alt,
-                //   CategoryListScreen(),
-                // ),
-                _buildAdminButton(
-                  context,
-                  'Add Banner',
-                  Icons.image,
-                  AddBanner(),
+                  'Add Farmer Tutorials',
+                  Icons.video_collection_sharp,
+                  AddLecturesAdmin(),
                 ),
                 _buildAdminButton(
                   context,
-                  'Add Event',
+                  'Add Farmer Pdf',
+                  Icons.file_copy,
+                  Addpdf(),
+                ),
+                _buildAdminButton(
+                  context,
+                  'Farmer Applications',
+                  Icons.assignment,
+                  FarmerApplicationsList(),
+                ),
+                _buildAdminButton(
+                  context,
+                  'Sanstha Applications',
+                  Icons.assignment_turned_in,
+                  SansthaApplicationList(),
+                ),
+                _buildAdminButton(
+                  context,
+                  'Add Farmer Event',
                   Icons.event,
-                  AddEvent(),
+                  AddFarmerEvent(),
                 ),
                 _buildAdminButton(
                   context,
-                  'Orders',
-                  Icons.shopping_cart,
-                  AdminOrderHistoryScreen(),
+                  'Add Farmer Gallery',
+                  Icons.image,
+                  AddGalleryImages(),
                 ),
                 _buildAdminButton(
                   context,
-                  'Cancelled Orders',
-                  Icons.cancel,
-                  CancelledOrdersScreen(),
-                ),
-                _buildAdminButton(
-                  context,
-                  'Add Money',
-                  Icons.attach_money,
-                  AddMoney(),
-                ),
-                _buildAdminButton(
-                  context,
-                  'Banners',
-                  Icons.branding_watermark,
-                  AllBanners(),
-                ),
-                _buildAdminButton(
-                  context,
-                  'Out OF Stock',
-                  Icons.remove_shopping_cart,
-                  OutOfStockItems(),
+                  'Add Farmer Banner',
+                  Icons.upload,
+                  AddFarmerBanner(),
                 ),
               ],
             ),

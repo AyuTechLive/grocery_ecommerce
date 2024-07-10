@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Account/account.dart';
 import 'package:hakikat_app_new/AdminSide/adminpanel.dart';
+import 'package:hakikat_app_new/AdminSide/farmeradminpanel.dart';
 import 'package:hakikat_app_new/Cart/cart.dart';
 import 'package:hakikat_app_new/Cart/democart.dart';
 import 'package:hakikat_app_new/Explore/explore.dart';
@@ -79,7 +80,7 @@ class _MainPageState extends State<MainPage> {
             Explore(),
             CartScreen(),
             AdminPanel(),
-            Account()
+            FarmerAdminPanel()
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -116,7 +117,7 @@ class _MainPageState extends State<MainPage> {
             ),
             BottomNavigationBarItem(
               icon: ImageIcon(AssetImage('assets/account.png')),
-              label: 'Account',
+              label: 'Farmer',
             ),
           ],
         ),
