@@ -1,151 +1,135 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
-class EventDiscription extends StatefulWidget {
+class EventDiscription extends StatelessWidget {
   final String eventname;
   final String hostname;
   final String time;
   final String date;
   final String img;
   final String eventdetails;
-  const EventDiscription(
-      {super.key,
-      required this.eventname,
-      required this.hostname,
-      required this.time,
-      required this.date,
-      required this.img,
-      required this.eventdetails});
 
-  @override
-  State<EventDiscription> createState() => _EventDiscriptionState();
-}
+  const EventDiscription({
+    Key? key,
+    required this.eventname,
+    required this.hostname,
+    required this.time,
+    required this.date,
+    required this.img,
+    required this.eventdetails,
+  }) : super(key: key);
 
-class _EventDiscriptionState extends State<EventDiscription> {
   @override
   Widget build(BuildContext context) {
     final Size screensize = MediaQuery.of(context).size;
     final double height = screensize.height;
     final double width = screensize.width;
+
     return Scaffold(
+      appBar: AppBar(),
       body: SingleChildScrollView(
-        child: Column(children: [
-          Container(
-            width: width,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black)),
-            child: Column(children: [
-              Container(
-                width: width,
-                height: height * 0.3,
-                child: Image.network(
-                  widget.img,
-                  fit: BoxFit.fill,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                Image.network(
+                  img,
+                  width: width,
+                  height: height * 0.4,
+                  fit: BoxFit.cover,
                 ),
-              ),
-              SizedBox(
-                height: height * 0.03,
-              ),
-              Row(
-                children: [
-                  Spacer(),
-                  Column(
+                Container(
+                  width: width,
+                  height: height * 0.4,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.7)
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 20,
+                  left: 20,
+                  right: 20,
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
-                        width: width * 0.5,
-                        child: Text(
-                          widget.eventname,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontFamily: 'Sahitya',
-                            fontWeight: FontWeight.w600,
-                            height: 0,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: height * 0.01,
-                      ),
                       Text(
-                        'HOST : ${widget.hostname}',
+                        eventname,
                         style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          // fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                          height: 0,
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(
-                        height: height * 0.01,
-                      ),
-                      Text(
-                        'TIME - ${widget.time}',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          // fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                          height: 0,
-                        ),
+                      SizedBox(height: 10),
+                      Row(
+                        children: [
+                          _buildInfoChip(Icons.person, hostname),
+                          SizedBox(width: 10),
+                          _buildInfoChip(Icons.access_time, time),
+                          SizedBox(width: 10),
+                          _buildInfoChip(Icons.calendar_today, date),
+                        ],
                       ),
                     ],
                   ),
-                  Spacer(),
-                  Column(
-                    children: [
-                      Image.asset('assets/eventimg.png'),
-                      SizedBox(
-                        height: height * 0.01,
-                      ),
-                      Text(
-                        widget.date,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          // fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                          height: 0,
-                        ),
-                      ),
-                    ],
+                ),
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Event Details',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
-                  Spacer(),
+                  SizedBox(height: 10),
+                  Text(
+                    eventdetails,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black54,
+                      height: 1.5,
+                    ),
+                  ),
                 ],
               ),
-              SizedBox(
-                height: height * 0.02,
-              )
-            ]),
-          ),
-          SizedBox(
-            height: height * 0.03,
-          ),
-          Row(children: [
-            SizedBox(
-              width: width * 0.05,
             ),
-            Text(
-              'Event Detail:- ',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            )
-          ]),
-          SizedBox(
-            height: height * 0.02,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String label) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.white),
+          SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(color: Colors.white, fontSize: 14),
           ),
-          SizedBox(
-            width: width * 0.9,
-            child: Text(widget.eventdetails),
-          ),
-          SizedBox(
-            height: height * 0.02,
-          )
-        ]),
+        ],
       ),
     );
   }

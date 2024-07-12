@@ -46,12 +46,24 @@ class _PhotoGalleryState extends State<PhotoGallery> {
     // Using GridView.builder to build the photo gallery grid
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: AppColors.greenthemecolor,
-          foregroundColor: Colors.white,
-          automaticallyImplyLeading: true,
-          leading: BackButton(),
-          title: Text('Photo Gallery'),
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          backgroundColor: Colors.white,
+          title: Text('Photo Gallery',
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.more_vert, color: Colors.black),
+              onPressed: () {},
+            ),
+          ],
         ),
+        backgroundColor: Colors.white,
         body: notificationFetcher());
   }
 
@@ -114,10 +126,11 @@ class _PhotoGalleryState extends State<PhotoGallery> {
                     decoration: ShapeDecoration(
                       image: DecorationImage(
                         image: NetworkImage(imageUrls[index]),
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                       ),
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(width: 1, color: Color(0xFF0A1E51)),
+                          side:
+                              BorderSide(width: 0.5, color: Color(0xFF0A1E51)),
                           borderRadius: BorderRadius.circular(5)),
                     ),
                   ),

@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hakeekat_farmer_version/Account/accounts.dart';
 import 'package:hakeekat_farmer_version/ContactUs/helpscreen.dart';
 import 'package:hakeekat_farmer_version/ContactUs/paymentqr.dart';
 import 'package:hakeekat_farmer_version/Events/events_page.dart';
@@ -91,6 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: IconButton(
           icon: Icon(Icons.menu, color: Colors.black),
           onPressed: () {
+            nextScreen(context, Account());
             // Add drawer functionality here
           },
         ),
@@ -101,12 +103,14 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.notifications, color: Colors.orange),
             onPressed: () {
+              nextScreen(context, EventPage());
               // Add notifications functionality here
             },
           ),
           IconButton(
             icon: Icon(Icons.account_circle, color: Colors.grey),
             onPressed: () {
+              nextScreen(context, Account());
               // Add profile functionality here
             },
           ),
@@ -258,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
               end: Alignment.bottomRight,
               colors: [
                 AppColors.greenthemecolor,
-                AppColors.greenthemecolor.withOpacity(0.7)
+                AppColors.greenthemecolor.withOpacity(1)
               ],
             ),
             borderRadius: BorderRadius.circular(15),

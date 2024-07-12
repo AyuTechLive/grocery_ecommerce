@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hakeekat_farmer_version/Admin/addvideos.dart';
+import 'package:hakeekat_farmer_version/Account/accounts.dart';
+
 import 'package:hakeekat_farmer_version/Events/events_page.dart';
 import 'package:hakeekat_farmer_version/Home/Homepage.dart';
-import 'package:hakeekat_farmer_version/Tutorials/pdflist.dart';
+
 import 'package:hakeekat_farmer_version/Tutorials/videoslist.dart';
 import 'package:hakeekat_farmer_version/Utils/colors.dart';
 
@@ -70,14 +71,7 @@ class _MainPageState extends State<MainPage> {
               _currentIndex = index;
             });
           },
-          children: [
-            HomeScreen(),
-            VideosListScreen(),
-            EventPage(),
-            Center(
-              child: Text('Accounts'),
-            )
-          ],
+          children: [HomeScreen(), VideosListScreen(), EventPage(), Account()],
         ),
         bottomNavigationBar: BottomNavigationBar(
           unselectedItemColor: Colors.black,

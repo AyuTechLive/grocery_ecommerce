@@ -36,17 +36,21 @@ class _EventPageState extends State<EventPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        // backgroundColor: AppColors.greenthemecolor,
-        // foregroundColor: Colors.white,
-        automaticallyImplyLeading: true,
-        leading: BackButton(),
-        title: Text(
-          'EVENTS',
-          style: TextStyle(
-              // color: Colors.white,
-
-              ),
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: Text('Events',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.more_vert, color: Colors.black),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,

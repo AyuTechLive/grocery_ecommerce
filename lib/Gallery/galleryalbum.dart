@@ -34,20 +34,21 @@ class _GalleryAlbumState extends State<GalleryAlbum> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.greenthemecolor,
-        foregroundColor: Colors.white,
-        automaticallyImplyLeading: true,
-        leading: BackButton(),
-        title: Text(
-          'Albums',
-          style: TextStyle(
-            // color: Colors.white,
-            fontSize: 16,
-            fontFamily: 'Quando',
-            fontWeight: FontWeight.w400,
-            height: 0,
-          ),
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: Text('Albums',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.more_vert, color: Colors.black),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
