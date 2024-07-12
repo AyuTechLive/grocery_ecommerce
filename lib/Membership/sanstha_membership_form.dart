@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hakeekat_farmer_version/Membership/essentials/sansthadocumentupload.dart';
 import 'package:hakeekat_farmer_version/Utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
@@ -111,40 +112,32 @@ class _MembershipFormState extends State<MembershipForm> {
         return;
       }
 
-      String docId = _uuid.v4();
-      try {
-        await _firestore.collection('SanastaApplication').doc(docId).set({
-          'id': docId,
-          'name': _nameController.text,
-          'fatherName': _fatherNameController.text,
-          'aadharNumber': _aadharController.text,
-          'bhamashahNumber': _bhamashahController.text,
-          'mobileNumber': _mobileController.text,
-          'whatsappNumber': _whatsappController.text,
-          'email': user.email,
-          'occupation': _occupationController.text,
-          'village': _villageController.text,
-          'city': _cityController.text,
-          'gramPanchayat': _gramPanchayatController.text,
-          'tehsil': _tehsilController.text,
-          'district': _districtController.text,
-          'state': _stateController.text,
-          'pinCode': _pinCodeController.text,
-          'submissionDate': FieldValue.serverTimestamp(),
-          'status': 'pending',
-        });
-        setState(() {
-          _submittedFormId = docId;
-          _formStatus = 'pending';
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Form submitted successfully')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error submitting form: $e')),
-        );
-      }
+      Map<String, dynamic> formData = {
+        'name': _nameController.text,
+        'fatherName': _fatherNameController.text,
+        'aadharNumber': _aadharController.text,
+        'bhamashahNumber': _bhamashahController.text,
+        'mobileNumber': _mobileController.text,
+        'whatsappNumber': _whatsappController.text,
+        'email': user.email,
+        'occupation': _occupationController.text,
+        'village': _villageController.text,
+        'city': _cityController.text,
+        'gramPanchayat': _gramPanchayatController.text,
+        'tehsil': _tehsilController.text,
+        'district': _districtController.text,
+        'state': _stateController.text,
+        'pinCode': _pinCodeController.text,
+        'submissionDate': FieldValue.serverTimestamp(),
+        'status': 'pending',
+      };
+
+      // Navigate to SansthaDocumentUploadScreen
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SansthaDocumentUploadScreen(formData: formData),
+        ),
+      );
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hakeekat_farmer_version/Membership/essentials/document_uploadscreen.dart';
 import 'package:hakeekat_farmer_version/Utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
@@ -86,7 +87,7 @@ class _FarmerMembershipFormState extends State<FarmerMembershipForm> {
     User? user = _auth.currentUser;
     if (user != null) {
       QuerySnapshot querySnapshot = await _firestore
-          .collection('FarmerOrganicApplication')
+          .collection('FarmerApplications')
           .where('email', isEqualTo: user.email)
           .limit(1)
           .get();
@@ -140,49 +141,38 @@ class _FarmerMembershipFormState extends State<FarmerMembershipForm> {
         return;
       }
 
-      String docId = _uuid.v4();
-      try {
-        await _firestore.collection('FarmerOrganicApplication').doc(docId).set({
-          'id': docId,
-          'email': user.email,
-          'status': 'pending',
-          'membershipNumber': _membershipNumberController.text,
-          'totalLand': double.tryParse(_totalLandController.text),
-          'isAlreadyDoingOrganicFarming': isAlreadyDoingOrganicFarming,
-          'organicFarmingStartDate': _organicFarmingStartDateController.text,
-          'organicFarmingLand':
-              double.tryParse(_organicFarmingLandController.text),
-          'previousCrops':
-              _previousCropsControllers.map((e) => e.text).toList(),
-          'nonOrganicLand': double.tryParse(_nonOrganicLandController.text),
-          'organicFarmingStartSeason':
-              _organicFarmingStartSeasonController.text,
-          'khasraNumbers':
-              _khasraNumbersControllers.map((e) => e.text).toList(),
-          'villageLocation': _villageLocationController.text,
-          'panchayatName': _panchayatNameController.text,
-          'state': _stateController.text,
-          'districtHeadquartersDistance':
-              _districtHeadquartersDistanceController.text,
-          'livestock': livestockControllers.map(
-              (key, value) => MapEntry(key, int.tryParse(value.text) ?? 0)),
-          'wantToSellMilk': wantToSellMilk,
-          'milkQuantity': double.tryParse(_milkQuantityController.text),
-          'makeOrganicFertilizer': makeOrganicFertilizer,
-          'submissionDate': FieldValue.serverTimestamp(),
-        });
-        setState(() {
-          _submittedFormId = docId;
-          _formStatus = 'pending';
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Form submitted successfully')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error submitting form: $e')),
-        );
-      }
+      Map<String, dynamic> formData = {
+        'email': user.email,
+        'status': 'pending',
+        'membershipNumber': _membershipNumberController.text,
+        'totalLand': double.tryParse(_totalLandController.text),
+        'isAlreadyDoingOrganicFarming': isAlreadyDoingOrganicFarming,
+        'organicFarmingStartDate': _organicFarmingStartDateController.text,
+        'organicFarmingLand':
+            double.tryParse(_organicFarmingLandController.text),
+        'previousCrops': _previousCropsControllers.map((e) => e.text).toList(),
+        'nonOrganicLand': double.tryParse(_nonOrganicLandController.text),
+        'organicFarmingStartSeason': _organicFarmingStartSeasonController.text,
+        'khasraNumbers': _khasraNumbersControllers.map((e) => e.text).toList(),
+        'villageLocation': _villageLocationController.text,
+        'panchayatName': _panchayatNameController.text,
+        'state': _stateController.text,
+        'districtHeadquartersDistance':
+            _districtHeadquartersDistanceController.text,
+        'livestock': livestockControllers
+            .map((key, value) => MapEntry(key, int.tryParse(value.text) ?? 0)),
+        'wantToSellMilk': wantToSellMilk,
+        'milkQuantity': double.tryParse(_milkQuantityController.text),
+        'makeOrganicFertilizer': makeOrganicFertilizer,
+        'submissionDate': FieldValue.serverTimestamp(),
+      };
+
+      // Navigate to DocumentUploadScreen
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => DocumentUploadScreen(formData: formData),
+        ),
+      );
     }
   }
 
@@ -190,7 +180,7 @@ class _FarmerMembershipFormState extends State<FarmerMembershipForm> {
     User? user = _auth.currentUser;
     if (user != null && _submittedFormId != null) {
       await _firestore
-          .collection('FarmerOrganicApplication')
+          .collection('FarmerApplications')
           .doc(_submittedFormId)
           .delete();
       setState(() {
