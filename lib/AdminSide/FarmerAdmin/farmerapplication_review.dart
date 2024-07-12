@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 
 class FarmerApplicationReview extends StatefulWidget {
@@ -27,7 +27,7 @@ class _FarmerApplicationReviewState extends State<FarmerApplicationReview> {
       ),
       body: StreamBuilder<DocumentSnapshot>(
         stream: secondFirebaseFirestore
-            .collection('FarmerOrganicApplication')
+            .collection('FarmerApplications')
             .doc(widget.applicationId)
             .snapshots(),
         builder: (context, snapshot) {
@@ -93,6 +93,9 @@ class _FarmerApplicationReviewState extends State<FarmerApplicationReview> {
                   _buildInfoRow('Makes Organic Fertilizer',
                       data['makeOrganicFertilizer'] ? 'Yes' : 'No'),
                 ]),
+                _buildInfoCard('Documents', [
+                  _buildDocumentsList(data['documents'] ?? {}),
+                ]),
                 SizedBox(height: 20),
                 _buildActionButtons(context, data['status']),
               ],
@@ -140,6 +143,31 @@ class _FarmerApplicationReviewState extends State<FarmerApplicationReview> {
     );
   }
 
+  Widget _buildDocumentsList(Map<String, dynamic> documents) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: documents.entries.map((entry) {
+        return ListTile(
+          title: Text(entry.key),
+          trailing: ElevatedButton(
+            child: Text('View'),
+            onPressed: () => _launchURL(entry.value),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Future<void> _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open document')),
+      );
+    }
+  }
+
   Widget _buildActionButtons(BuildContext context, String status) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -175,7 +203,7 @@ class _FarmerApplicationReviewState extends State<FarmerApplicationReview> {
       BuildContext context, String status) async {
     try {
       await secondFirebaseFirestore
-          .collection('FarmerOrganicApplication')
+          .collection('FarmerApplications')
           .doc(widget.applicationId)
           .update({'status': status});
 

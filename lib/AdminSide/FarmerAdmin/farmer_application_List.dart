@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hakikat_app_new/AdminSide/FarmerAdmin/farmerapplication_review.dart';
-
 import 'package:hakikat_app_new/Utils/colors.dart';
 
 class FarmerApplicationsList extends StatefulWidget {
@@ -13,6 +12,7 @@ class FarmerApplicationsList extends StatefulWidget {
 class _FarmerApplicationsListState extends State<FarmerApplicationsList> {
   final secondFirebaseFirestore =
       FirebaseFirestore.instanceFor(app: Firebase.app('secondary'));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +22,7 @@ class _FarmerApplicationsListState extends State<FarmerApplicationsList> {
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: secondFirebaseFirestore
-            .collection('FarmerOrganicApplication')
+            .collection('FarmerApplications')
             .orderBy('submissionDate', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
@@ -42,7 +42,7 @@ class _FarmerApplicationsListState extends State<FarmerApplicationsList> {
 
               return Card(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: ListTile(
+                child: ExpansionTile(
                   title: Text(
                     '${data['email']}',
                     style: TextStyle(
@@ -50,30 +50,61 @@ class _FarmerApplicationsListState extends State<FarmerApplicationsList> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Membership Number: ${data['membershipNumber']}'),
-                      Text(
-                          'Submission Date: ${_formatDate(data['submissionDate'])}'),
-                      Text('Status: ${data['status'] ?? 'Pending'}'),
-                    ],
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            FarmerApplicationReview(applicationId: doc.id),
+                  subtitle: Text('Status: ${data['status'] ?? 'Pending'}'),
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              'Membership Number: ${data['membershipNumber']}'),
+                          Text(
+                              'Submission Date: ${_formatDate(data['submissionDate'])}'),
+                          SizedBox(height: 8),
+                          Text('Uploaded Documents:',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          _buildDocumentsList(data['documents'] ?? {}),
+                          SizedBox(height: 16),
+                          ElevatedButton(
+                            child: Text('Review Application'),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => FarmerApplicationReview(
+                                      applicationId: doc.id),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              //primary: AppColors.greenthemecolor,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               );
             },
           );
         },
       ),
+    );
+  }
+
+  Widget _buildDocumentsList(Map<String, dynamic> documents) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: documents.entries.map((entry) {
+        return Padding(
+          padding: EdgeInsets.only(left: 16, top: 4),
+          child: Text('• ${entry.key}'),
+        );
+      }).toList(),
     );
   }
 
