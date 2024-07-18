@@ -42,9 +42,13 @@ class CategoryCard extends StatelessWidget {
           children: [
             Container(
               height: height * 0.1,
-              child: Image.network(
-                img,
-                fit: BoxFit.fill,
+              width: width * 0.23,
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+                child: Image.network(
+                  img,
+                  fit: BoxFit.fill,
+                ),
               ),
             ),
             SizedBox(
@@ -73,6 +77,3 @@ class CategoryCard extends StatelessWidget {
     );
   }
 }
-
-
-

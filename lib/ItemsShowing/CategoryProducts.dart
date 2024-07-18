@@ -19,10 +19,61 @@ class _CategoryProductState extends State<CategoryProduct> {
   List<Map<String, dynamic>> filteredProducts = [];
   final searchController = TextEditingController();
 
+  int _currentPage = 1;
+  int _itemsPerPage = 10;
+  bool _isLoading = false;
+  bool _hasMoreItems = true;
+
+  ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     fetchProducts();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      if (!_isLoading && _hasMoreItems) {
+        _loadMoreItems();
+      }
+    }
+  }
+
+  Future<void> _loadMoreItems() async {
+    if (_isLoading) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+    await Future.delayed(Duration(seconds: 2)); // Simulating network delay
+
+    int startIndex = _currentPage * _itemsPerPage;
+    int endIndex = startIndex + _itemsPerPage;
+    if (endIndex > filteredProducts.length) {
+      endIndex = filteredProducts.length;
+    }
+
+    List<Map<String, dynamic>> newItems =
+        filteredProducts.sublist(startIndex, endIndex);
+
+    setState(() {
+      products.addAll(newItems);
+      _currentPage++;
+      _isLoading = false;
+      if (endIndex >= filteredProducts.length) {
+        _hasMoreItems = false;
+      }
+    });
   }
 
   @override
@@ -69,8 +120,8 @@ class _CategoryProductState extends State<CategoryProduct> {
           ]),
           Expanded(
             child: GridView.builder(
+              controller: _scrollController,
               shrinkWrap: true,
-              // physics: NeverScrollableScrollPhysics(),
               padding: EdgeInsets.all(width * 0.06),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 childAspectRatio: 0.75,
@@ -78,66 +129,53 @@ class _CategoryProductState extends State<CategoryProduct> {
                 mainAxisSpacing: height * 0.01,
                 crossAxisCount: 2,
               ),
-              itemCount: filteredProducts.length,
+              itemCount: products.length + (_hasMoreItems ? 1 : 0),
               itemBuilder: (context, index) {
-                Map<String, dynamic> product = filteredProducts[index];
-                return Items(
-                  ontap: () {
-                    nextScreen(
-                        context,
-                        ProductDetails(
-                          discription: product['Product Discription'] ?? '',
-                          imageUrls: List<String>.from(product['Product Img'] ??
-                              [AppImage.defaultimgurl]),
-                          orderid: product['id'],
-                          img: (product['Product Img'] != null &&
-                                  product['Product Img'].isNotEmpty)
-                              ? product['Product Img'][0]
-                              : AppImage.defaultimgurl,
-                          maxquantity: product['Product Stock'] != null
-                              ? int.tryParse(
-                                      product['Product Stock'].toString()) ??
-                                  0
-                              : 0,
-                          price: product['Product Price'],
-                          title: product['Product Title'] ?? '',
-                          subtitle: product['Product Subtitle'] ?? '',
-                        ));
-                  },
-                  onadd: () {
-                    nextScreen(
-                        context,
-                        ProductDetails(
-                          discription: product['Product Discription'] ?? '',
-                          imageUrls: List<String>.from(product['Product Img'] ??
-                              [AppImage.defaultimgurl]),
-                          orderid: product['id'],
-                          img: (product['Product Img'] != null &&
-                                  product['Product Img'].isNotEmpty)
-                              ? product['Product Img'][0]
-                              : AppImage.defaultimgurl,
-                          maxquantity: product['Product Stock'] != null
-                              ? int.tryParse(
-                                      product['Product Stock'].toString()) ??
-                                  0
-                              : 0,
-                          price: product['Product Price'],
-                          title: product['Product Title'] ?? '',
-                          subtitle: product['Product Subtitle'] ?? '',
-                        ));
-                  },
-                  img: (product['Product Img'] != null &&
-                          product['Product Img'].isNotEmpty)
-                      ? product['Product Img'][0]
-                      : AppImage.defaultimgurl,
-                  price: product['Product Price'],
-                  title: product['Product Title'] ?? '',
-                  subtitle: product['Product Subtitle'] ?? '',
-                );
+                if (index < products.length) {
+                  Map<String, dynamic> product = products[index];
+                  return Items(
+                    ontap: () => navigateToProductDetails(context, product),
+                    onadd: () => navigateToProductDetails(context, product),
+                    img: (product['Product Img'] != null &&
+                            product['Product Img'].isNotEmpty)
+                        ? product['Product Img'][0]
+                        : AppImage.defaultimgurl,
+                    price: product['Product Price'],
+                    title: product['Product Title'] ?? '',
+                    subtitle: product['Product Subtitle'] ?? '',
+                  );
+                } else if (_hasMoreItems) {
+                  return Center(child: CircularProgressIndicator());
+                } else {
+                  return SizedBox.shrink();
+                }
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void navigateToProductDetails(
+      BuildContext context, Map<String, dynamic> product) {
+    nextScreen(
+      context,
+      ProductDetails(
+        discription: product['Product Discription'] ?? '',
+        imageUrls: List<String>.from(
+            product['Product Img'] ?? [AppImage.defaultimgurl]),
+        orderid: product['id'],
+        img: (product['Product Img'] != null &&
+                product['Product Img'].isNotEmpty)
+            ? product['Product Img'][0]
+            : AppImage.defaultimgurl,
+        maxquantity: product['Product Stock'] != null
+            ? int.tryParse(product['Product Stock'].toString()) ?? 0
+            : 0,
+        price: product['Product Price'],
+        title: product['Product Title'] ?? '',
+        subtitle: product['Product Subtitle'] ?? '',
       ),
     );
   }
@@ -149,6 +187,9 @@ class _CategoryProductState extends State<CategoryProduct> {
               .toLowerCase()
               .contains(query.toLowerCase()))
           .toList();
+      _currentPage = 1;
+      _hasMoreItems = true;
+      products = filteredProducts.take(_itemsPerPage).toList();
     });
   }
 
@@ -157,8 +198,7 @@ class _CategoryProductState extends State<CategoryProduct> {
       if (event.snapshot.exists) {
         Map<dynamic, dynamic> data =
             event.snapshot.value as Map<dynamic, dynamic>;
-        products.clear(); // Clear the existing data
-        filteredProducts.clear(); // Clear the existing filtered data
+        List<Map<String, dynamic>> allProducts = [];
 
         data.forEach((key, value) {
           if (value is Map) {
@@ -175,15 +215,19 @@ class _CategoryProductState extends State<CategoryProduct> {
             if (widget.categoryname == 'All Products' ||
                 (value.containsKey('Category') &&
                     value['Category'] == widget.categoryname)) {
-              if (mounted) {
-                setState(() {
-                  products.add(product);
-                  filteredProducts.add(product);
-                });
-              }
+              allProducts.add(product);
             }
           }
         });
+
+        if (mounted) {
+          setState(() {
+            filteredProducts = allProducts;
+            products = filteredProducts.take(_itemsPerPage).toList();
+            _currentPage = 1;
+            _hasMoreItems = filteredProducts.length > _itemsPerPage;
+          });
+        }
       }
     });
   }

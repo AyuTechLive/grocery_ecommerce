@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Cart/components/carttile.dart';
-import 'package:hakikat_app_new/CheckoutPage/checkoutpage.dart';
 import 'package:hakikat_app_new/CheckoutPage/democheckout.dart';
 import 'package:hakikat_app_new/Utils/appimg.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
@@ -33,53 +32,75 @@ class _CartScreenState extends State<CartScreen> {
         .collection('Users')
         .doc(userEmailsDocumentId);
 
-    QuerySnapshot cartSnapshot = await userDocRef.collection('Cart').get();
+    try {
+      QuerySnapshot cartSnapshot = await userDocRef.collection('Cart').get();
 
-    List<Map<String, dynamic>> fetchedCartItems = [];
-
-    for (QueryDocumentSnapshot doc in cartSnapshot.docs) {
-      Map<String, dynamic> docData = doc.data() as Map<String, dynamic>;
-      Map<String, dynamic> cartItem = {
-        'id': doc.id,
-        'quantity': docData['quantity'] ?? 1,
-      };
-
-      DataSnapshot productSnapshot =
-          await FirebaseDatabase.instance.ref().child(doc.id).get();
-
-      if (productSnapshot.value != null) {
-        Map<dynamic, dynamic> productData =
-            productSnapshot.value as Map<dynamic, dynamic>;
-        Map<String, dynamic> productDataStringKeys = productData.map(
-          (key, value) => MapEntry(key.toString(), value),
-        );
-
-        cartItem.addAll({
-          'Product Title': productDataStringKeys['Product Title'] ?? '',
-          'Product Subtitle': productDataStringKeys['Product Subtitle'] ?? '',
-          'Product Price': productDataStringKeys['Product Price'] ?? '',
-          'Product Img': (productDataStringKeys['Product Img'] != null &&
-                  productDataStringKeys['Product Img'].isNotEmpty)
-              ? productDataStringKeys['Product Img'][0]
-              : AppImage.defaultimgurl,
-        });
+      if (cartSnapshot.docs.isEmpty) {
+        // Cart collection exists but is empty, or doesn't exist
+        if (mounted) {
+          setState(() {
+            cartItems = [];
+            grandTotal = 0.0;
+            isLoading = false;
+          });
+        }
+        return;
       }
 
-      fetchedCartItems.add(cartItem);
-    }
+      List<Map<String, dynamic>> fetchedCartItems = [];
 
-    if (mounted) {
-      // Check if the widget is still mounted
-      setState(() {
-        cartItems = fetchedCartItems;
-        grandTotal = 0.0; // Reset grandTotal before calculating
-        for (var item in cartItems) {
-          double itemTotal =
-              (int.parse(item['Product Price']).toDouble() * item['quantity']);
-          grandTotal += itemTotal;
+      for (QueryDocumentSnapshot doc in cartSnapshot.docs) {
+        Map<String, dynamic> docData = doc.data() as Map<String, dynamic>;
+        Map<String, dynamic> cartItem = {
+          'id': doc.id,
+          'quantity': docData['quantity'] ?? 1,
+        };
+
+        DataSnapshot productSnapshot =
+            await FirebaseDatabase.instance.ref().child(doc.id).get();
+
+        if (productSnapshot.value != null) {
+          Map<dynamic, dynamic> productData =
+              productSnapshot.value as Map<dynamic, dynamic>;
+          Map<String, dynamic> productDataStringKeys = productData.map(
+            (key, value) => MapEntry(key.toString(), value),
+          );
+
+          cartItem.addAll({
+            'Product Title': productDataStringKeys['Product Title'] ?? '',
+            'Product Subtitle': productDataStringKeys['Product Subtitle'] ?? '',
+            'Product Price': productDataStringKeys['Product Price'] ?? '',
+            'Product Img': (productDataStringKeys['Product Img'] != null &&
+                    productDataStringKeys['Product Img'].isNotEmpty)
+                ? productDataStringKeys['Product Img'][0]
+                : AppImage.defaultimgurl,
+          });
         }
-        isLoading = false; // Data loading completed
-      });
+
+        fetchedCartItems.add(cartItem);
+      }
+
+      if (mounted) {
+        setState(() {
+          cartItems = fetchedCartItems;
+          grandTotal = 0.0;
+          for (var item in cartItems) {
+            double itemTotal = (int.parse(item['Product Price']).toDouble() *
+                item['quantity']);
+            grandTotal += itemTotal;
+          }
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching cart items: $e");
+      if (mounted) {
+        setState(() {
+          cartItems = [];
+          grandTotal = 0.0;
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -105,75 +126,76 @@ class _CartScreenState extends State<CartScreen> {
                         itemBuilder: (context, index) {
                           Map<String, dynamic> item = cartItems[index];
                           return Dismissible(
-                              key: Key(item['id']),
-                              direction: DismissDirection.endToStart,
-                              background: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Icon(Icons.delete, color: Colors.white),
-                                    SizedBox(width: 10),
-                                    Text(
-                                      'Delete',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                            key: Key(item['id']),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(15),
                               ),
-                              confirmDismiss: (direction) async {
-                                return await showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text("Confirm"),
-                                      content: Text(
-                                          "Are you sure you want to delete this item?"),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(false),
-                                          child: Text("Cancel"),
-                                        ),
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(true),
-                                          child: Text("Delete"),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                              onDismissed: (direction) {
-                                _deleteCartItem(item['id']);
-                              },
-                              child: CartTile(
-                                onremove: () async {
-                                  bool shouldDelete =
-                                      await _showDeleteConfirmationDialog(
-                                          context, item['id']);
-                                  if (shouldDelete) {
-                                    _deleteCartItem(item['id']);
-                                  }
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(Icons.delete, color: Colors.white),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            confirmDismiss: (direction) async {
+                              return await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("Confirm"),
+                                    content: Text(
+                                        "Are you sure you want to delete this item?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: Text("Cancel"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: Text("Delete"),
+                                      ),
+                                    ],
+                                  );
                                 },
-                                title: item['Product Title'] ?? '',
-                                subtitle: item['Product Subtitle'] ?? '',
-                                price: (int.parse(item['Product Price']) *
-                                            item['quantity'])
-                                        .toString() ??
-                                    '',
-                                quantity: item['quantity'],
-                                img: item['Product Img'],
-                              ));
+                              );
+                            },
+                            onDismissed: (direction) {
+                              _deleteCartItem(item['id']);
+                            },
+                            child: CartTile(
+                              onremove: () async {
+                                bool shouldDelete =
+                                    await _showDeleteConfirmationDialog(
+                                        context, item['id']);
+                                if (shouldDelete) {
+                                  _deleteCartItem(item['id']);
+                                }
+                              },
+                              title: item['Product Title'] ?? '',
+                              subtitle: item['Product Subtitle'] ?? '',
+                              price: (int.parse(item['Product Price']) *
+                                          item['quantity'])
+                                      .toString() ??
+                                  '',
+                              quantity: item['quantity'],
+                              img: item['Product Img'],
+                            ),
+                          );
                         },
                       ),
                     ),
@@ -242,7 +264,6 @@ class _CartScreenState extends State<CartScreen> {
 
     await userDocRef.collection('Cart').doc(itemId).delete();
 
-    // Remove the item from the cartItems list and recalculate grandTotal
     setState(() {
       Map<String, dynamic> removedItem =
           cartItems.firstWhere((item) => item['id'] == itemId);
@@ -288,7 +309,6 @@ class _CartScreenState extends State<CartScreen> {
 
     DocumentSnapshot userSnapshot = await userDocRef.get();
     if (userSnapshot.exists && mounted) {
-      // Check if the widget is still mounted
       setState(() {
         walletBalance = double.parse(userSnapshot['Wallet'] ?? '0');
       });
@@ -297,7 +317,6 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   void dispose() {
-    // Cancel any active asynchronous operations or listeners here
     super.dispose();
   }
 }

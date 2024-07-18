@@ -37,8 +37,8 @@ class _MyWalletState extends State<MyWallet>
 
     if (userDocSnapshot.exists) {
       final userData = userDocSnapshot.data();
-      final bonus = userData?['Bonus'] ?? 0;
-      final balance = userData?['Wallet'] ?? 0;
+      final bonus = userData?['Bonus'] ?? '0';
+      final balance = userData?['Wallet'] ?? '0';
       final uid = userData?['UID'] ?? '';
       final name = userData?['Name'] ?? '';
       setState(() {
@@ -141,7 +141,9 @@ class _MyWalletState extends State<MyWallet>
           );
         }
 
-        final transactions = snapshot.data!.docs;
+        // Manually sort the transactions by date in descending order
+        List<DocumentSnapshot> sortedTransactions = snapshot.data!.docs
+          ..sort((a, b) => b['date'].compareTo(a['date']));
 
         return ListView.separated(
           separatorBuilder: (context, index) {
@@ -149,11 +151,12 @@ class _MyWalletState extends State<MyWallet>
               height: height * 0.02,
             );
           },
-          itemCount: transactions.length,
+          itemCount: sortedTransactions.length,
           itemBuilder: (context, index) {
             final transaction =
-                transactions[index].data() as Map<String, dynamic>?;
+                sortedTransactions[index].data() as Map<String, dynamic>?;
             final amount = transaction?['amount'] ?? 0.0;
+            final remarks = transaction?['remarks'] ?? 'Transaction Successful';
             final date = transaction?['date'] as Timestamp?;
             final formattedDate = date != null
                 ? DateFormat('dd/MM/yyyy hh:mm a').format(date.toDate())
@@ -183,7 +186,7 @@ class _MyWalletState extends State<MyWallet>
                                 style: TextStyle(
                                     fontWeight: FontWeight.w700, fontSize: 16),
                               ),
-                              Text(' ${transactions[index].id}'),
+                              Text(' ${sortedTransactions[index].id}'),
                             ],
                           ),
                           Row(
@@ -194,6 +197,24 @@ class _MyWalletState extends State<MyWallet>
                                 style: TextStyle(fontWeight: FontWeight.w700),
                               ),
                               Text('  ${formattedDate}')
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Remarks:',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                              SizedBox(
+                                width: width * 0.5,
+                                child: Text(
+                                  ' ${remarks}',
+                                  // overflow: TextOverflow.ellipsis,
+                                  // maxLines: 2, // Limit to one line
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -214,11 +235,6 @@ class _MyWalletState extends State<MyWallet>
                 ),
               ),
             );
-
-            // ListTile(
-            //   title: Text('Amount: $amount'),
-            //   subtitle: Text('Date: $formattedDate'),
-            // );
           },
         );
       },

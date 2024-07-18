@@ -14,6 +14,7 @@ import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/appimg.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   final CollectionReference _categoriesCollection =
       FirebaseFirestore.instance.collection('Categories');
   String? _selectedAddress;
+  bool _isLoading = true;
 
   int _currentIndex = 0;
   final CarouselController _controller = CarouselController();
@@ -115,195 +117,212 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: width * 0.879,
-              height: height * 0.057,
-              decoration: ShapeDecoration(
-                color: Color(0xFFF1F2F2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              child: Center(
-                child: TextFormField(
-                  textAlign: TextAlign.justify,
-                  controller: searchcontroller,
-                  cursorColor: Color(0xFF4C4E4D),
-                  decoration: InputDecoration(
-                    icon: Padding(
-                      padding: EdgeInsets.only(left: width * 0.03),
-                      child: Icon(Icons.search),
-                    ),
-                    hintText: 'Search Store',
-                    iconColor: Color(0xFF4C4E4D),
-                    border: InputBorder.none,
-                  ),
-                  onTap: () {
-                    nextScreen(context, Explore());
-                  },
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                ),
-              ),
-            ),
-            SizedBox(height: height * 0.022),
-            StreamBuilder<QuerySnapshot>(
-              stream: fireStore2,
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                }
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                }
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Text('No banners found.');
-                }
-
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(height: height * 0.02),
-                    Center(
-                      child: CarouselSlider(
-                        carouselController: _controller,
-                        options: CarouselOptions(
-                          autoPlay: true,
-                          enlargeCenterPage: true,
-                          viewportFraction: 0.93,
-                          aspectRatio: 2.2,
-                          initialPage: 2,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                        ),
-                        items: snapshot.data!.docs.map((document) {
-                          String imageUrl = document['Banner Image Link'];
-                          return Builder(
-                            builder: (BuildContext context) {
-                              return InkWell(
-                                onTap: () {
-                                  // Handle banner tap
-                                },
-                                child: Container(
-                                  height: 10,
-                                  width: 500,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(5),
-                                    child: Image.network(
-                                      imageUrl,
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        }).toList(),
+      body: _isLoading
+          ? _buildShimmerEffect()
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: width * 0.879,
+                    height: height * 0.057,
+                    decoration: ShapeDecoration(
+                      color: Color(0xFFF1F2F2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                  ],
-                );
-              },
-            ),
-            SizedBox(height: height * 0.02),
-            Sectionheader(
-              title: 'Exclusive Offer',
-              ontap: () {
-                nextScreen(context, ExclusiveItems(categoryname: 'Exclusive'));
-              },
-            ),
-            buildProductList(filteredProducts, 5),
-            SizedBox(height: height * 0.02),
-            Sectionheader(
-              title: 'Categories',
-              ontap: () {
-                Navigator.pushReplacement(context, MaterialPageRoute(
-                  builder: (context) {
-                    return MainPage(index: 1);
-                  },
-                ));
-              },
-            ),
-            StreamBuilder(
-              stream: _categoriesCollection.snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                }
-                if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
-                }
-                final documents = snapshot.data!.docs;
-                return SizedBox(
-                  height: height * 0.117,
-                  child: ListView.separated(
-                    padding: EdgeInsets.symmetric(horizontal: width * 0.05),
-                    separatorBuilder: (context, index) {
-                      return SizedBox(width: width * 0.05);
-                    },
-                    itemCount: documents.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      final document = documents[index];
-                      final data = document.data() as Map?;
-                      if (data == null) {
-                        return SizedBox();
-                      }
-                      return HomeCategoryItems(
-                        img: data['Category Img'] ?? '',
-                        title: data['Category Name'] ?? '',
-                        ontap: () {
-                          nextScreen(
-                            context,
-                            CategoryProduct(
-                              categoryname: data['Category Name'] ?? '',
-                            ),
-                          );
+                    child: Center(
+                      child: TextFormField(
+                        textAlign: TextAlign.justify,
+                        controller: searchcontroller,
+                        cursorColor: Color(0xFF4C4E4D),
+                        decoration: InputDecoration(
+                          icon: Padding(
+                            padding: EdgeInsets.only(left: width * 0.03),
+                            child: Icon(Icons.search),
+                          ),
+                          hintText: 'Search Store',
+                          iconColor: Color(0xFF4C4E4D),
+                          border: InputBorder.none,
+                        ),
+                        onTap: () {
+                          nextScreen(context, Explore());
                         },
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: height * 0.022),
+                  StreamBuilder<QuerySnapshot>(
+                    stream: fireStore2,
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Text('No banners found.');
+                      }
+
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: height * 0.02),
+                          Center(
+                            child: CarouselSlider(
+                              carouselController: _controller,
+                              options: CarouselOptions(
+                                autoPlay: true,
+                                enlargeCenterPage: true,
+                                viewportFraction: 0.93,
+                                aspectRatio: 2.2,
+                                initialPage: 2,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    _currentIndex = index;
+                                  });
+                                },
+                              ),
+                              items: snapshot.data!.docs.map((document) {
+                                String imageUrl = document['Banner Image Link'];
+                                return Builder(
+                                  builder: (BuildContext context) {
+                                    return InkWell(
+                                      onTap: () {
+                                        // Handle banner tap
+                                      },
+                                      child: Container(
+                                        height: 10,
+                                        width: 500,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          child: Image.network(
+                                            imageUrl,
+                                            fit: BoxFit.fill,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
                       );
                     },
                   ),
-                );
-              },
+                  SizedBox(height: height * 0.02),
+                  if (filteredProducts.isNotEmpty) ...[
+                    SizedBox(height: height * 0.02),
+                    Sectionheader(
+                      title: 'Exclusive Offer',
+                      ontap: () {
+                        nextScreen(
+                            context, ExclusiveItems(categoryname: 'Exclusive'));
+                      },
+                    ),
+                    buildProductList(filteredProducts, 5),
+                  ],
+                  SizedBox(height: height * 0.02),
+                  Sectionheader(
+                    title: 'Categories',
+                    ontap: () {
+                      Navigator.pushReplacement(context, MaterialPageRoute(
+                        builder: (context) {
+                          return MainPage(index: 1);
+                        },
+                      ));
+                    },
+                  ),
+                  StreamBuilder(
+                    stream: _categoriesCollection.snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+                      if (!snapshot.hasData) {
+                        return CircularProgressIndicator();
+                      }
+                      final documents = snapshot.data!.docs;
+                      return SizedBox(
+                        height: height * 0.117,
+                        child: ListView.separated(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: width * 0.05),
+                          separatorBuilder: (context, index) {
+                            return SizedBox(width: width * 0.05);
+                          },
+                          itemCount: documents.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            final document = documents[index];
+                            final data = document.data() as Map?;
+                            if (data == null) {
+                              return SizedBox();
+                            }
+                            return HomeCategoryItems(
+                              img: data['Category Img'] ?? '',
+                              title: data['Category Name'] ?? '',
+                              ontap: () {
+                                nextScreen(
+                                  context,
+                                  CategoryProduct(
+                                    categoryname: data['Category Name'] ?? '',
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: height * 0.02),
+                  if (products
+                      .where((product) => product['BestSelling'] == true)
+                      .isNotEmpty) ...[
+                    SizedBox(height: height * 0.02),
+                    Sectionheader(
+                      title: 'Best Selling',
+                      ontap: () {
+                        nextScreen(context,
+                            ExclusiveItems(categoryname: 'BestSelling'));
+                      },
+                    ),
+                    buildProductList(
+                        products
+                            .where((product) => product['BestSelling'] == true)
+                            .toList(),
+                        5),
+                  ],
+                  SizedBox(height: height * 0.02),
+                  if (products.isNotEmpty) ...[
+                    SizedBox(height: height * 0.02),
+                    Sectionheader(
+                      title: 'All Products',
+                      ontap: () {
+                        nextScreen(context,
+                            CategoryProduct(categoryname: 'All Products'));
+                      },
+                    ),
+                    buildProductList(products, 5),
+                  ],
+                  SizedBox(height: height * 0.02),
+                ],
+              ),
             ),
-            SizedBox(height: height * 0.02),
-            Sectionheader(
-              title: 'Best Selling',
-              ontap: () {
-                nextScreen(
-                    context, ExclusiveItems(categoryname: 'BestSelling'));
-              },
-            ),
-            buildProductList(
-                products
-                    .where((product) => product['BestSelling'] == true)
-                    .toList(),
-                5),
-            SizedBox(height: height * 0.02),
-            Sectionheader(
-              title: 'All Products',
-              ontap: () {
-                nextScreen(
-                    context, CategoryProduct(categoryname: 'All Products'));
-              },
-            ),
-            buildProductList(products, 5),
-            SizedBox(height: height * 0.02),
-          ],
-        ),
-      ),
     );
   }
 
@@ -313,6 +332,71 @@ class _HomePageState extends State<HomePage> {
       path: phoneNumber,
     );
     await launchUrl(launchUri);
+  }
+
+  Widget _buildShimmerEffect() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Shimmer for banner
+            Container(
+              height: 200,
+              color: Colors.white,
+              margin: EdgeInsets.all(16),
+            ),
+            // Shimmer for product sections
+            for (int i = 0; i < 3; i++) ...[
+              // Section header shimmer
+              Container(
+                height: 24,
+                width: 150,
+                color: Colors.white,
+                margin: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              ),
+              // Product items shimmer
+              Container(
+                height: 200,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 5,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      width: 150,
+                      margin:
+                          EdgeInsets.only(left: 16, right: index == 4 ? 16 : 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 120,
+                            color: Colors.white,
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            height: 16,
+                            width: 100,
+                            color: Colors.white,
+                          ),
+                          SizedBox(height: 4),
+                          Container(
+                            height: 16,
+                            width: 80,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
   Widget buildProductList(
@@ -422,6 +506,11 @@ class _HomePageState extends State<HomePage> {
               });
             }
           }
+        });
+      }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
         });
       }
     });

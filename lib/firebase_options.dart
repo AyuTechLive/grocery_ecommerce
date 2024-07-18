@@ -41,54 +41,56 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAHbTpwvcU5fCRSxFNAaxNblNJlmKImNJ0',
-    appId: '1:460364116205:web:11c5e1a993786d81255ce4',
-    messagingSenderId: '460364116205',
-    projectId: 'hakkikatdemo',
-    authDomain: 'hakkikatdemo.firebaseapp.com',
-    databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',
-    storageBucket: 'hakkikatdemo.appspot.com',
-    measurementId: 'G-94BYKHKR3X',
+    apiKey: 'AIzaSyC5xGvNdH7uwHSYguAG0Yl2tAXBQ93Nx34',
+    appId: '1:671942765975:web:d0fa236892f96f89f5e8d2',
+    messagingSenderId: '671942765975',
+    projectId: 'hakeekat-naturals',
+    authDomain: 'hakeekat-naturals.firebaseapp.com',
+    databaseURL: 'https://hakeekat-naturals-default-rtdb.firebaseio.com',
+    storageBucket: 'hakeekat-naturals.appspot.com',
+    measurementId: 'G-N9BSKMRVC7',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDb06naJZxObS4TAsZQeM55DNGBiAwzJHk',
-    appId: '1:460364116205:android:b73322f109b8cefa255ce4',
-    messagingSenderId: '460364116205',
-    projectId: 'hakkikatdemo',
-    databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',
-    storageBucket: 'hakkikatdemo.appspot.com',
+    apiKey: 'AIzaSyBQ5GgRKdxqLl4i3s016886Jn10oTnnNis',
+    appId: '1:671942765975:android:340301246d1c43f5f5e8d2',
+    messagingSenderId: '671942765975',
+    projectId: 'hakeekat-naturals',
+    databaseURL: 'https://hakeekat-naturals-default-rtdb.firebaseio.com',
+    storageBucket: 'hakeekat-naturals.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDY3NgP5Az2KZSQq-qdMNsvsgsFl262KtU',
-    appId: '1:460364116205:ios:5fd12effb3142ced255ce4',
-    messagingSenderId: '460364116205',
-    projectId: 'hakkikatdemo',
-    databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',
-    storageBucket: 'hakkikatdemo.appspot.com',
+    apiKey: 'AIzaSyB2_z6UP6-F4q8K3bBgCQiv-1PdZAjwWak',
+    appId: '1:671942765975:ios:427018d71ddba190f5e8d2',
+    messagingSenderId: '671942765975',
+    projectId: 'hakeekat-naturals',
+    databaseURL: 'https://hakeekat-naturals-default-rtdb.firebaseio.com',
+    storageBucket: 'hakeekat-naturals.appspot.com',
+    iosClientId: '671942765975-64na1uvnobfuj3cuctsl6dma3dhcqjhi.apps.googleusercontent.com',
     iosBundleId: 'com.example.hakikatAppNew',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDY3NgP5Az2KZSQq-qdMNsvsgsFl262KtU',
-    appId: '1:460364116205:ios:5fd12effb3142ced255ce4',
-    messagingSenderId: '460364116205',
-    projectId: 'hakkikatdemo',
-    databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',
-    storageBucket: 'hakkikatdemo.appspot.com',
+    apiKey: 'AIzaSyB2_z6UP6-F4q8K3bBgCQiv-1PdZAjwWak',
+    appId: '1:671942765975:ios:427018d71ddba190f5e8d2',
+    messagingSenderId: '671942765975',
+    projectId: 'hakeekat-naturals',
+    databaseURL: 'https://hakeekat-naturals-default-rtdb.firebaseio.com',
+    storageBucket: 'hakeekat-naturals.appspot.com',
+    iosClientId: '671942765975-64na1uvnobfuj3cuctsl6dma3dhcqjhi.apps.googleusercontent.com',
     iosBundleId: 'com.example.hakikatAppNew',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAHbTpwvcU5fCRSxFNAaxNblNJlmKImNJ0',
-    appId: '1:460364116205:web:1cc6a311c4da305e255ce4',
-    messagingSenderId: '460364116205',
-    projectId: 'hakkikatdemo',
-    authDomain: 'hakkikatdemo.firebaseapp.com',
-    databaseURL: 'https://hakkikatdemo-default-rtdb.firebaseio.com',
-    storageBucket: 'hakkikatdemo.appspot.com',
-    measurementId: 'G-9GB0SPMF9E',
+    apiKey: 'AIzaSyC5xGvNdH7uwHSYguAG0Yl2tAXBQ93Nx34',
+    appId: '1:671942765975:web:42e41bf094b158c5f5e8d2',
+    messagingSenderId: '671942765975',
+    projectId: 'hakeekat-naturals',
+    authDomain: 'hakeekat-naturals.firebaseapp.com',
+    databaseURL: 'https://hakeekat-naturals-default-rtdb.firebaseio.com',
+    storageBucket: 'hakeekat-naturals.appspot.com',
+    measurementId: 'G-G4QDLHFDEF',
   );
 
 }

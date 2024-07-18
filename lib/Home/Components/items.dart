@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 
@@ -35,10 +36,13 @@ class Items extends StatelessWidget {
               flex: 3,
               child: ClipRRect(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                child: Image.network(
-                  img,
+                child: CachedNetworkImage(
+                  imageUrl: img,
                   fit: BoxFit.fill,
                   width: double.infinity,
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
               ),
             ),

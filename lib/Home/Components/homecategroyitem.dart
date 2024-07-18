@@ -15,43 +15,46 @@ class HomeCategoryItems extends StatelessWidget {
     return InkWell(
       onTap: ontap,
       child: Container(
-          width: width * 0.599,
-          height: height * 0.117,
-          decoration: ShapeDecoration(
-            color: Color(0xFFF8A44C).withOpacity(0.15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
+        width: width * 0.599,
+        height: height * 0.117,
+        decoration: ShapeDecoration(
+          color: Color(0xFFF8A44C).withOpacity(0.15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Spacer(),
-              Container(
-                width: width * 0.25,
+        ),
+        child: Row(
+          children: [
+            SizedBox(width: width * 0.02),
+            Container(
+              width: width * 0.23,
+              height: height * 0.1,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
                 child: Image.network(
                   img,
                   fit: BoxFit.fill,
                 ),
               ),
-              Spacer(),
-              SizedBox(
-                width: width * 0.31,
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    color: Color(0xFF3E423F),
-                    fontSize: 16,
-                    fontFamily: 'Gilroy',
-                    fontWeight: FontWeight.w600,
-                    height: 0,
-                  ),
+            ),
+            SizedBox(width: width * 0.02),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Color(0xFF3E423F),
+                  fontSize: 16,
+                  fontFamily: 'Gilroy',
+                  fontWeight: FontWeight.w600,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              Spacer(),
-              Spacer(),
-            ],
-          )),
+            ),
+            SizedBox(width: width * 0.02),
+          ],
+        ),
+      ),
     );
   }
 }

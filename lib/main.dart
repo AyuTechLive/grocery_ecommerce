@@ -16,7 +16,7 @@ void main() async {
 
   runApp(const MyApp());
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  OneSignal.initialize('9c34ad01-1149-4c6d-8720-2afd0ea248d5');
+  OneSignal.initialize('2237d8dd-271c-4501-b461-ecf2a21173f1');
   OneSignal.Notifications.requestPermission(true).then((value) {
     print('signal value: $value');
   });

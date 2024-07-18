@@ -85,7 +85,7 @@ class _ExploreState extends State<Explore> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Find Products',
+              'Explore',
               style: TextStyle(
                 color: Color(0xFF181725),
                 fontSize: 20,
