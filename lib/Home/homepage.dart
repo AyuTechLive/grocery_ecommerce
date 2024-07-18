@@ -344,7 +344,11 @@ class _HomePageState extends State<HomePage> {
             // Shimmer for banner
             Container(
               height: 200,
-              color: Colors.white,
+              // color: Colors.white,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
+              ),
               margin: EdgeInsets.all(16),
             ),
             // Shimmer for product sections
@@ -364,15 +368,22 @@ class _HomePageState extends State<HomePage> {
                   itemCount: 5,
                   itemBuilder: (context, index) {
                     return Container(
-                      width: 150,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      width: 160,
                       margin:
                           EdgeInsets.only(left: 16, right: index == 4 ? 16 : 0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            height: 120,
-                            color: Colors.white,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.white,
+                            ),
+                            height: 140,
                           ),
                           SizedBox(height: 8),
                           Container(
