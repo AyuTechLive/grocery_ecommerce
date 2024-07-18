@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hakikat_app_new/AdminSide/FarmerAdmin/Album/albumscreen.dart';
+import 'package:hakikat_app_new/AdminSide/FarmerAdmin/Farmerbanner.dart';
+import 'package:hakikat_app_new/AdminSide/FarmerAdmin/Tutorials/farmerpdftutorials.dart';
+import 'package:hakikat_app_new/AdminSide/FarmerAdmin/Tutorials/farmervideotutorials.dart';
 import 'package:hakikat_app_new/AdminSide/FarmerAdmin/addfarmerbanner.dart';
 import 'package:hakikat_app_new/AdminSide/FarmerAdmin/addfarmerevent.dart';
 import 'package:hakikat_app_new/AdminSide/FarmerAdmin/addfarmerpdf.dart';
 import 'package:hakikat_app_new/AdminSide/FarmerAdmin/addgalleryimg.dart';
 import 'package:hakikat_app_new/AdminSide/FarmerAdmin/farmer_application_List.dart';
 import 'package:hakikat_app_new/AdminSide/FarmerAdmin/sanstha_application_list.dart';
+import 'package:hakikat_app_new/AdminSide/FarmerAdmin/Farmerevent/eventpage.dart';
 import 'package:hakikat_app_new/AdminSide/Orders/cancelledorder.dart';
 import 'package:hakikat_app_new/AdminSide/Orders/placedorders.dart';
 import 'package:hakikat_app_new/AdminSide/addbanner.dart';
@@ -53,15 +58,15 @@ class FarmerAdminPanel extends StatelessWidget {
               children: [
                 _buildAdminButton(
                   context,
-                  'Add Farmer Tutorials',
+                  'Farmer Tutorials',
                   Icons.video_collection_sharp,
-                  AddLecturesAdmin(),
+                  VideosListScreen(),
                 ),
                 _buildAdminButton(
                   context,
-                  'Add Farmer Pdf',
+                  'Farmer Pdf',
                   Icons.file_copy,
-                  Addpdf(),
+                  PdfListScreen(),
                 ),
                 _buildAdminButton(
                   context,
@@ -77,9 +82,9 @@ class FarmerAdminPanel extends StatelessWidget {
                 ),
                 _buildAdminButton(
                   context,
-                  'Add Farmer Event',
+                  'Farmer Event',
                   Icons.event,
-                  AddFarmerEvent(),
+                  FarmerEventPage(),
                 ),
                 _buildAdminButton(
                   context,
@@ -89,10 +94,22 @@ class FarmerAdminPanel extends StatelessWidget {
                 ),
                 _buildAdminButton(
                   context,
-                  'Add Farmer Banner',
+                  'Farmer Banner',
                   Icons.upload,
-                  AddFarmerBanner(),
+                  FarmerBanner(),
                 ),
+                _buildAdminButton(
+                  context,
+                  'Album',
+                  Icons.upload,
+                  GalleryAlbum(),
+                ),
+                // _buildAdminButton(
+                //   context,
+                //   'Event Page',
+                //   Icons.upload,
+                //   FarmerEventPage(),
+                // ),
               ],
             ),
           ),

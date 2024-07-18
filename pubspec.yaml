@@ -49,6 +49,8 @@ dependencies:
   change_app_package_name: ^1.2.0
   url_launcher: ^6.3.0
   file_picker: ^8.0.6
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

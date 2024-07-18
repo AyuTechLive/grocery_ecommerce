@@ -8,6 +8,7 @@ class AddMoney extends StatefulWidget {
 
 class _AddMoneyState extends State<AddMoney> {
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _remarkcontroller = TextEditingController();
   final TextEditingController _bonusController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   final CollectionReference _usersCollection =
@@ -16,8 +17,8 @@ class _AddMoneyState extends State<AddMoney> {
   String _searchQuery = '';
   bool _isSearching = false;
 
-  Future<void> _updateWalletBalance(
-      String userId, String amount, String bonus, bool isAdd) async {
+  Future<void> _updateWalletBalance(String userId, String amount, String bonus,
+      bool isAdd, String remark) async {
     try {
       final userDoc = _usersCollection.doc(userId);
       final userData = await userDoc.get();
@@ -41,7 +42,7 @@ class _AddMoneyState extends State<AddMoney> {
 
         await userDoc.update({
           'Wallet': newBalance,
-          'balance': newBonus,
+          'Bonus': newBonus,
         });
 
         await userDoc.collection('transactions').add({
@@ -49,6 +50,7 @@ class _AddMoneyState extends State<AddMoney> {
           'bonus': bonusValue,
           'type': isAdd ? 'Credit' : 'Debit',
           'date': DateTime.now(),
+          'remarks': remark
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -98,6 +100,13 @@ class _AddMoneyState extends State<AddMoney> {
                   hintText: 'Enter bonus amount',
                 ),
               ),
+              TextField(
+                controller: _remarkcontroller,
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                  hintText: 'Enter remarks',
+                ),
+              ),
             ],
           ),
           actions: <Widget>[
@@ -106,11 +115,13 @@ class _AddMoneyState extends State<AddMoney> {
               onPressed: () {
                 final amount = _amountController.text;
                 final bonus = _bonusController.text;
+                final remark = _remarkcontroller.text;
                 if (amount.isNotEmpty && bonus.isNotEmpty) {
-                  _updateWalletBalance(userId, amount, bonus, true);
+                  _updateWalletBalance(userId, amount, bonus, true, remark);
                   Navigator.of(context).pop();
                   _amountController.clear();
                   _bonusController.clear();
+                  _remarkcontroller.clear();
                 }
               },
             ),

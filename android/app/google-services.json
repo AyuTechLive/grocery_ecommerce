@@ -1,65 +1,80 @@
 {
   "project_info": {
-    "project_number": "460364116205",
-    "firebase_url": "https://hakkikatdemo-default-rtdb.firebaseio.com",
-    "project_id": "hakkikatdemo",
-    "storage_bucket": "hakkikatdemo.appspot.com"
+    "project_number": "671942765975",
+    "firebase_url": "https://hakeekat-naturals-default-rtdb.firebaseio.com",
+    "project_id": "hakeekat-naturals",
+    "storage_bucket": "hakeekat-naturals.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:460364116205:android:0c06dd3c9c7dffa9255ce4",
-        "android_client_info": {
-          "package_name": "com.example.hakikat_app_new"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDb06naJZxObS4TAsZQeM55DNGBiAwzJHk"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:460364116205:android:d1af929c3a4211a7255ce4",
+        "mobilesdk_app_id": "1:671942765975:android:f77911be8dc9f23ef5e8d2",
         "android_client_info": {
           "package_name": "com.hakkikat.admin"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "671942765975-maeu242e2hjm5envc3a9r4hqqhoi0pbu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDb06naJZxObS4TAsZQeM55DNGBiAwzJHk"
+          "current_key": "AIzaSyBQ5GgRKdxqLl4i3s016886Jn10oTnnNis"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "671942765975-maeu242e2hjm5envc3a9r4hqqhoi0pbu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "671942765975-64na1uvnobfuj3cuctsl6dma3dhcqjhi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.hakikatAppNew"
+              }
+            }
+          ]
         }
       }
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:460364116205:android:b73322f109b8cefa255ce4",
+        "mobilesdk_app_id": "1:671942765975:android:340301246d1c43f5f5e8d2",
         "android_client_info": {
           "package_name": "com.hakkikat.user"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "671942765975-maeu242e2hjm5envc3a9r4hqqhoi0pbu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDb06naJZxObS4TAsZQeM55DNGBiAwzJHk"
+          "current_key": "AIzaSyBQ5GgRKdxqLl4i3s016886Jn10oTnnNis"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "671942765975-maeu242e2hjm5envc3a9r4hqqhoi0pbu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "671942765975-64na1uvnobfuj3cuctsl6dma3dhcqjhi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.hakikatAppNew"
+              }
+            }
+          ]
         }
       }
     }

@@ -17,12 +17,13 @@ void main() async {
   await Firebase.initializeApp(
     name: 'secondary', // Give your second app a custom name
     options: FirebaseOptions(
-        apiKey: 'AIzaSyB5sOK4XWHf8YFmi1Oqp1Nsj3GqUvcuHh4',
-        appId: '1:233847987701:android:5da30b41793797a4bc54bc',
-        messagingSenderId: '233847987701',
-        projectId: 'hakeekatfarmer',
-        storageBucket: 'hakeekatfarmer.appspot.com',
-        databaseURL: 'https://hakeekatfarmer-default-rtdb.firebaseio.com/'),
+      apiKey: 'AIzaSyBemIx8hltMpMi-wPvdQH_4uMO_yxRbMDE',
+      appId: '1:823039150889:android:bc38de3db63eb4ce388538',
+      messagingSenderId: '823039150889',
+      projectId: 'hakeekat-farmer',
+      databaseURL: 'https://hakeekat-farmer-default-rtdb.firebaseio.com',
+      storageBucket: 'hakeekat-farmer.appspot.com',
+    ),
   );
   runApp(const MyApp());
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);

@@ -178,6 +178,10 @@ class _ExclusiveItemsState extends State<ExclusiveItems> {
               'Product Price': value['Product Price'],
               'Product Discription': value['Product Discription'],
               'id': value['id'],
+              'Exclusive':
+                  value.containsKey('Exclusive') && value['Exclusive'] == true,
+              'BestSelling': value.containsKey('BestSelling') &&
+                  value['BestSelling'] == true,
             };
             setState(() {
               products.add(product);
