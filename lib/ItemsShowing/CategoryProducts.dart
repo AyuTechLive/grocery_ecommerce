@@ -164,6 +164,10 @@ class _CategoryProductState extends State<CategoryProduct> {
               'Product Price': value['Product Price'],
               'id': value['id'],
               'Product Discription': value['Product Discription'],
+              'Exclusive':
+                  value.containsKey('Exclusive') && value['Exclusive'] == true,
+              'BestSelling': value.containsKey('BestSelling') &&
+                  value['BestSelling'] == true,
             };
 
             if (widget.categoryname == 'All Products' ||

@@ -7,14 +7,14 @@ import 'package:hakikat_app_new/AdminSide/addevents.dart';
 
 import 'package:hakikat_app_new/Utils/colors.dart';
 
-class FarmerEventPage extends StatefulWidget {
-  const FarmerEventPage({super.key});
+class MainEventPage extends StatefulWidget {
+  const MainEventPage({super.key});
 
   @override
-  State<FarmerEventPage> createState() => _FarmerEventPageState();
+  State<MainEventPage> createState() => _MainEventPageState();
 }
 
-class _FarmerEventPageState extends State<FarmerEventPage> {
+class _MainEventPageState extends State<MainEventPage> {
   late Stream<QuerySnapshot> events;
   final CollectionReference eventcollection =
       FirebaseFirestore.instance.collection('events');

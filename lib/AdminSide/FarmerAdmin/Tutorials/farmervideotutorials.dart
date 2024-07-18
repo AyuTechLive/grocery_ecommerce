@@ -85,7 +85,7 @@ class _VideosListScreenState extends State<VideosListScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: isLoading ? _buildShimmerEffect() : _buildContent(),
+      body: _buildContent(),
     );
   }
 

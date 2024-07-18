@@ -12,6 +12,7 @@ import 'package:hakikat_app_new/AdminSide/addcategory.dart';
 import 'package:hakikat_app_new/AdminSide/addevents.dart';
 import 'package:hakikat_app_new/AdminSide/FarmerAdmin/addfarmervideos.dart';
 import 'package:hakikat_app_new/AdminSide/addproduct.dart';
+import 'package:hakikat_app_new/AdminSide/maineventpage.dart';
 import 'package:hakikat_app_new/AdminSide/removebanner.dart';
 import 'package:hakikat_app_new/AdminSide/testing.dart';
 import 'package:hakikat_app_new/AdminSide/testing2.dart';
@@ -85,7 +86,7 @@ class AdminPanel extends StatelessWidget {
                   context,
                   'Add Event',
                   Icons.event,
-                  AddEvent(),
+                  MainEventPage(),
                 ),
                 _buildAdminButton(
                   context,

@@ -3,9 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
-
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
 import 'package:hakikat_app_new/Utils/utils.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AddLecturesAdmin extends StatefulWidget {
   const AddLecturesAdmin({Key? key}) : super(key: key);
@@ -17,7 +19,7 @@ class AddLecturesAdmin extends StatefulWidget {
 class _AddLecturesAdminState extends State<AddLecturesAdmin> {
   bool loading = false;
   final postcontroller = TextEditingController();
-  late TextEditingController cousenamecontroller;
+
   final subjectcontroller = TextEditingController();
   final videotitlecontroller = TextEditingController();
   final videosubtitlecontroller = TextEditingController();
@@ -33,21 +35,38 @@ class _AddLecturesAdminState extends State<AddLecturesAdmin> {
   List<String> courses = [];
   List<String> subjects = [];
   int counter = 0;
+  File? _image;
 
   @override
   void initState() {
     super.initState();
-    cousenamecontroller = TextEditingController();
-    fetchCourses();
   }
 
-  void fetchCourses() async {
-    var querySnapshot =
-        await secondFirebaseFirestore.collection('All Courses').get();
-    for (var doc in querySnapshot.docs) {
-      courses.add(doc.id);
-    }
-    setState(() {});
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      }
+    });
+  }
+
+  Future<String> _uploadImage() async {
+    if (_image == null) return '';
+
+    final Reference storageRef =
+        FirebaseStorage.instanceFor(app: Firebase.app('secondary'))
+            .ref()
+            .child('video_images')
+            .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+    final UploadTask uploadTask = storageRef.putFile(_image!);
+    final TaskSnapshot taskSnapshot = await uploadTask;
+    final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+    return downloadUrl;
   }
 
   @override
@@ -60,7 +79,7 @@ class _AddLecturesAdminState extends State<AddLecturesAdmin> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        title: Text('Add Your Course Content'),
+        title: Text('Add Your Content'),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -97,14 +116,25 @@ class _AddLecturesAdminState extends State<AddLecturesAdmin> {
                       borderRadius: BorderRadius.circular(10)),
                 ),
               ),
+              SizedBox(height: height * 0.03),
+              ElevatedButton(
+                onPressed: _pickImage,
+                child: Text('Pick Image'),
+              ),
+              SizedBox(height: height * 0.02),
+              _image != null
+                  ? Image.file(_image!, height: 100)
+                  : Text('No image selected'),
               SizedBox(height: height * 0.05),
               RoundButton(
                 loading: loading,
                 title: 'Add Video Lecture',
-                onTap: () {
+                onTap: () async {
                   setState(() {
                     loading = true;
                   });
+
+                  String imageUrl = await _uploadImage();
 
                   String id = DateTime.now().millisecondsSinceEpoch.toString();
                   databaseRef = secondFirebaseDatabase.ref('videos');
@@ -113,7 +143,7 @@ class _AddLecturesAdminState extends State<AddLecturesAdmin> {
                     'Title': videotitlecontroller.text.toString(),
                     'Subtitle': videosubtitlecontroller.text.toString(),
                     'Video Link': videourlcontroller.text.toString(),
-                    'imageUrl': ''
+                    'imageUrl': imageUrl
                   }).then(
                     (value) {
                       Utils().toastMessage('Post Successfully Added');
@@ -125,6 +155,7 @@ class _AddLecturesAdminState extends State<AddLecturesAdmin> {
                         videosubtitlecontroller.clear();
                         videourlcontroller.clear();
                         videolectureno.clear();
+                        _image = null;
                       });
                     },
                   ).catchError((error) {
