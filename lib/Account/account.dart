@@ -9,6 +9,8 @@ import 'package:hakikat_app_new/AdminSide/adminpanel.dart';
 import 'package:hakikat_app_new/Auth/login.dart';
 import 'package:hakikat_app_new/Events/events_page.dart';
 import 'package:hakikat_app_new/OrderSucess/myorder.dart';
+import 'package:hakikat_app_new/Pdf/pdflist.dart';
+import 'package:hakikat_app_new/Referalsystem/referearn.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/utils.dart';
@@ -105,6 +107,7 @@ class _AccountState extends State<Account> {
                 nextScreen(context, MyOrdersScreen());
               },
             ),
+
             Divider(),
             AccountMenuCard(
               img: 'delivery',
@@ -132,9 +135,17 @@ class _AccountState extends State<Account> {
             Divider(),
             AccountMenuCard(
               img: 'notification',
-              title: 'Notifications',
+              title: 'Refer and Earn',
               ontap: () {
-                Utils().toastMessage('Currently Under Dev');
+                nextScreen(context, ReferEarn());
+              },
+            ),
+            Divider(),
+            AccountMenuCard(
+              img: 'orders',
+              title: 'Store Items',
+              ontap: () {
+                nextScreen(context, PdfListScreen());
               },
             ),
             // Divider(),

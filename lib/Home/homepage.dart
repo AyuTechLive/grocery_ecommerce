@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = true;
 
   int _currentIndex = 0;
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
 
   @override
   void initState() {
@@ -209,6 +209,45 @@ class _HomePageState extends State<HomePage> {
                                           child: Image.network(
                                             imageUrl,
                                             fit: BoxFit.fill,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[300],
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                child: Icon(
+                                                  Icons.image_not_supported,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              );
+                                            },
+                                            loadingBuilder: (context, child,
+                                                loadingProgress) {
+                                              if (loadingProgress == null)
+                                                return child;
+                                              return Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[200],
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                child: Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    value: loadingProgress
+                                                                .expectedTotalBytes !=
+                                                            null
+                                                        ? loadingProgress
+                                                                .cumulativeBytesLoaded /
+                                                            loadingProgress
+                                                                .expectedTotalBytes!
+                                                        : null,
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ),
                                       ),
@@ -344,7 +383,6 @@ class _HomePageState extends State<HomePage> {
             // Shimmer for banner
             Container(
               height: 200,
-              // color: Colors.white,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 color: Colors.white,
@@ -390,12 +428,14 @@ class _HomePageState extends State<HomePage> {
                             height: 16,
                             width: 100,
                             color: Colors.white,
+                            margin: EdgeInsets.symmetric(horizontal: 8),
                           ),
                           SizedBox(height: 4),
                           Container(
                             height: 16,
                             width: 80,
                             color: Colors.white,
+                            margin: EdgeInsets.symmetric(horizontal: 8),
                           ),
                         ],
                       ),
@@ -419,7 +459,7 @@ class _HomePageState extends State<HomePage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Container(
-          height: height * 0.3, // Set a fixed height or adjust as needed
+          height: height * 0.3,
           child: ListView.separated(
             padding:
                 EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.05),
@@ -432,7 +472,7 @@ class _HomePageState extends State<HomePage> {
             itemBuilder: (context, index) {
               Map<String, dynamic> product = productList[index];
               return Container(
-                width: constraints.maxWidth * 0.4, // Adjust the width as needed
+                width: constraints.maxWidth * 0.4,
                 child: Items(
                   ontap: () => navigateToProductDetails(context, product),
                   onadd: () => navigateToProductDetails(context, product),
@@ -525,5 +565,12 @@ class _HomePageState extends State<HomePage> {
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    searchcontroller.dispose();
+    super.dispose();
   }
 }
