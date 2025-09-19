@@ -1,16 +1,14 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hakikat_app_new/Account/addressscreen.dart';
-import 'package:hakikat_app_new/Explore/explore.dart';
 import 'package:hakikat_app_new/Home/Components/homecategroyitem.dart';
 import 'package:hakikat_app_new/Home/Components/items.dart';
 import 'package:hakikat_app_new/Home/Components/sectionheader.dart';
-import 'package:hakikat_app_new/Home/mainpage.dart';
-import 'package:hakikat_app_new/ItemsShowing/CategoryProducts.dart';
-import 'package:hakikat_app_new/ItemsShowing/Exclusiveitemshowing.dart';
-import 'package:hakikat_app_new/ProductDetails/productdetails.dart';
 import 'package:hakikat_app_new/Utils/appimg.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
@@ -40,6 +38,13 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   final CarouselSliderController _controller = CarouselSliderController();
 
+  // Responsive breakpoints
+  static const double webBreakpoint = 600;
+  static const double tabletBreakpoint = 900;
+
+  bool get isWeb => MediaQuery.of(context).size.width > webBreakpoint;
+  bool get isTablet => MediaQuery.of(context).size.width > tabletBreakpoint;
+
   @override
   void initState() {
     super.initState();
@@ -47,331 +52,581 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _navigateToAddressScreen(BuildContext context) async {
-    final selectedAddress = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddressScreen(
-          onAddressSelected: (address) {
-            setState(() {
-              _selectedAddress = address;
-            });
-          },
+    if (kIsWeb) {
+      context.push('/addresses');
+    } else {
+      final selectedAddress = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddressScreen(
+            onAddressSelected: (address) {
+              setState(() {
+                _selectedAddress = address;
+              });
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    if (selectedAddress != null) {
-      setState(() {
-        _selectedAddress = selectedAddress;
-      });
+      if (selectedAddress != null) {
+        setState(() {
+          _selectedAddress = selectedAddress;
+        });
+      }
     }
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await Future.delayed(const Duration(milliseconds: 500));
+    fetchProducts();
   }
 
   @override
   Widget build(BuildContext context) {
-    final Size screensize = MediaQuery.of(context).size;
-    final double height = screensize.height;
-    final double width = screensize.width;
-
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.location_pin),
-                IconButton(
-                  onPressed: () {
-                    _navigateToAddressScreen(context);
-                  },
-                  icon: SizedBox(
-                    width: width * 0.6,
-                    child: Text(
-                      overflow: TextOverflow.ellipsis,
-                      _selectedAddress ?? 'Select Address',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF4C4E4D),
-                        fontSize: 18,
-                        fontFamily: 'Gilroy',
-                        fontWeight: FontWeight.w600,
-                        height: 0,
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                    onPressed: () {
-                      _launchDialer('9672261265');
-                    },
-                    icon: Icon(
-                      Icons.call_outlined,
-                      color: AppColors.greenthemecolor,
-                    ))
-              ],
-            )
-          ],
-        ),
-      ),
+      backgroundColor: Colors.grey[50],
+      appBar: _buildAppBar(),
       body: _isLoading
           ? _buildShimmerEffect()
-          : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: width * 0.879,
-                    height: height * 0.057,
-                    decoration: ShapeDecoration(
-                      color: Color(0xFFF1F2F2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    child: Center(
-                      child: TextFormField(
-                        textAlign: TextAlign.justify,
-                        controller: searchcontroller,
-                        cursorColor: Color(0xFF4C4E4D),
-                        decoration: InputDecoration(
-                          icon: Padding(
-                            padding: EdgeInsets.only(left: width * 0.03),
-                            child: Icon(Icons.search),
-                          ),
-                          hintText: 'Search Store',
-                          iconColor: Color(0xFF4C4E4D),
-                          border: InputBorder.none,
-                        ),
-                        onTap: () {
-                          nextScreen(context, Explore());
-                        },
-                        onChanged: (value) {
-                          setState(() {});
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: height * 0.022),
-                  StreamBuilder<QuerySnapshot>(
-                    stream: fireStore2,
-                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      }
-                      if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      }
-                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return Text('No banners found.');
-                      }
-
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: height * 0.02),
-                          Center(
-                            child: CarouselSlider(
-                              carouselController: _controller,
-                              options: CarouselOptions(
-                                autoPlay: true,
-                                enlargeCenterPage: true,
-                                viewportFraction: 0.93,
-                                aspectRatio: 2.2,
-                                initialPage: 2,
-                                onPageChanged: (index, reason) {
-                                  setState(() {
-                                    _currentIndex = index;
-                                  });
-                                },
-                              ),
-                              items: snapshot.data!.docs.map((document) {
-                                String imageUrl = document['Banner Image Link'];
-                                print(imageUrl);
-                                return Builder(
-                                  builder: (BuildContext context) {
-                                    return InkWell(
-                                      onTap: () {
-                                        // Handle banner tap
-                                      },
-                                      child: Container(
-                                        height: 10,
-                                        width: 500,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          child: Image.network(
-                                            imageUrl,
-                                            fit: BoxFit.fill,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Container(
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey[300],
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
-                                                child: Icon(
-                                                  Icons.image_not_supported,
-                                                  color: Colors.grey[600],
-                                                ),
-                                              );
-                                            },
-                                            loadingBuilder: (context, child,
-                                                loadingProgress) {
-                                              if (loadingProgress == null)
-                                                return child;
-                                              return Container(
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey[200],
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
-                                                child: Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    value: loadingProgress
-                                                                .expectedTotalBytes !=
-                                                            null
-                                                        ? loadingProgress
-                                                                .cumulativeBytesLoaded /
-                                                            loadingProgress
-                                                                .expectedTotalBytes!
-                                                        : null,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                  SizedBox(height: height * 0.02),
-                  if (filteredProducts.isNotEmpty) ...[
-                    SizedBox(height: height * 0.02),
-                    Sectionheader(
-                      title: 'Exclusive Offer',
-                      ontap: () {
-                        nextScreen(
-                            context, ExclusiveItems(categoryname: 'Exclusive'));
-                      },
-                    ),
-                    buildProductList(filteredProducts, 5),
+          : RefreshIndicator(
+              onRefresh: _refreshData,
+              color: AppColors.greenthemecolor,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (kIsWeb) _buildWebHeader(),
+                    const SizedBox(height: 16),
+                    _buildSearchBar(),
+                    const SizedBox(height: 24),
+                    _buildBannerSection(),
+                    const SizedBox(height: 24),
+                    if (filteredProducts.isNotEmpty) _buildExclusiveSection(),
+                    _buildCategoriesSection(),
+                    const SizedBox(height: 24),
+                    if (_getBestSellingProducts().isNotEmpty)
+                      _buildBestSellingSection(),
+                    if (products.isNotEmpty) _buildAllProductsSection(),
+                    const SizedBox(height: 32),
                   ],
-                  SizedBox(height: height * 0.02),
-                  Sectionheader(
-                    title: 'Categories',
-                    ontap: () {
-                      Navigator.pushReplacement(context, MaterialPageRoute(
-                        builder: (context) {
-                          return MainPage(index: 1);
-                        },
-                      ));
-                    },
-                  ),
-                  StreamBuilder(
-                    stream: _categoriesCollection.snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      }
-                      if (!snapshot.hasData) {
-                        return CircularProgressIndicator();
-                      }
-                      final documents = snapshot.data!.docs;
-                      return SizedBox(
-                        height: height * 0.117,
-                        child: ListView.separated(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: width * 0.05),
-                          separatorBuilder: (context, index) {
-                            return SizedBox(width: width * 0.05);
-                          },
-                          itemCount: documents.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            final document = documents[index];
-                            final data = document.data() as Map?;
-                            if (data == null) {
-                              return SizedBox();
-                            }
-                            return HomeCategoryItems(
-                              img: data['Category Img'] ?? '',
-                              title: data['Category Name'] ?? '',
-                              ontap: () {
-                                nextScreen(
-                                  context,
-                                  CategoryProduct(
-                                    categoryname: data['Category Name'] ?? '',
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(height: height * 0.02),
-                  if (products
-                      .where((product) => product['BestSelling'] == true)
-                      .isNotEmpty) ...[
-                    SizedBox(height: height * 0.02),
-                    Sectionheader(
-                      title: 'Best Selling',
-                      ontap: () {
-                        nextScreen(context,
-                            ExclusiveItems(categoryname: 'BestSelling'));
-                      },
-                    ),
-                    buildProductList(
-                        products
-                            .where((product) => product['BestSelling'] == true)
-                            .toList(),
-                        5),
-                  ],
-                  SizedBox(height: height * 0.02),
-                  if (products.isNotEmpty) ...[
-                    SizedBox(height: height * 0.02),
-                    Sectionheader(
-                      title: 'All Products',
-                      ontap: () {
-                        nextScreen(context,
-                            CategoryProduct(categoryname: 'All Products'));
-                      },
-                    ),
-                    buildProductList(products, 5),
-                  ],
-                  SizedBox(height: height * 0.02),
-                ],
+                ),
               ),
             ),
     );
   }
 
-  Future<void> _launchDialer(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
+  PreferredSizeWidget? _buildAppBar() {
+    if (kIsWeb) return null;
+
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+      title: _buildAppBarContent(),
     );
-    await launchUrl(launchUri);
+  }
+
+  Widget _buildAppBarContent() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.location_pin, color: Colors.grey[600], size: 20),
+        const SizedBox(width: 4),
+        Expanded(
+          child: TextButton(
+            onPressed: () => _navigateToAddressScreen(context),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+            child: Text(
+              _selectedAddress ?? 'Select Address',
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF4C4E4D),
+                fontSize: 16,
+                fontFamily: 'Gilroy',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.greenthemecolor.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            onPressed: () => _launchDialer('9672261265'),
+            icon: Icon(
+              Icons.call_outlined,
+              color: AppColors.greenthemecolor,
+              size: 20,
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildWebHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.location_pin, color: Colors.grey[600]),
+          const SizedBox(width: 8),
+          TextButton(
+            onPressed: () => _navigateToAddressScreen(context),
+            child: Text(
+              _selectedAddress ?? 'Select Address',
+              style: const TextStyle(
+                color: Color(0xFF4C4E4D),
+                fontSize: 16,
+                fontFamily: 'Gilroy',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const Spacer(),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.greenthemecolor.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              onPressed: () => _launchDialer('9672261265'),
+              icon: Icon(
+                Icons.call_outlined,
+                color: AppColors.greenthemecolor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: searchcontroller,
+        cursorColor: const Color(0xFF4C4E4D),
+        decoration: InputDecoration(
+          prefixIcon: Container(
+            padding: const EdgeInsets.all(12),
+            child: Icon(
+              Icons.search_rounded,
+              color: Colors.grey[500],
+              size: 22,
+            ),
+          ),
+          hintText: 'Search for products, categories...',
+          hintStyle: TextStyle(
+            color: Colors.grey[500],
+            fontSize: isWeb ? 16 : 14,
+            fontWeight: FontWeight.w400,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
+        ),
+        onTap: () => context.go('/explore'),
+        onChanged: (value) => setState(() {}),
+      ),
+    );
+  }
+
+  Widget _buildBannerSection() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: fireStore2,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildBannerShimmer();
+        }
+        if (snapshot.hasError ||
+            !snapshot.hasData ||
+            snapshot.data!.docs.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          children: [
+            _buildBannerCarousel(snapshot.data!.docs),
+            const SizedBox(height: 16),
+            _buildBannerIndicators(snapshot.data!.docs.length),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildBannerCarousel(List<QueryDocumentSnapshot> banners) {
+    return CarouselSlider(
+      carouselController: _controller,
+      options: CarouselOptions(
+        autoPlay: true,
+        autoPlayInterval: const Duration(seconds: 4),
+        enlargeCenterPage: true,
+        viewportFraction: isWeb ? 0.95 : 0.93,
+        aspectRatio: isWeb ? 2.5 : 2.2,
+        height: isWeb ? 300 : null,
+        onPageChanged: (index, reason) {
+          setState(() => _currentIndex = index);
+        },
+      ),
+      items: banners.map((document) {
+        String imageUrl = document['Banner Image Link'] ?? '';
+        return _buildBannerItem(imageUrl);
+      }).toList(),
+    );
+  }
+
+  Widget _buildBannerItem(String imageUrl) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.network(
+          imageUrl,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.image_not_supported_outlined,
+                  color: Colors.grey[400],
+                  size: 48,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Image not available',
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Center(
+                child: CircularProgressIndicator(
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppColors.greenthemecolor),
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBannerIndicators(int length) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        length,
+        (index) => Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: _currentIndex == index ? 24 : 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: _currentIndex == index
+                ? AppColors.greenthemecolor
+                : Colors.grey[300],
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoriesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Sectionheader(
+          title: 'Categories',
+          ontap: () => context.go('/explore'),
+        ),
+        const SizedBox(height: 12),
+        StreamBuilder<QuerySnapshot>(
+          stream: _categoriesCollection.snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return _buildErrorMessage('Error loading categories');
+            }
+            if (!snapshot.hasData) {
+              return _buildCategoryShimmer();
+            }
+
+            final documents = snapshot.data!.docs;
+            if (documents.isEmpty) {
+              return _buildEmptyState('No categories available');
+            }
+
+            return SizedBox(
+              height: isWeb ? 120 : 100,
+              child: ListView.separated(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                separatorBuilder: (context, index) => const SizedBox(width: 12),
+                itemCount: documents.length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) =>
+                    _buildCategoryItem(documents[index]),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryItem(QueryDocumentSnapshot document) {
+    final data = document.data() as Map<String, dynamic>?;
+    if (data == null) return const SizedBox.shrink();
+
+    return HomeCategoryItems(
+      img: data['Category Img'] ?? '',
+      title: data['Category Name'] ?? '',
+      ontap: () => AppRoutes.goToCategory(context, data['Category Name'] ?? ''),
+    );
+  }
+
+  List<Map<String, dynamic>> _getBestSellingProducts() {
+    return products.where((product) => product['BestSelling'] == true).toList();
+  }
+
+  Widget _buildExclusiveSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Sectionheader(
+          title: 'Exclusive Offers',
+          ontap: () => context.push('/exclusive/Exclusive'),
+        ),
+        const SizedBox(height: 12),
+        _buildProductList(filteredProducts, 5),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildBestSellingSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Sectionheader(
+          title: 'Best Selling',
+          ontap: () => context.push('/exclusive/BestSelling'),
+        ),
+        const SizedBox(height: 12),
+        _buildProductList(_getBestSellingProducts(), 5),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildAllProductsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Sectionheader(
+          title: 'All Products',
+          ontap: () => AppRoutes.goToCategory(context, 'All Products'),
+        ),
+        const SizedBox(height: 12),
+        _buildProductList(products, 5),
+      ],
+    );
+  }
+
+  Widget _buildProductList(
+      List<Map<String, dynamic>> productList, int maxItems) {
+    if (productList.isEmpty) {
+      return _buildEmptyState('No products available');
+    }
+
+    return SizedBox(
+      height: isWeb ? 300 : 260,
+      child: ListView.separated(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        separatorBuilder: (context, index) => const SizedBox(width: 12),
+        itemCount:
+            productList.length > maxItems ? maxItems : productList.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) => _buildProductItem(productList[index]),
+      ),
+    );
+  }
+
+  Widget _buildProductItem(Map<String, dynamic> product) {
+    return SizedBox(
+      width: isWeb ? 200 : 160,
+      child: Items(
+        ontap: () => navigateToProductDetails(context, product),
+        onadd: () => navigateToProductDetails(context, product),
+        img: _getProductImage(product),
+        price: product['Product Price']?.toString() ?? '0',
+        title: product['Product Title'] ?? '',
+        subtitle: product['Product Subtitle'] ?? '',
+      ),
+    );
+  }
+
+  String _getProductImage(Map<String, dynamic> product) {
+    if (product['Product Img'] != null && product['Product Img'].isNotEmpty) {
+      return product['Product Img'][0];
+    }
+    return AppImage.defaultimgurl;
+  }
+
+  Widget _buildErrorMessage(String message) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, color: Colors.red[600]),
+          const SizedBox(width: 8),
+          Text(
+            message,
+            style: TextStyle(
+              color: Colors.red[600],
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(String message) {
+    return Container(
+      height: 100,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.inbox_outlined,
+              color: Colors.grey[400],
+              size: 32,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBannerShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        height: isWeb ? 200 : 180,
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: SizedBox(
+        height: 100,
+        child: ListView.separated(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          separatorBuilder: (context, index) => const SizedBox(width: 12),
+          itemCount: 4,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            return Container(
+              width: isWeb ? 200 : 160,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 
   Widget _buildShimmerEffect() {
@@ -381,64 +636,51 @@ class _HomePageState extends State<HomePage> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            // Shimmer for banner
+            // Search bar shimmer
             Container(
-              height: 200,
+              height: 56,
+              margin: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
                 color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
               ),
-              margin: EdgeInsets.all(16),
             ),
-            // Shimmer for product sections
+            // Banner shimmer
+            Container(
+              height: 180,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Categories shimmer
+            _buildCategoryShimmer(),
+            const SizedBox(height: 24),
+            // Product sections shimmer
             for (int i = 0; i < 3; i++) ...[
-              // Section header shimmer
               Container(
                 height: 24,
                 width: 150,
                 color: Colors.white,
-                margin: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               ),
-              // Product items shimmer
-              Container(
-                height: 200,
+              SizedBox(
+                height: 240,
                 child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
                   itemCount: 5,
                   itemBuilder: (context, index) {
                     return Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey[300]!),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
                       width: 160,
                       margin:
                           EdgeInsets.only(left: 16, right: index == 4 ? 16 : 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.white,
-                            ),
-                            height: 140,
-                          ),
-                          SizedBox(height: 8),
-                          Container(
-                            height: 16,
-                            width: 100,
-                            color: Colors.white,
-                            margin: EdgeInsets.symmetric(horizontal: 8),
-                          ),
-                          SizedBox(height: 4),
-                          Container(
-                            height: 16,
-                            width: 80,
-                            color: Colors.white,
-                            margin: EdgeInsets.symmetric(horizontal: 8),
-                          ),
-                        ],
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     );
                   },
@@ -451,68 +693,36 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildProductList(
-      List<Map<String, dynamic>> productList, int maxItems) {
-    final Size screensize = MediaQuery.of(context).size;
-    final double height = screensize.height;
-    final double width = screensize.width;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Container(
-          height: height * 0.3,
-          child: ListView.separated(
-            padding:
-                EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.05),
-            separatorBuilder: (context, index) {
-              return SizedBox(width: constraints.maxWidth * 0.05);
-            },
-            itemCount:
-                productList.length > maxItems ? maxItems : productList.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) {
-              Map<String, dynamic> product = productList[index];
-              return Container(
-                width: constraints.maxWidth * 0.4,
-                child: Items(
-                  ontap: () => navigateToProductDetails(context, product),
-                  onadd: () => navigateToProductDetails(context, product),
-                  img: (product['Product Img'] != null &&
-                          product['Product Img'].isNotEmpty)
-                      ? product['Product Img'][0]
-                      : AppImage.defaultimgurl,
-                  price: product['Product Price'],
-                  title: product['Product Title'] ?? '',
-                  subtitle: product['Product Subtitle'] ?? '',
-                ),
-              );
-            },
-          ),
-        );
-      },
+  Future<void> _launchDialer(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
     );
+    try {
+      await launchUrl(launchUri);
+    } catch (e) {
+      debugPrint('Could not launch $launchUri: $e');
+    }
   }
 
   void navigateToProductDetails(
       BuildContext context, Map<String, dynamic> product) {
-    nextScreen(
+    AppRoutes.goToProductDetails(
       context,
-      ProductDetails(
-        discription: product['Product Discription'] ?? '',
-        imageUrls: List<String>.from(
+      product['id'],
+      {
+        'discription': product['Product Discription'] ?? '',
+        'imageUrls': List<String>.from(
             product['Product Img'] ?? [AppImage.defaultimgurl]),
-        orderid: product['id'],
-        img: (product['Product Img'] != null &&
-                product['Product Img'].isNotEmpty)
-            ? product['Product Img'][0]
-            : AppImage.defaultimgurl,
-        maxquantity: product['Product Stock'] != null
+        'orderid': product['id'],
+        'img': _getProductImage(product),
+        'maxquantity': product['Product Stock'] != null
             ? int.tryParse(product['Product Stock'].toString()) ?? 0
             : 0,
-        price: product['Product Price'],
-        title: product['Product Title'] ?? '',
-        subtitle: product['Product Subtitle'] ?? '',
-      ),
+        'price': product['Product Price'],
+        'title': product['Product Title'] ?? '',
+        'subtitle': product['Product Subtitle'] ?? '',
+      },
     );
   }
 

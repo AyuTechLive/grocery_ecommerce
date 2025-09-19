@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hakikat_app_new/Cart/components/carttile.dart';
-import 'package:hakikat_app_new/CheckoutPage/democheckout.dart';
 import 'package:hakikat_app_new/Utils/appimg.dart';
 import 'package:hakikat_app_new/Utils/checkuserauthentication.dart';
 import 'package:hakikat_app_new/Utils/colors.dart';
+import 'package:hakikat_app_new/Utils/responsive_helper.dart';
 import 'package:hakikat_app_new/Utils/widget.dart';
 
 class CartScreen extends StatefulWidget {
@@ -36,7 +38,6 @@ class _CartScreenState extends State<CartScreen> {
       QuerySnapshot cartSnapshot = await userDocRef.collection('Cart').get();
 
       if (cartSnapshot.docs.isEmpty) {
-        // Cart collection exists but is empty, or doesn't exist
         if (mounted) {
           setState(() {
             cartItems = [];
@@ -109,150 +110,303 @@ class _CartScreenState extends State<CartScreen> {
     final Size screensize = MediaQuery.of(context).size;
     final double height = screensize.height;
     final double width = screensize.width;
+    final isWeb = kIsWeb;
+
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text('Cart'),
+      appBar: isWeb
+          ? null
+          : AppBar(
+              automaticallyImplyLeading: false,
+              title: Text('Cart'),
+            ),
+      body: ResponsiveWidget(
+        mobile: _buildMobileLayout(height, width),
+        tablet: _buildTabletLayout(height, width),
+        desktop: _buildDesktopLayout(height, width),
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : cartItems.isEmpty
-              ? Center(child: Text('No items in your cart'))
-              : Column(
+    );
+  }
+
+  Widget _buildMobileLayout(double height, double width) {
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : cartItems.isEmpty
+            ? Center(child: Text('No items in your cart'))
+            : Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: cartItems.length,
+                      itemBuilder: (context, index) {
+                        Map<String, dynamic> item = cartItems[index];
+                        return _buildCartItem(item, height, width);
+                      },
+                    ),
+                  ),
+                  _buildCheckoutButton(height, width),
+                  SizedBox(height: height * 0.01)
+                ],
+              );
+  }
+
+  Widget _buildTabletLayout(double height, double width) {
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : cartItems.isEmpty
+            ? Center(child: Text('No items in your cart'))
+            : Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
                   children: [
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: cartItems.length,
-                        itemBuilder: (context, index) {
-                          Map<String, dynamic> item = cartItems[index];
-                          return Dismissible(
-                            key: Key(item['id']),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Icon(Icons.delete, color: Colors.white),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Delete',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            confirmDismiss: (direction) async {
-                              return await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text("Confirm"),
-                                    content: Text(
-                                        "Are you sure you want to delete this item?"),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(false),
-                                        child: Text("Cancel"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(true),
-                                        child: Text("Delete"),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            onDismissed: (direction) {
-                              _deleteCartItem(item['id']);
-                            },
-                            child: CartTile(
-                              onremove: () async {
-                                bool shouldDelete =
-                                    await _showDeleteConfirmationDialog(
-                                        context, item['id']);
-                                if (shouldDelete) {
-                                  _deleteCartItem(item['id']);
-                                }
-                              },
-                              title: item['Product Title'] ?? '',
-                              subtitle: item['Product Subtitle'] ?? '',
-                              price: (int.parse(item['Product Price']) *
-                                          item['quantity'])
-                                      .toString() ??
-                                  '',
-                              quantity: item['quantity'],
-                              img: item['Product Img'],
-                            ),
-                          );
-                        },
+                    Text(
+                      'Shopping Cart',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        nextScreen(
-                            context,
-                            DemoCheckout(
-                                walletbalance: walletBalance.toString(),
-                                cartItems: cartItems,
-                                grandTotal: grandTotal));
-                      },
-                      icon: Container(
-                        width: width * 0.879,
-                        height: height * 0.074,
-                        decoration: ShapeDecoration(
-                          color: AppColors.greenthemecolor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(19),
-                          ),
+                    SizedBox(height: 20),
+                    Expanded(
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: 600),
+                        child: ListView.builder(
+                          itemCount: cartItems.length,
+                          itemBuilder: (context, index) {
+                            Map<String, dynamic> item = cartItems[index];
+                            return _buildCartItem(item, height, width);
+                          },
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+                    ),
+                    Container(
+                      constraints: BoxConstraints(maxWidth: 400),
+                      child: _buildCheckoutButton(height, width),
+                    ),
+                    SizedBox(height: 20)
+                  ],
+                ),
+              );
+  }
+
+  Widget _buildDesktopLayout(double height, double width) {
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : cartItems.isEmpty
+            ? Center(child: Text('No items in your cart'))
+            : Padding(
+                padding: EdgeInsets.all(32),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Cart Items
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Shopping Cart',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: cartItems.length,
+                              itemBuilder: (context, index) {
+                                Map<String, dynamic> item = cartItems[index];
+                                return _buildCartItem(item, height, width);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 32),
+                    // Order Summary
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        padding: EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Spacer(),
-                            Spacer(),
                             Text(
-                              'Go to Checkout',
+                              'Order Summary',
                               style: TextStyle(
-                                color: Color(0xFFFCFCFC),
-                                fontSize: 18,
-                                fontFamily: 'Gilroy',
-                                fontWeight: FontWeight.w600,
-                                height: 0.06,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Spacer(),
-                            Text(
-                              "₹" + grandTotal.toString(),
-                              style: TextStyle(
-                                color: Color(0xFFFCFCFC),
-                                fontSize: 18,
-                                fontFamily: 'Gilroy',
-                                fontWeight: FontWeight.w600,
-                                height: 0.06,
-                              ),
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Items (${cartItems.length})'),
+                                Text('₹${grandTotal.toStringAsFixed(2)}'),
+                              ],
                             ),
-                            Spacer()
+                            Divider(height: 32),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Total',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '₹${grandTotal.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.greenthemecolor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 24),
+                            SizedBox(
+                              width: double.infinity,
+                              child: _buildCheckoutButton(height, width),
+                            ),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: height * 0.01,
-                    )
                   ],
                 ),
+              );
+  }
+
+  Widget _buildCartItem(
+      Map<String, dynamic> item, double height, double width) {
+    return Dismissible(
+      key: Key(item['id']),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Icon(Icons.delete, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Delete',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+      confirmDismiss: (direction) async {
+        return await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Confirm"),
+              content: Text("Are you sure you want to delete this item?"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text("Delete"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      onDismissed: (direction) {
+        _deleteCartItem(item['id']);
+      },
+      child: CartTile(
+        onremove: () async {
+          bool shouldDelete =
+              await _showDeleteConfirmationDialog(context, item['id']);
+          if (shouldDelete) {
+            _deleteCartItem(item['id']);
+          }
+        },
+        title: item['Product Title'] ?? '',
+        subtitle: item['Product Subtitle'] ?? '',
+        price:
+            (int.parse(item['Product Price']) * item['quantity']).toString() ??
+                '',
+        quantity: item['quantity'],
+        img: item['Product Img'],
+      ),
+    );
+  }
+
+  Widget _buildCheckoutButton(double height, double width) {
+    return IconButton(
+      onPressed: () {
+        AppRoutes.goToCheckout(
+          context,
+          cartItems,
+          grandTotal,
+          walletBalance.toString(),
+        );
+      },
+      icon: Container(
+        width: kIsWeb ? double.infinity : width * 0.879,
+        height: height * 0.074,
+        decoration: ShapeDecoration(
+          color: AppColors.greenthemecolor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(19),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Spacer(),
+            Spacer(),
+            Text(
+              'Go to Checkout',
+              style: TextStyle(
+                color: Color(0xFFFCFCFC),
+                fontSize: 18,
+                fontFamily: 'Gilroy',
+                fontWeight: FontWeight.w600,
+                height: 0.06,
+              ),
+            ),
+            Spacer(),
+            Text(
+              "₹${grandTotal.toStringAsFixed(2)}",
+              style: TextStyle(
+                color: Color(0xFFFCFCFC),
+                fontSize: 18,
+                fontFamily: 'Gilroy',
+                fontWeight: FontWeight.w600,
+                height: 0.06,
+              ),
+            ),
+            Spacer()
+          ],
+        ),
+      ),
     );
   }
 
