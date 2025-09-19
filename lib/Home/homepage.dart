@@ -190,6 +190,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               items: snapshot.data!.docs.map((document) {
                                 String imageUrl = document['Banner Image Link'];
+                                print(imageUrl);
                                 return Builder(
                                   builder: (BuildContext context) {
                                     return InkWell(

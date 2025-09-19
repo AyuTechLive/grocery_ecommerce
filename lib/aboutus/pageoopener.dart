@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class PageOpener extends StatefulWidget {
@@ -26,21 +26,21 @@ class _PageOpenerState extends State<PageOpener> {
       appBar: AppBar(),
       body: Stack(
         children: [
-          InAppWebView(
-            initialUrlRequest: URLRequest(url: WebUri(widget.url)),
-            initialOptions: InAppWebViewGroupOptions(
-              crossPlatform: InAppWebViewOptions(),
-            ),
-            onWebViewCreated: (InAppWebViewController controller) {},
-            onLoadStart: (InAppWebViewController controller, Uri? url) {},
-            onLoadStop: (InAppWebViewController controller, Uri? url) {},
-            onProgressChanged:
-                (InAppWebViewController controller, int progress) {
-              setState(() {
-                this.progress = progress / 100;
-              });
-            },
-          ),
+          // InAppWebView(
+          //   initialUrlRequest: URLRequest(url: WebUri(widget.url)),
+          //   initialOptions: InAppWebViewGroupOptions(
+          //     crossPlatform: InAppWebViewOptions(),
+          //   ),
+          //   onWebViewCreated: (InAppWebViewController controller) {},
+          //   onLoadStart: (InAppWebViewController controller, Uri? url) {},
+          //   onLoadStop: (InAppWebViewController controller, Uri? url) {},
+          //   onProgressChanged:
+          //       (InAppWebViewController controller, int progress) {
+          //     setState(() {
+          //       this.progress = progress / 100;
+          //     });
+          //   },
+          // ),
           if (progress < 1.0)
             Positioned(
               top: height * 0.5,
