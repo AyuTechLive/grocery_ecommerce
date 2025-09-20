@@ -80,7 +80,7 @@ class _WebNavigationWrapperState extends State<WebNavigationWrapper> {
             ),
             const SizedBox(width: 12),
             const Text(
-              'Hakeekat',
+              'Hakeeqat',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

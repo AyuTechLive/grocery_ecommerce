@@ -1,1 +1,39 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"hakeekat-naturals","appId":"1:671942765975:android:340301246d1c43f5f5e8d2","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"hakeekat-naturals","configurations":{"android":"1:671942765975:android:340301246d1c43f5f5e8d2","ios":"1:671942765975:ios:427018d71ddba190f5e8d2","macos":"1:671942765975:ios:427018d71ddba190f5e8d2","web":"1:671942765975:web:d0fa236892f96f89f5e8d2","windows":"1:671942765975:web:42e41bf094b158c5f5e8d2"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "hakeekat-naturals",
+          "appId": "1:671942765975:android:340301246d1c43f5f5e8d2",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "hakeekat-naturals",
+          "configurations": {
+            "android": "1:671942765975:android:340301246d1c43f5f5e8d2",
+            "ios": "1:671942765975:ios:427018d71ddba190f5e8d2",
+            "macos": "1:671942765975:ios:427018d71ddba190f5e8d2",
+            "web": "1:671942765975:web:d0fa236892f96f89f5e8d2",
+            "windows": "1:671942765975:web:42e41bf094b158c5f5e8d2"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

@@ -94,6 +94,7 @@ class _ProductDetailsState extends State<ProductDetails>
   }
 
   bool get isWeb => kIsWeb || MediaQuery.of(context).size.width > 600;
+  bool get isMobile => !isWeb && MediaQuery.of(context).size.width <= 600;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +108,10 @@ class _ProductDetailsState extends State<ProductDetails>
         tablet: _buildTabletLayout(screenSize.height, screenSize.width),
         desktop: _buildDesktopLayout(screenSize.height, screenSize.width),
       ),
-      bottomNavigationBar: isWeb ? null : _buildBottomBar(),
+      // Fixed bottom navigation bar for mobile
+      bottomNavigationBar: isMobile ? _buildBottomBar() : null,
+      // Ensure the body content doesn't get hidden behind the bottom bar
+      resizeToAvoidBottomInset: false,
     );
   }
 
@@ -171,8 +175,9 @@ class _ProductDetailsState extends State<ProductDetails>
       child: Column(
         children: [
           _buildImageCarousel(height, width),
-          _buildProductInfoCard(height, width),
-          const SizedBox(height: 24),
+          _buildProductInfoCard(height, width, isMobile: true),
+          // Add safe area padding to prevent content from hiding behind bottom bar
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 80),
         ],
       ),
     );
@@ -391,7 +396,7 @@ class _ProductDetailsState extends State<ProductDetails>
   }
 
   Widget _buildProductInfoCard(double height, double width,
-      {bool isTablet = false, bool isDesktop = false}) {
+      {bool isMobile = false, bool isTablet = false, bool isDesktop = false}) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Container(
@@ -418,10 +423,13 @@ class _ProductDetailsState extends State<ProductDetails>
             _buildQuantitySelector(height, width),
             const SizedBox(height: 24),
             _buildProductDetails(),
-            if (isTablet || isDesktop) ...[
-              const SizedBox(height: 32),
-              _buildAddToCartButton(height, width),
-            ],
+            // Show button for tablet and desktop, not for mobile (mobile uses bottom bar)
+            // if (isTablet || isDesktop) ...[
+            //   const SizedBox(height: 32),
+            //   _buildAddToCartButton(height, width),
+            // ], const SizedBox(height: 24),
+            const SizedBox(height: 24),
+            _buildAddToCartButton(height, width),
           ],
         ),
       ),
@@ -732,21 +740,24 @@ class _ProductDetailsState extends State<ProductDetails>
     );
   }
 
+  // Fixed bottom bar with proper SafeArea handling
   Widget _buildBottomBar() {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
       child: SafeArea(
-        child: _buildAddToCartButton(0, 0),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          child: _buildAddToCartButton(0, 0),
+        ),
       ),
     );
   }
