@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hakikat_app_new/Utils/roundbutton.dart';
 import 'package:hakikat_app_new/Utils/utils.dart';
@@ -21,6 +23,7 @@ class _AddBannerState extends State<AddBanner> {
 
   final fireStore = FirebaseFirestore.instance.collection('Banners');
   File? _image;
+  Uint8List? _webImage; // For web platform
   firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
   final picker = ImagePicker();
@@ -30,17 +33,29 @@ class _AddBannerState extends State<AddBanner> {
       source: ImageSource.gallery,
       imageQuality: 80,
     );
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
+
+    if (pickedFile != null) {
+      if (kIsWeb) {
+        // For web platform
+        final bytes = await pickedFile.readAsBytes();
+        setState(() {
+          _webImage = bytes;
+          _image = null;
+        });
       } else {
-        Utils().toastMessage('No image picked');
+        // For mobile platforms
+        setState(() {
+          _image = File(pickedFile.path);
+          _webImage = null;
+        });
       }
-    });
+    } else {
+      Utils().toastMessage('No image picked');
+    }
   }
 
   Future<void> handleImageUpload() async {
-    if (_image != null) {
+    if (_image != null || _webImage != null) {
       try {
         setState(() {
           isImageUploading = true;
@@ -56,6 +71,35 @@ class _AddBannerState extends State<AddBanner> {
       }
     } else {
       Utils().toastMessage('No image selected');
+    }
+  }
+
+  Widget _buildImageContainer() {
+    if (kIsWeb && _webImage != null) {
+      // For web platform
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.memory(
+          _webImage!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
+      );
+    } else if (!kIsWeb && _image != null) {
+      // For mobile platforms
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.file(
+          _image!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
+      );
+    } else {
+      // No image selected
+      return Icon(Icons.add_a_photo, size: 50, color: Colors.grey);
     }
   }
 
@@ -84,7 +128,7 @@ class _AddBannerState extends State<AddBanner> {
             InkWell(
               onTap: () async {
                 await getImageFromGallery();
-                if (_image != null) {
+                if (_image != null || _webImage != null) {
                   await handleImageUpload();
                 }
               },
@@ -94,12 +138,7 @@ class _AddBannerState extends State<AddBanner> {
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: _image != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.file(_image!, fit: BoxFit.cover),
-                      )
-                    : Icon(Icons.add_a_photo, size: 50, color: Colors.grey),
+                child: _buildImageContainer(),
               ),
             ),
             SizedBox(height: 20),
@@ -158,18 +197,28 @@ class _AddBannerState extends State<AddBanner> {
   }
 
   Future<String> uploadImage() async {
-    if (_image == null) {
+    if (_image == null && _webImage == null) {
       throw Exception('No image file selected');
     }
-    String fileExtension = _image!.path.split('.').last;
-    String fileName = '${DateTime.now().microsecondsSinceEpoch}.$fileExtension';
+
+    String fileName = '${DateTime.now().microsecondsSinceEpoch}.jpg';
     firebase_storage.Reference ref = storage.ref('/banners/$fileName');
     firebase_storage.SettableMetadata metadata =
         firebase_storage.SettableMetadata(
-      contentType: 'image/$fileExtension',
+      contentType: 'image/jpeg',
       contentDisposition: 'inline; filename="$fileName"',
     );
-    firebase_storage.UploadTask uploadTask = ref.putFile(_image!, metadata);
+
+    firebase_storage.UploadTask uploadTask;
+
+    if (kIsWeb) {
+      // For web platform
+      uploadTask = ref.putData(_webImage!, metadata);
+    } else {
+      // For mobile platforms
+      uploadTask = ref.putFile(_image!, metadata);
+    }
+
     await uploadTask;
     String downloadURL = await ref.getDownloadURL();
     return downloadURL;

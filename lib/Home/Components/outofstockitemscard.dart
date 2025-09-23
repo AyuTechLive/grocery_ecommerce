@@ -8,147 +8,272 @@ class OutofStockItemCard extends StatelessWidget {
   final String img;
   final VoidCallback ontap;
   final VoidCallback onadd;
-  const OutofStockItemCard(
-      {super.key,
-      required this.title,
-      required this.subtitle,
-      required this.ontap,
-      required this.onadd,
-      required this.img,
-      required this.price});
+
+  const OutofStockItemCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.ontap,
+    required this.onadd,
+    required this.img,
+    required this.price,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final Size screensize = MediaQuery.of(context).size;
-    final double height = screensize.height;
-    final double width = screensize.width;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWeb = screenWidth > 600;
+
     return InkWell(
       onTap: ontap,
+      borderRadius: BorderRadius.circular(16),
       child: Stack(
         children: [
           Container(
-            width: width * 0.4186,
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                side: BorderSide(width: 1, color: Color(0xFFE2E2E2)),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              shadows: [
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.red[200]!),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
                 BoxShadow(
-                  color: Color(0x00000000),
+                  color: Colors.red.withOpacity(0.08),
                   blurRadius: 12,
-                  offset: Offset(0, 6),
-                  spreadRadius: 0,
-                )
+                  offset: const Offset(0, 4),
+                ),
               ],
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: height * (0.028)),
-                Container(
-                  width: width * 0.241,
-                  height: height * 0.086,
-                  child: Image.network(
-                    img,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                SizedBox(height: height * 0.03),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: Color(0xFF181725),
-                        fontSize: 16,
-                        fontFamily: 'Gilroy-Bold',
-                        fontWeight: FontWeight.w600,
-                        height: 0.07,
-                        letterSpacing: 0.10,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: height * 0.030,
-                ),
-                Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: width * 0.04),
-                    child: Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: Color(0xFF7C7C7C),
-                        fontSize: 14,
-                        fontFamily: 'Gilroy-Medium',
-                        fontWeight: FontWeight.w400,
-                        height: 0.09,
-                      ),
-                    ),
-                  ),
-                ]),
-                SizedBox(
-                  height: height * 0.02,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Spacer(),
-                    Text(
-                      '₹ ${price}',
-                      style: TextStyle(
-                        color: Color(0xFF181725),
-                        fontSize: 18,
-                        fontFamily: 'Gilroy',
-                        fontWeight: FontWeight.w600,
-                        height: 0.06,
-                        letterSpacing: 0.10,
-                      ),
-                    ),
-                    Spacer(),
-                    IconButton(
-                        onPressed: onadd,
-                        icon: Container(
-                          width: width * 0.1103,
-                          height: height * 0.050,
-                          decoration: ShapeDecoration(
-                            color: AppColors.greenthemecolor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(17),
+                // Image Section
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Stack(
+                        children: [
+                          Image.network(
+                            img,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            color: Colors.grey.withOpacity(0.3),
+                            colorBlendMode: BlendMode.darken,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.red[400]!,
+                                    ),
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.image_not_supported_outlined,
+                                      color: Colors.grey[400],
+                                      size: isWeb ? 32 : 24,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'No Image',
+                                      style: TextStyle(
+                                        color: Colors.grey[500],
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                          // Overlay to indicate out of stock
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.black.withOpacity(0.1),
+                              ),
+                              child: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black54,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    Icons.block,
+                                    color: Colors.white,
+                                    size: isWeb ? 24 : 20,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                          child: Center(
-                            child: Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                            ),
-                          ),
-                        )),
-                    Spacer(),
-                  ],
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                SizedBox(height: height * 0.01),
+
+                // Content Section
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Title and Subtitle
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color:
+                                    Colors.grey[600], // Dimmed for out of stock
+                                fontSize: isWeb ? 16 : 14,
+                                fontFamily: 'Gilroy',
+                                fontWeight: FontWeight.w600,
+                                height: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              subtitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.grey[500],
+                                fontSize: isWeb ? 14 : 12,
+                                fontFamily: 'Gilroy',
+                                fontWeight: FontWeight.w400,
+                                height: 1.2,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        // Price and Edit Button
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '₹$price',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: isWeb ? 16 : 14,
+                                  fontFamily: 'Gilroy',
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.2,
+                                  decoration: TextDecoration.lineThrough,
+                                  decorationColor: Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: onadd,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: EdgeInsets.all(isWeb ? 8 : 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.red[600],
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.red.withOpacity(0.3),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: isWeb ? 20 : 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
+
+          // Out of Stock Badge
           Positioned(
-            top: 10,
-            right: 10,
+            top: 8,
+            right: 8,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.red,
+                color: Colors.red[600],
                 borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.red.withOpacity(0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              child: Text(
-                'Out of Stock',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.block,
+                    color: Colors.white,
+                    size: 12,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Out of Stock',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isWeb ? 12 : 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -8,136 +8,195 @@ class Items extends StatelessWidget {
   final String img;
   final VoidCallback ontap;
   final VoidCallback onadd;
-  const Items(
-      {super.key,
-      required this.title,
-      required this.subtitle,
-      required this.ontap,
-      required this.onadd,
-      required this.img,
-      required this.price});
+
+  const Items({
+    Key? key,
+    required this.title,
+    required this.subtitle,
+    required this.ontap,
+    required this.onadd,
+    required this.img,
+    required this.price,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final Size screensize = MediaQuery.of(context).size;
-    final double height = screensize.height;
-    final double width = screensize.width;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWeb = screenWidth > 600;
+
     return InkWell(
-      onTap: ontap,
+      onTap: onadd,
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        width: width * 0.4186,
-        //height: height * 0.277,
-        decoration: ShapeDecoration(
-          shape: RoundedRectangleBorder(
-            side: BorderSide(width: 1, color: Color(0xFFE2E2E2)),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          shadows: [
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.grey[200]!),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x00000000),
-              blurRadius: 12,
-              offset: Offset(0, 6),
-              spreadRadius: 0,
-            )
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
           ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: height * (0.028)),
-            Container(
-              width: width * 0.241,
-              height: height * 0.086,
-              child: Image.network(
-                img,
-                fit: BoxFit.fill,
+            // Image Section
+            Expanded(
+              flex: 3,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    img,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.greenthemecolor,
+                            ),
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.image_not_supported_outlined,
+                              color: Colors.grey[400],
+                              size: isWeb ? 32 : 24,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'No Image',
+                              style: TextStyle(
+                                color: Colors.grey[500],
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
-            SizedBox(height: height * 0.03),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Color(0xFF181725),
-                    fontSize: 16,
-                    fontFamily: 'Gilroy-Bold',
-                    fontWeight: FontWeight.w600,
-                    height: 0.07,
-                    letterSpacing: 0.10,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: height * 0.030,
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              Padding(
-                padding: EdgeInsets.only(left: width * 0.04),
-                child: Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: Color(0xFF7C7C7C),
-                    fontSize: 14,
-                    fontFamily: 'Gilroy-Medium',
-                    fontWeight: FontWeight.w400,
-                    height: 0.09,
-                  ),
+
+            // Content Section
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Title and Subtitle
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: const Color(0xFF181725),
+                            fontSize: isWeb ? 16 : 14,
+                            fontFamily: 'Gilroy',
+                            fontWeight: FontWeight.w600,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: const Color(0xFF7C7C7C),
+                            fontSize: isWeb ? 14 : 12,
+                            fontFamily: 'Gilroy',
+                            fontWeight: FontWeight.w400,
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Price and Add Button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '₹$price',
+                            style: TextStyle(
+                              color: const Color(0xFF181725),
+                              fontSize: isWeb ? 16 : 14,
+                              fontFamily: 'Gilroy',
+                              fontWeight: FontWeight.w700,
+                              height: 1.2,
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: onadd,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: EdgeInsets.all(isWeb ? 8 : 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.greenthemecolor,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.greenthemecolor
+                                      .withOpacity(0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                              size: isWeb ? 20 : 16,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ]),
-            SizedBox(
-              height: height * 0.02,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Spacer(),
-                Text(
-                  '₹ ${price}',
-                  style: TextStyle(
-                    color: Color(0xFF181725),
-                    fontSize: 18,
-                    fontFamily: 'Gilroy',
-                    fontWeight: FontWeight.w600,
-                    height: 0.06,
-                    letterSpacing: 0.10,
-                  ),
-                ),
-                Spacer(),
-                IconButton(
-                    onPressed: onadd,
-                    icon: Container(
-                      width: width * 0.1103,
-                      height: height * 0.050,
-                      decoration: ShapeDecoration(
-                        color: AppColors.greenthemecolor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(17),
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.edit,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )),
-                Spacer(),
-                // Container(
-                //   width: width * 0.1103,
-                //   height: height * 0.050,
-                //   decoration: ShapeDecoration(
-                //     color: Color(0xFF53B175),
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(17),
-                //     ),
-                //   ),
-                // )
-              ],
-            )
           ],
         ),
       ),

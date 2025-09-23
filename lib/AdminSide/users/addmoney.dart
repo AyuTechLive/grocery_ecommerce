@@ -17,6 +17,48 @@ class _AddMoneyState extends State<AddMoney> {
   String _searchQuery = '';
   bool _isSearching = false;
 
+  final int _pageSize = 10;
+  DocumentSnapshot? _lastDocument;
+  bool _hasMoreData = true;
+  List<DocumentSnapshot> _users = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    if (!_hasMoreData || _isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    Query query = _usersCollection.orderBy('Email').limit(_pageSize);
+
+    if (_lastDocument != null) {
+      query = query.startAfterDocument(_lastDocument!);
+    }
+
+    final snapshot = await query.get();
+
+    if (snapshot.docs.length < _pageSize) {
+      _hasMoreData = false;
+    }
+
+    _users.addAll(snapshot.docs);
+
+    if (snapshot.docs.isNotEmpty) {
+      _lastDocument = snapshot.docs.last;
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   Future<void> _updateWalletBalance(String userId, String amount, String bonus,
       bool isAdd, String remark) async {
     try {
@@ -35,7 +77,7 @@ class _AddMoneyState extends State<AddMoney> {
         double newBalanceValue = isAdd
             ? currentBalanceValue + amountValue
             : currentBalanceValue - amountValue;
-        double newBonusValue = currentBonusValue + bonusValue;
+        double newBonusValue = bonusValue;
 
         String newBalance = newBalanceValue.toStringAsFixed(2);
         String newBonus = newBonusValue.toStringAsFixed(2);
@@ -52,6 +94,18 @@ class _AddMoneyState extends State<AddMoney> {
           'date': DateTime.now(),
           'remarks': remark
         });
+
+        // Check for referral bonus
+        if (isAdd && amountValue >= 1000) {
+          int referralCounter = data['ReferralCounter'] ?? 0;
+          if (referralCounter == 0 && data['ReferredBy'] != null) {
+            String referrerEmail = data['ReferredBy'];
+            await _addReferralBonus(referrerEmail);
+
+            // Update referral counter to 1
+            await userDoc.update({'ReferralCounter': 1});
+          }
+        }
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -76,81 +130,139 @@ class _AddMoneyState extends State<AddMoney> {
     }
   }
 
+  Future<void> _addReferralBonus(String referrerEmail) async {
+    try {
+      QuerySnapshot referrerQuery =
+          await _usersCollection.where('Email', isEqualTo: referrerEmail).get();
+
+      if (referrerQuery.docs.isNotEmpty) {
+        DocumentSnapshot referrerDoc = referrerQuery.docs.first;
+        String referrerId = referrerDoc.id;
+        Map<String, dynamic> referrerData =
+            referrerDoc.data() as Map<String, dynamic>;
+
+        double currentWallet = double.parse(referrerData['Wallet'] ?? '0');
+        double currentBonus = double.parse(referrerData['Bonus'] ?? '0');
+
+        double newWallet = currentWallet + 20;
+        double newBonus = currentBonus + 20;
+
+        await _usersCollection.doc(referrerId).update({
+          'Wallet': newWallet.toStringAsFixed(2),
+          'Bonus': newBonus.toStringAsFixed(2),
+        });
+
+        await _usersCollection.doc(referrerId).collection('transactions').add({
+          'amount': 20,
+          'bonus': 20,
+          'type': 'Credit',
+          'date': DateTime.now(),
+          'remarks': 'Referral bonus'
+        });
+      }
+    } catch (e) {
+      print('Error adding referral bonus: $e');
+    }
+  }
+
   void _showAmountDialog(String userId) {
     showDialog(
       context: context,
+      barrierDismissible:
+          false, // Prevent dismissing the dialog by tapping outside
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Modify Wallet Balance'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _amountController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: 'Enter amount',
-                ),
+        bool isLoading = false;
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text('Modify Wallet Balance'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _amountController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: 'Enter amount',
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: _bonusController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: 'Enter bonus amount',
+                    ),
+                  ),
+                  TextField(
+                    controller: _remarkcontroller,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      hintText: 'Enter remarks',
+                    ),
+                  ),
+                  if (isLoading)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                ],
               ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _bonusController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: 'Enter bonus amount',
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Add'),
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          final amount = _amountController.text;
+                          final bonus = _bonusController.text;
+                          final remark = _remarkcontroller.text;
+                          if (amount.isNotEmpty && bonus.isNotEmpty) {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            await _updateWalletBalance(
+                                userId, amount, bonus, true, remark);
+                            setState(() {
+                              isLoading = false;
+                            });
+                            Navigator.of(context).pop();
+                            _amountController.clear();
+                            _bonusController.clear();
+                            _remarkcontroller.clear();
+                            _reloadData();
+                          }
+                        },
                 ),
-              ),
-              TextField(
-                controller: _remarkcontroller,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  hintText: 'Enter remarks',
+                TextButton(
+                  child: Text('Close'),
+                  onPressed:
+                      isLoading ? null : () => Navigator.of(context).pop(),
                 ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Add'),
-              onPressed: () {
-                final amount = _amountController.text;
-                final bonus = _bonusController.text;
-                final remark = _remarkcontroller.text;
-                if (amount.isNotEmpty && bonus.isNotEmpty) {
-                  _updateWalletBalance(userId, amount, bonus, true, remark);
-                  Navigator.of(context).pop();
-                  _amountController.clear();
-                  _bonusController.clear();
-                  _remarkcontroller.clear();
-                }
-              },
-            ),
-            // TextButton(
-            //   child: Text('Remove'),
-            //   onPressed: () {
-            //     final amount = _amountController.text;
-            //     final bonus = _bonusController.text;
-            //     if (amount.isNotEmpty && bonus.isNotEmpty) {
-            //       _updateWalletBalance(userId, amount, bonus, false);
-            //       Navigator.of(context).pop();
-            //       _amountController.clear();
-            //       _bonusController.clear();
-            //     }
-            //   },
-            // ),
-            TextButton(
-              child: Text('Close'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
+              ],
+            );
+          },
         );
       },
     );
   }
 
+  void _reloadData() {
+    setState(() {
+      _users.clear();
+      _lastDocument = null;
+      _hasMoreData = true;
+    });
+    _fetchData();
+  }
+
   void _startSearch() {
     setState(() {
       _isSearching = true;
+      _users.clear();
+      _lastDocument = null;
+      _hasMoreData = true;
+      _fetchData();
     });
   }
 
@@ -159,6 +271,10 @@ class _AddMoneyState extends State<AddMoney> {
       _isSearching = false;
       _searchQuery = '';
       _searchController.clear();
+      _users.clear();
+      _lastDocument = null;
+      _hasMoreData = true;
+      _fetchData();
     });
   }
 
@@ -175,6 +291,10 @@ class _AddMoneyState extends State<AddMoney> {
       onChanged: (value) {
         setState(() {
           _searchQuery = value.toLowerCase();
+          _users.clear();
+          _lastDocument = null;
+          _hasMoreData = true;
+          _fetchData();
         });
       },
     );
@@ -218,95 +338,100 @@ class _AddMoneyState extends State<AddMoney> {
         title: _isSearching ? _buildSearchField() : Text('Users'),
         actions: _buildActions(),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _usersCollection.snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+      body: ListView.builder(
+        itemCount: _users.length + (_hasMoreData ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index == _users.length) {
+            if (!_isLoading) {
+              _fetchData();
+            }
+            return Center(child: CircularProgressIndicator());
           }
 
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+          final user = _users[index].data() as Map<String, dynamic>?;
+          final userId = _users[index].id;
+
+          // Only show users that match the search query
+          final userEmail = user?['Email'] as String? ?? '';
+          final userName = user?['Name'] as String? ?? '';
+          if (_searchQuery.isNotEmpty &&
+              !userEmail.toLowerCase().contains(_searchQuery) &&
+              !userName.toLowerCase().contains(_searchQuery)) {
+            return SizedBox.shrink();
           }
 
-          final users = snapshot.data!.docs;
-          final filteredUsers = users.where((doc) {
-            final userData = doc.data() as Map<String, dynamic>?;
-            final userEmail = userData?['Email'] as String? ?? '';
-            final userName = userData?['Name'] as String? ?? '';
-            return userEmail.toLowerCase().contains(_searchQuery) ||
-                userName.toLowerCase().contains(_searchQuery);
-          }).toList();
-
-          return ListView.builder(
-            itemCount: filteredUsers.length,
-            itemBuilder: (context, index) {
-              final user = filteredUsers[index].data() as Map<String, dynamic>?;
-              final userId = filteredUsers[index].id;
-
-              return Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user?['Name'] ?? 'Unknown',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Email: ${user?['Email'] ?? 'N/A'}',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          user?['Name'] ?? 'Unknown',
+                          'Wallet Balance: ₹${user?['Wallet'] ?? '0'}',
                           style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.green,
                           ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Email: ${user?['Email'] ?? 'N/A'}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Wallet Balance: ₹${user?['Wallet'] ?? '0'}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: height * 0.02,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton(
-                              child: Text('Modify Balance'),
-                              onPressed: () => _showAmountDialog(userId),
-                              style: ElevatedButton.styleFrom(
-                                //primary: Colors.blue,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
-                  ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Bonus Balance: ₹${user?['Bonus'] ?? '0'}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          child: Text('Modify Balance'),
+                          onPressed: () => _showAmountDialog(userId),
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              );
-            },
+              ),
+            ),
           );
         },
       ),
@@ -317,6 +442,8 @@ class _AddMoneyState extends State<AddMoney> {
   void dispose() {
     _amountController.dispose();
     _searchController.dispose();
+    _bonusController.dispose();
+    _remarkcontroller.dispose();
     super.dispose();
   }
 }
